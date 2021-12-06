@@ -1,5 +1,6 @@
 # Colas: advent-of-code-my-solutions
 These are my solutions for the advent-of-code puzzles.
+The code is reasonably commented, and the top README in each directory details the tricks/tweaks/hacks I used.
 
 Available for now:
 - [bash/2021](bash/2021)

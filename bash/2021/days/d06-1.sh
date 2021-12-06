@@ -9,7 +9,7 @@ steps="${2:-80}"                # 2nd argument is the number of steps (def, 80)
 
 : COMMENT <<ENDCOMMENT
 We will not actually build the generation table. We will just maintain an array
-counting the nyumber of newborns during a day, that the generation of
+counting the number of newborns during a day, that the generation of
 fish_timers will update when completing virtually a timeline of a fish
 
 When we add a newborn fish, we virtually unroll its timer, but just increment
@@ -26,7 +26,7 @@ We then have make the algorithm linear and no more exponential
 
 ENDCOMMENT
 
-initial_fishes=$(tr ',' ' ' <"$in")
+initial_fishes=$(tr ',' ' ' <"$in") # list of fish timers at day 0
 declare -a born                 # array of number of newborns per day
 for ((i=0; i<steps; i++)); do born[i]=0; done
 
@@ -55,4 +55,4 @@ while (( day < steps)); do
     fish_timers 8 "$newborns"
 done
 
-echo "$((fishes))"   # last generation was not processed above
+echo "$((fishes))"
