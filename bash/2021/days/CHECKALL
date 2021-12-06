@@ -1,0 +1,5 @@
+#!/bin/bash
+for i in d*.sh; do
+    bash -n "$i"
+    shellcheck -f gcc "$i"
+done

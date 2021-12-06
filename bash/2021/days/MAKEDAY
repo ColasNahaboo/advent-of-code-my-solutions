@@ -1,0 +1,27 @@
+#!/bin/bash
+# Usage: MAKEDAY N
+# creates the set of files for day N
+n="$1"
+[[ $n =~ ^[[:digit:]]+$ ]] || { echo "Usage: MAKEDAY N"; exit 1;}
+[[ ${#n} == 1 ]] && n="0$n"
+
+name="d$n"
+year="${PWD##*/}"               # The current dir name must be the year
+
+for i in 1 2; do
+    cat >"$name-$i.sh" <<EOF
+#!/bin/bash
+# https://adventofcode.com/$year/day/${n#0} puzzle #$i
+# See README.md
+in="\${1:-\${0%-[0-9].*}.input}"; [[ -e \$in ]] || exit 1
+err(){ echo "***ERROR: \$*" >&2; exit 1;}
+tmp=tmp.\$\$; clean(){ rm -f "\$tmp" "\$tmp".*;}; trap clean 0
+
+EOF
+
+    chmod a+x "$name-$i.sh"
+done
+>"$name.example"
+>"$name.input"
+   
+echo "Generated $name-1.sh $name-2.sh $name.example $name.input"
