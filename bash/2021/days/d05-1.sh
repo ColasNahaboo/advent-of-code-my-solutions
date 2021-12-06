@@ -13,12 +13,12 @@ tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
 while read -r ax ay arrow bx by; do
     : "$arrow"                  # keep shellcheck happy
-    if [[ $ax == $bx ]]; then   # vertical line
+    if (( ax == bx )); then   # vertical line
         if (( ay < by )); then min="$ay"; max="$by"
         else min="$by"; max="$ay"
         fi
         for ((y=min; y <= max; y++)); do echo "$ax,$y"; done
-    elif [[ $ay == $by ]]; then   # horizontal line
+    elif (( ay == by )); then   # horizontal line
         if (( ax < bx )); then min="$ax"; max="$bx"
         else min="$bx"; max="$ax"
         fi

@@ -16,7 +16,7 @@ next=(6 0 1 2 3 4 5 6 7)
 # advance once the existing fishes (olds) create the newborns (news)
 # modifies in place the global space-separated list "fishes"
 nextgen(){
-    local olds= news=
+    local olds='' news=''
     for f in $fishes; do
         olds="$olds ${next[f]}"
         [[ $f == 0 ]] && news="$news 8"

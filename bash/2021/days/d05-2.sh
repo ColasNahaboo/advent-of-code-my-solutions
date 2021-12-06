@@ -13,12 +13,12 @@ tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
 while read -r ax ay arrow bx by; do
     : "$arrow"                  # keep shellcheck happy
-    if [[ $ax == $bx ]]; then   # vertical line
+    if (( ax == bx )); then   # vertical line
         if (( ay < by )); then min="$ay"; max="$by"
         else min="$by"; max="$ay"
         fi
         for ((y=min; y <= max; y++)); do echo "$ax,$y"; done
-    elif [[ $ay == $by ]]; then   # horizontal line
+    elif (( ay == by )); then   # horizontal line
         if (( ax < bx )); then min="$ax"; max="$bx"
         else min="$bx"; max="$ax"
         fi
@@ -27,13 +27,13 @@ while read -r ax ay arrow bx by; do
         # We square as a cheap way to get the absolute value of the differences
         dx=$(( (ax - bx) ** 2 ))
         dy=$(( (ay - by) ** 2 ))
-        if [[ $dx == $dy ]]; then # same ==> 45 degrees line
+        if (( dx == dy )); then # same ==> 45 degrees line
             ((ax < bx)) && dx=1 || dx=-1
             ((ay < by)) && dy=1 || dy=-1
             x="$ax"; y="$ay"
             while true; do
                 echo "$x,$y"
-                [[ $x == $bx ]] && break
+                (( x == bx )) && break
                 (( x += dx ))
                 (( y += dy ))
             done

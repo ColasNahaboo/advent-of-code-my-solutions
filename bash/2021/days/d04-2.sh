@@ -20,6 +20,7 @@ readboard(){
     local row                   # array of values in the row
     local col                   # array of columns, space-separated values
     local r c value             # current row and col index, and the value
+    # shellcheck disable=SC2034 # we do not use the empty var
     read -r empty || return 1   # error on EOF
     for ((c=0; c<cols; c++)); do col[c]=' '; done
     # first, copy the rows into the file
@@ -80,7 +81,8 @@ for draw in $draws; do
         exit 0
     else
         # remove the winners, they are not the last ones, and continue
-        rm -f $(cat $tmp.winners)
+        # shellcheck disable=SC2046 # the filenames there are safe, don't worry
+        rm -f $(cat "$tmp.winners")
     fi
 done
 

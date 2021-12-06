@@ -15,6 +15,7 @@ Although I invented, designed and implemented a commercial programming language 
 - So running all the codes can be done by: `for i in d*.sh; do ./$i; done` (or via `EXECALL`)
 - There is nearly no error checking, to keep the code small and readable.
   We only check for non-obvious errors.
+- Alternate solutions are sometime left for reference in files `dNN-otherM.sh`, e.g: `d06-other2.sh`
 
 **Notes:**
 - These scripts need bash version 4.4+, and GNU linux utilities, so they will not run on non-GNU unix systems such as vanilla MacOS or FreeBSD.
