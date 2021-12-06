@@ -79,14 +79,13 @@ The code is generic and has variables to adjust the size of boards.
 > For each board, figure out what time it wins at. By building a map of called number -> time it's called, you can determine this very quickly. For each board, take maximum across each row/column, take minimum of those maxima.
 
 ## Day 5
-Creating a (huge) 2-dimensional aray and plotting the  lines in it would be too slow in bash, so we just list the lines points one by one, each on a line in a sequential file. The points that are thus parts of more than one line are simply the coordinates that appears multiple times in the file! So a simple classic `sort|uniq -d` can find them quickly. This is a huge gain in efficiency, both in time and spacem, for data with few lines sparse in a big space as the input files are.
+Creating a (huge) 2-dimensional aray and plotting the  lines in it would be too slow in bash, so we just list the lines points one by one, each on a line in a sequential file. The points that are thus parts of more than one line are simply the coordinates that appears multiple times in the file! So a simple classic `sort|uniq -d` can find them quickly. This is a huge gain in efficiency, both in time and space, for data with few lines sparse in a big space as the input files are.
 
 ## Day 6
 There is no way we can solve this problem with an exponential algorithm, especially with the 256 number of steps of the second exercise. So we use a linear approach where we do not actually generate a representation of individual fishes, but just keep track of the number of newborns that will be born each day in the future. When we add a fish, either at the start or because it is born on the day, we just increment the count of future newborns at the days its timer will reach zero.
 
 We can then just iterate on the days and add the its newborn fishes this way. details in the comments of `d06-1.sh`.
 
-I have kept some attempts that were correct but too slow for reference:
+I have kept some attempts that were correct but too slow for reference. They provided quickly some prototypes, unusable for the "production" use of tackling the 256 steps in reasonable time, but simple enough to give correct answers to test the validity of the final solution.
 - `d06-other1.sh` the straightforward version implementin naively the explanations.
 - `d06-other2.sh` a version trying to capitalize on the speed of grep with a full representation of the fishes in a file, but inverted.
-These attempts were useful as it allowed me an agild coding. I could have quickly some prototypes, unusable for the "production" use of tackling the 256 steps in reasonable time, but simple enough to give correct answers to test the validity of the final solution.
