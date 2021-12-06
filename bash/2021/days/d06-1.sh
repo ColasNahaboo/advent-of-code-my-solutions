@@ -19,7 +19,7 @@ born where zeros would have been:
              <timer->|      |
 =====================+======+====== born[]
 
-Also, we increment by the number of newborns on this day, no new to process
+Also, we increment by the number of newborns on this day, no need to process
 them individually.
 
 We then have make the algorithm linear and no more exponential
@@ -30,7 +30,7 @@ initial_fishes=$(tr ',' ' ' <"$in") # list of fish timers at day 0
 declare -a born                 # array of number of newborns per day
 for ((i=0; i<steps; i++)); do born[i]=0; done
 
-# for a fish (line), complete its timers until step, but only update born[]
+# for a fish (column), complete its timers until steps, but only update born[]
 # globals: day steps fishes
 fish_timers(){
     local timer="$1"
@@ -48,7 +48,7 @@ day=0                           # current day
 fishes=0                        # total number of fishes on this day
 for timer in $initial_fishes; do fish_timers "$timer"; done
 
-# then for each day, add newborns of the day as new lines: "0" in column "day"
+# then for each day (row), add newborns of the day as new lines
 while (( day < steps)); do
     newborns="${born[day]}"
     (( ++day ))
