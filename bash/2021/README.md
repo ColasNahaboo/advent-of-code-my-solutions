@@ -24,7 +24,7 @@ Although I invented, designed and implemented a commercial programming language 
 - When temporary files are used, they are cleaned with a clean function called on any exit with trap 0
 - If we detect errors, they are listed on stderr, with the function `err`
 - To generate files for test number `N`: `MAKEDAY N`
-- Simple regression tests embedded in the scripts with the comments `#TEST: input-name expected-value` can be run with the command [days/TEST]. Usage by `./TEST`.
+- Simple regression tests embedded in the scripts with the comments `#TEST: input-name expected-value` can be run with the command [TEST](days/TEST). Usage by `./TEST`.
 
 **Style:**
 - We use `(( ... ))` and `[[ ... ]]` rather than let and `[ ... ]`
