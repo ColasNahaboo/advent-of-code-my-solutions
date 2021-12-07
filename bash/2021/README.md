@@ -47,8 +47,8 @@ Use temporary files `$tmp` or any prefixed by `$tmp.` and delete them on any exi
 Optional regression tests via `#TEST: input-name expected-value` comments
 
 ## Commands used
-- The classic ones: `grep`, `sed`, `sort`, `uniq`
-  Note that the perl-compatible `grep -oP` is only in GNU grep, and very useful in bash scripts.
+- The classic ones: `grep`, `sed`, `sort`, `uniq`, `tr`
+  Note that the perl-compatible `grep -oP` is only available in GNU grep, and is very useful in bash scripts.
 - `rev` reverses the parameters: `echo a1 b2 c3 | rev` prints `3b 2c 1a`
 
 ## More info

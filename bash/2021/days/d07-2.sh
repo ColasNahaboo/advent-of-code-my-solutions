@@ -2,8 +2,7 @@
 # https://adventofcode.com/days/day/7 puzzle #2
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
-err(){ echo "***ERROR: $*" >&2; exit 1;}
-tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
+
 #TEST: example 168
 #TEST: input 92676646
 
@@ -11,9 +10,9 @@ tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 # the only optimization is to precompute the fuel costs for each possible move
 # Runs fast enough in 7s
 
-# all positions, one per line, in increasing order
-crabs="$(tr ',' '\n' <"$in")"
-numof_crabs=$(tr ',' '\n' <"$in" |wc -l)
+# array of positions of each crab
+read -r -a crabs < <(tr ',' ' ' <"$in")
+# compute the range of possible positions, min&max of the occupied ones
 positions="$(tr ',' '\n' <"$in" |sort -n |uniq)"
 minpos=$(echo "$positions" | head -1)
 maxpos=$(echo "$positions" | tail -1)
@@ -23,13 +22,13 @@ for ((steps=1; steps <= (maxpos - minpos); steps++)); do
     ((cost[steps] = cost[steps-1] + steps))
 done
 
-# start with valid, but non-optimal values
+# iterate by computing fuel costs for all possible positions
 optimalpos="$minpos"
-optimalfuel=$((2 ** 62))        # MAXINT
+optimalfuel=$(( cost[maxpos - minpos] * ${#crabs[@]} ))
 
 for ((pos=minpos; pos <= maxpos; pos++)); do
     fuel=0
-    for crab in $crabs; do
+    for crab in "${crabs[@]}"; do
         ((crab >= pos)) && ((move = crab - pos)) || ((move = pos - crab))
         ((fuel += cost[move]))
     done
