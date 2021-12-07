@@ -1,5 +1,6 @@
 #!/bin/bash
-for i in d*.sh; do
-    bash -n "$i"
-    shellcheck -f gcc "$i"
-done
+# check for syntax and style all bash script in this directory
+# terse output usable under emacs compile mode
+while read -r file; do
+    bash -n "$file" && shellcheck -f gcc "$file"
+done < <(grep -l '^#!/bin/bash$' -- *)

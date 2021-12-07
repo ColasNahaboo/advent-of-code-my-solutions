@@ -29,6 +29,7 @@ optimalfuel=$(( cost[maxpos - minpos] * ${#crabs[@]} ))
 for ((pos=minpos; pos <= maxpos; pos++)); do
     fuel=0
     for crab in "${crabs[@]}"; do
+        # shellcheck disable=SC2015 # B is always true in this (A && B && C)
         ((crab >= pos)) && ((move = crab - pos)) || ((move = pos - crab))
         ((fuel += cost[move]))
     done
