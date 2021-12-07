@@ -5,7 +5,7 @@ in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
-steps="${2:-80}"                # 2nd argument is the number of steps (def, 80)
+days="${2:-80}"                # 2nd argument is the number of days (def, 80)
 
 : COMMENT <<ENDCOMMENT
 We will not actually build the generation table. We will just maintain an array
@@ -28,16 +28,16 @@ ENDCOMMENT
 
 initial_fishes=$(tr ',' ' ' <"$in") # list of fish timers at day 0
 declare -a born                 # array of number of newborns per day
-for ((i=0; i<steps; i++)); do born[i]=0; done
+for ((i=0; i<days; i++)); do born[i]=0; done
 
-# for a fish (column), complete its timers until steps, but only update born[]
-# globals: day steps fishes
+# for a fish (column), complete its timers until days, but only update born[]
+# globals: day days fishes
 fish_timers(){
     local timer="$1"
     local n="${2:-1}"           # number of newborns to add
     local i
     [[ $n == 0 ]] && return
-    for ((i = timer + day; i < steps; i += 7)); do
+    for ((i = timer + day; i < days; i += 7)); do
         (( born[i] += n ))
     done
     (( fishes += n ))
@@ -49,7 +49,7 @@ fishes=0                        # total number of fishes on this day
 for timer in $initial_fishes; do fish_timers "$timer"; done
 
 # then for each day (row), add newborns of the day as new lines
-while (( day < steps)); do
+while (( day < days)); do
     newborns="${born[day]}"
     (( ++day ))
     fish_timers 8 "$newborns"
