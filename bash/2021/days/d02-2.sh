@@ -1,6 +1,6 @@
 #!/bin/bash
 # https://adventofcode.com/2021/day/2 puzzle #2
-# See README.md
+# See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 
 # Brute force. Ignore invalid lines.

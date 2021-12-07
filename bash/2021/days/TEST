@@ -1,0 +1,83 @@
+#!/bin/bash
+USAGE='TEST scripts...
+Runs the test on a solution (script name or number), or on all tests
+for the argument ALL.
+To define a test, in a script put comments like:
+  #TEST: name value
+This program will then run the script for each #TEST: line, with script.name
+as argument, expecting value as the last line of output (so the script can
+print extra info before)
+Nothing is printed in case of success.
+Comments can be added at the end of line, like:
+  #TEST: mini 17 # the simplest value, runs with dNN.mini
+  #TEST: huge 51275276 # stress test with dNN.huge
+E.g:
+in a file d06-2.sh, the line "#TEST: input 365131" means that calling
+"./TEST d06-2.sh" (or "./TEST 6") will run "d06-2.sh d06.input" and expect
+that the last line of output will be 365131
+Note: adding a comment #TEST_EXCLUDED: prevents the script to be run with ALL
+
+Options:
+  -v    verbose, prints what tests are being done
+'
+
+#TEST_EXCLUDED:
+
+[[ -z $1 ]] && { echo "USAGE: $USAGE"; exit 1;}
+nl=$'\n'
+shopt -s nullglob
+verbose=false
+V(){ "$verbose" && echo "$*";}
+
+# runs all the tests of a script. Returns the number of failed tests
+runtest(){
+    local script="$1"
+    grep -q '^[[:space:]]*#TEST_EXCLUDED:' "$script" && return 0
+    local name value result fails=0 radix="$script"
+    [[ $script =~ ^(.*)-[0-9][.]sh$ ]] && radix="${BASH_REMATCH[1]}"
+    V "Running tests in $script"
+    while read -r name value; do
+        V "  TEST $radix.$name"
+        result=$(./"$script" "$radix.$name" | tail -1)
+        if [[ $result != "$value" ]]; then
+            echo "***TEST ERROR: $script $radix.$name: found \"$result\", expecting \"$value\""
+            (( fails++ ))
+        else
+            V "       OK"
+        fi
+    done < <(grep -oP '^[[:space:]]*#TEST:[[:space:]]*\K[^#]+' "$script")
+    return "$fails"
+}        
+
+errors=0
+for arg in "$@"; do
+    if [[ $arg == '-v' ]]; then
+        verbose=true
+    elif [[ $arg =~ ^- ]]; then   # any option ==> usage
+        echo "USAGE: $USAGE"; exit 1
+    elif [[ $arg == ALL ]]; then # run all tests found in d*.sh files
+        # shellcheck disable=SC2013
+        for script in $(grep -l '^[[:space:]]*#TEST:' d*.sh); do
+            runtest "$script"
+            (( errors += $? ))
+        done
+    elif [[ $arg =~ ^[[:digit:]]+$ ]]; then # run all the tests of the day
+        [[ $arg =~ ^[[:digit:]]$ ]] && n="0$arg" || n="$arg"
+        # shellcheck disable=SC2231
+        for script in d${n}-*.sh; do
+            runtest "$script"
+            (( errors += $? ))
+        done
+        
+    elif [[ -e $arg ]]; then    # run tests for a single script
+        runtest "$arg"
+        (( errors += $? ))
+    else
+        echo "***ERROR: Script not found: $arg.${nl}${nl}USAGE=$USAGE"
+        exit 1
+    fi
+done
+
+[[ $errors != 0 ]] && echo "$errors Tests failed!"
+exit "$errors"
+        

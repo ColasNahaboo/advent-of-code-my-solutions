@@ -1,6 +1,6 @@
 #!/bin/bash
 # https://adventofcode.com/2021/day/1 puzzle #2
-# See README.md
+# See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 

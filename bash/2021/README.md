@@ -7,7 +7,7 @@ I tried to implement "smart" bash solutions (see at the end, "Algorithmic tricks
 Although I invented, designed and implemented a commercial programming language (The SML - System Management Language - in the Bull ISM Network Management platform), and worked professionnally with "real" languages I grew in love with bash because the intellectual challenges it poses to write efficient code, making mundane tasks exciting, and that it (nearly) never breaks backwards compatibility, a code that runs now wioll run in 20 years and more... And since I retired in 2021 I now have time to play with things, and discovered the "Advent of code" challenge.
 
 **Usage:**
-- Everything is in the `days/` subdirectory, with no subdirectories. All files are in this directory, no subdirs. I hate navigating a maze of small directories, all alike.
+- Everything below is in the `days/` subdirectory, with no subdirectories. All files are in this directory, no subdirs. I hate navigating a maze of small directories, all alike.
 - Day `NN` solutions are scripts `dNN-1.sh` and `dNN-2.sh` for problem 1 and 2. E.g. `d05-2.sh`
 - Run them without input data file as argument (defaults to `dNN.input`). E.g. `d14.input`
 - Input data is in `dNN.input`. Note that the data may be different for different accounts on the web site.
@@ -24,6 +24,7 @@ Although I invented, designed and implemented a commercial programming language 
 - When temporary files are used, they are cleaned with a clean function called on any exit with trap 0
 - If we detect errors, they are listed on stderr, with the function `err`
 - To generate files for test number `N`: `MAKEDAY N`
+- Simple regression tests embedded in the scripts with the comments `#TEST: input-name expected-value` can be run with the command `TEST`. Usage by `./TEST`.
 
 **Style:**
 - We use `(( ... ))` and `[[ ... ]]` rather than let and `[ ... ]`

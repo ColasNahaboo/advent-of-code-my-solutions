@@ -1,9 +1,11 @@
 #!/bin/bash
 # https://adventofcode.com/days/day/6 puzzle #1
-# See README.md
+# See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
+#TEST: input 365131
+#TEST: example 5934
 
 days="${2:-80}"                # 2nd argument is the number of days (def, 80)
 

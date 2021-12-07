@@ -1,6 +1,6 @@
 #!/bin/bash
 # https://adventofcode.com/2021/day/3 puzzle #2
-# See README.md
+# See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 
 err(){ echo "***ERROR: $*" >&2; exit 1;}
