@@ -1,13 +1,16 @@
 #!/bin/bash
-USAGE='TEST scripts...
+# a simple regression test framework for my bash advent-of-code solutions
+USAGE='TEST [-v] scripts...
 Runs the test on a solution (script name or number), or on all tests
 for the argument ALL.
 To define a test, in a script put comments like:
-  #TEST: name value
-This program will then run the script for each #TEST: line, with script.name
-as argument, expecting value as the last line of output (so the script can
-print extra info before)
-Nothing is printed in case of success.
+  #TEST: input-name expected-value
+This program will then run the script for each #TEST: line, with
+script.input-name as argument, expecting expected-value (a number) as the last
+line of output (so the script can print extra info before)
+Nothing is printed in case of success, unless -v is used.
+Lines starting with #TEST: but not in the proper syntax are ignored, e.g. with
+a missing or non-numeric value.
 Comments can be added at the end of line, like:
   #TEST: mini 17 # the simplest value, runs with dNN.mini
   #TEST: huge 51275276 # stress test with dNN.huge
@@ -18,7 +21,7 @@ that the last line of output will be 365131
 Note: adding a comment #TEST_EXCLUDED: prevents the script to be run with ALL
 
 Options:
-  -v    verbose, prints what tests are being done
+  -v    verbose, prints what tests are being done after it
 '
 
 #TEST_EXCLUDED:
@@ -45,7 +48,7 @@ runtest(){
         else
             V "       OK"
         fi
-    done < <(grep -oP '^[[:space:]]*#TEST:[[:space:]]*\K[^#]+' "$script")
+    done < <(grep -oP '^[[:space:]]*#TEST:[[:space:]]*\K[-_[:alnum:]]+[[:space:]]+[[:digit:]]+' "$script")
     return "$fails"
 }        
 

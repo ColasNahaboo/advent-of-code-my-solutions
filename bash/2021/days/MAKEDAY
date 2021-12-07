@@ -16,12 +16,14 @@ for i in 1 2; do
 in="\${1:-\${0%-[0-9].*}.input}"; [[ -e \$in ]] || exit 1
 err(){ echo "***ERROR: \$*" >&2; exit 1;}
 tmp=tmp.\$\$; clean(){ rm -f "\$tmp" "\$tmp".*;}; trap clean 0
+#TEST: example 
+#TEST: input 
 
 EOF
 
     chmod a+x "$name-$i.sh"
 done
->"$name.example"
->"$name.input"
+: >"$name.example"
+: >"$name.input"
    
 echo "Generated $name-1.sh $name-2.sh $name.example $name.input"
