@@ -4,7 +4,7 @@ See https://adventofcode.com/2021
 
 I tried to implement "smart" bash solutions (see at the end, "Algorithmic tricks"), that rely on fast GNU/Linux utilities like grep, sed, sort... (the way I use bash in real life), but most of the time my goal was readability and compliance with shellcheck, not terseness or efficiency. I am an old (retired) proficient bash programmer, so my goal here is not to learn bash, but rather un-learn some bad dirty habits accumulated over the years and force myself to code in a "shellcheck-friendly" modern way.
 
-Although I invented, designed and implemented a commercial programming language (The SML - System Management Language - in the Bull ISM Network Management platform), and worked professionnally with "real" languages I grew in love with bash because the intellectual challenges it poses to write efficient code, making mundane tasks exciting, and that it (nearly) never breaks backwards compatibility, a code that runs now wioll run in 20 years and more... And since I retired in 2021 I now have time to play with things, and discovered the "Advent of code" challenge.
+Although I invented, designed and implemented a commercial programming language (The SML - System Management Language - in the Bull ISM Network Management platform), and worked professionnally with "real" languages, I grew in love with bash because the intellectual challenges it poses to write efficient code, making mundane tasks exciting, and that it (nearly) never breaks backwards compatibility, a code that runs now will still run in 20 years and more... And since I retired in 2021 I now have time to play with things, and discovered the "Advent of code" challenge.
 
 **Usage:**
 - Everything below is in the `days/` subdirectory, with no subdirectories. All files are in this directory, no subdirs. I hate navigating a maze of small directories, all alike.
@@ -24,7 +24,7 @@ Although I invented, designed and implemented a commercial programming language 
 - When temporary files are used, they are cleaned with a clean function called on any exit with trap 0
 - If we detect errors, they are listed on stderr, with the function `err`
 - To generate files for test number `N`: `MAKEDAY N`
-- Simple regression tests embedded in the scripts with the comments `#TEST: input-name expected-value` can be run with the command `TEST`. Usage by `./TEST`.
+- Simple regression tests embedded in the scripts with the comments `#TEST: input-name expected-value` can be run with the command [days/TEST]. Usage by `./TEST`.
 
 **Style:**
 - We use `(( ... ))` and `[[ ... ]]` rather than let and `[ ... ]`
