@@ -10,13 +10,13 @@ tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
 max=0                           # debug: max number of lines to process
 
-# we are going to cheat: the input always includes one word with 2, 3, 4, and 7
-# chars and three words with 5 and 6 chars (tested with "process_test" below)
-# so we are going to use a special case algorithm for this:
-# we first identify digits 1 and 4 since the only ones with 2 and 4 chars
-# we also identify 7 and 8 this way
-# and to differentiate the 5 and 6 chars, we compare the signature of their
+# We suppose the input always includes all digits, that means:
+# one word with 2, 3, 4, and 7 chars and three words with 5 and 6 chars.
+# We then first identify digits 1 and 4 since the only ones with 2 and 4 chars,
+# we also identify the unique 7 and 8 this way.
+# And to differentiate the 5 and 6 chars, we compare the signature of their
 # intersections with 1 and 4, which allows to differentiate them
+# In bash, the characters in s1 that are not in s2 are: ${s1//[$s2]/}
 
 # we preprocess the input, yielding a word length and a word per line, in order
 prepro(){

@@ -94,3 +94,9 @@ I have kept some attempts that were correct but too slow for reference. They pro
 - `d06-other2.sh` a version trying to capitalize on the speed of grep with a full representation of the fishes in a file, but inverted.
 
 *Also:* Most people on reddit used a similar approach of only having a set of counters, but instead of having one count per day like me, they just keep for all the timer values (0 to 8) the count of how many fishes have this timer. And they "rotate the bins" each day. See the [solutions megathread for day 6](https://www.reddit.com/r/adventofcode/comments/r9z49j/2021_day_6_solutions/)
+
+## Day 8
+The second part was quite tricky.
+The trick was to detect the four digits 2 4 7 8 that have unique "word" lengths, and then distinguish the digits with lengths 5 and 6 by their intersections with (number of characters not in) the 2 and 4 digits.
+
+*Also:* I didnt realise that the part before the left bar consisted of **exactly** the 10 digits. With this insight, "mnufat17" designed this [nice solution](https://www.reddit.com/r/adventofcode/comments/rc5s3z/2021_day_8_part_2_a_simple_fast_and_deterministic/). My solution worked for a variable number of inputs, and is the same as the first comment on the above post by "bunceandbean".
