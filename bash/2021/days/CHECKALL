@@ -1,6 +1,6 @@
 #!/bin/bash
-# check for syntax and style all bash script in this directory
+# check for syntax and style all bash scripts in this directory
 # terse output usable under emacs compile mode
 while read -r file; do
     bash -n "$file" && shellcheck -f gcc "$file"
-done < <(grep -l '^#!/bin/bash$' -- *)
+done < <(grep -rElm1 '^#!/(bin/|usr/bin/env )bash$' .)
