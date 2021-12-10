@@ -4,7 +4,6 @@
 
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 export TIMEFORMAT='%3R'
-bar='#########################################################################'
 barunit=10                     # one "#" is 10 decimal log of time in ms
 
 echo "| test | time | bar graph of times (logarithmic) |"
@@ -18,10 +17,21 @@ bench(){
     [[ $ms =~ ^0+([[:digit:]]+)$ ]] && ms="${BASH_REMATCH[1]}"
     len=$(echo "l($ms)/l(10)*$barunit" | bc -l)
     len="${len%.*}"
-    barline="${bar:1:$len}"
+    barline=$(barline "$len" "$ms")
     echo "| ${script%%-*} | $time | $barline |"
 }
 
+barline(){
+    local len="$1" ms="$2" c i
+    if ((ms < 100)); then c='-'
+    elif ((ms < 500)); then c='~'
+    elif ((ms < 1000)); then c='+'
+    elif ((ms < 10000)); then c='='
+    else c='#'
+    fi
+    for ((i=0; i<len; i++)); do echo -n "$c"; done
+}
+         
 if [[ -z $1 ]]; then
     for script in d*-2.sh; do bench "$script"; done
 else

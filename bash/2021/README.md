@@ -66,19 +66,22 @@ These are the execution times in seconds of the second exercises of each day on 
 
 | test | time | bar graph of times (logarithmic) |
 | :--- | ---: | :---- |
-| d01 | 0.053 | ################# |
-| d02 | 0.008 | ######### |
-| d03 | 18.723 | ########################################## |
-| d04 | 50.497 | ############################################### |
-| d05 | 0.699 | ############################ |
-| d06 | 0.061 | ################# |
-| d07 | 7.641 | ###################################### |
-| d08 | 0.231 | ####################### |
-| d09 | 0.384 | ######################### |
-| d10 | 0.105 | #################### |
+| d01 | 0.055 | ----------------- |
+| d02 | 0.005 | ------ |
+| d03 | 17.128 | ########################################## |
+| d04 | 53.749 | ############################################### |
+| d05 | 0.710 | ++++++++++++++++++++++++++++ |
+| d06 | 0.055 | ----------------- |
+| d07 | 7.580 | ====================================== |
+| d08 | 0.277 | ~~~~~~~~~~~~~~~~~~~~~~~~ |
+| d09 | 0.382 | ~~~~~~~~~~~~~~~~~~~~~~~~~ |
+| d10 | 0.111 | ~~~~~~~~~~~~~~~~~~~~ |
+
 
 ## Algorithmic tricks
-For a lot of problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions (or seen some on the web labelled "Also:"). I have commented them in the scripts, but here they are, collected for reference:
+For some problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions to stay under a minute execution time, and if possible, a second. I have commented them in the scripts, but here they are, collected for reference.
+
+I Solve all the problems myself first, without looking for any hint, but afterwards, I often look for other interesting solutions on the web, that I list under the label "Also:".
 
 ### Day 3
 To split a binary number into an array `digits` of its bits, in reverse (little endian) order, I use: `rev < "$in" | sed -e 's/./\0 /g | read -a digits'`
