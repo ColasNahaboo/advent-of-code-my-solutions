@@ -3,7 +3,6 @@
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
-tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 #TEST: example-1 5353
 #TEST: example 61229
 #TEST: input 
@@ -44,6 +43,8 @@ prepro(){
 
 # we now unroll an ad-hoc algorithm for our special input
 # we set the global digit array to translate chars, and we use globals
+# Since we are so dependent on a well-formed input, I feeled compelled
+# to do extensive input error checking, hence all the extra "err" calls.
 build_digits_table(){
     local i len w2 w4 word delta
     read -r len word            # 2-chars word
