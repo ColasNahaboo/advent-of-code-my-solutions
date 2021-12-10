@@ -61,6 +61,22 @@ Optional regression tests via `#TEST: input-name expected-value` comments
 Author: (c)2021 Colas Nahaboo, https://colas.nahaboo.net
 License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_License).
 
+## Benchmarks
+These are the execution times in seconds of the second exercises of each day on their full inputs, done with the script `BENCHALL`.
+
+| test | time | graph |
+| :--- | ---: | :---- |
+| d01 | 0.053 | ################# |
+| d02 | 0.008 | ######### |
+| d03 | 18.723 | ########################################## |
+| d04 | 50.497 | ############################################### |
+| d05 | 0.699 | ############################ |
+| d06 | 0.061 | ################# |
+| d07 | 7.641 | ###################################### |
+| d08 | 0.231 | ####################### |
+| d09 | 0.384 | ######################### |
+| d10 | 0.105 | #################### |
+
 ## Algorithmic tricks
 For a lot of problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions (or seen some on the web labelled "Also:"). I have commented them in the scripts, but here they are, collected for reference:
 
@@ -81,10 +97,10 @@ The code is generic and has variables to adjust the size of boards.
 
 > For each board, figure out what time it wins at. By building a map of called number -> time it's called, you can determine this very quickly. For each board, take maximum across each row/column, take minimum of those maxima.
 
-## Day 5
+### Day 5
 Creating a (huge) 2-dimensional aray and plotting the  lines in it would be too slow in bash, so we just list the lines points one by one, each on a line in a sequential file. The points that are thus parts of more than one line are simply the coordinates that appears multiple times in the file! So a simple classic `sort|uniq -d` can find them quickly. This is a huge gain in efficiency, both in time and space, for data with few lines sparse in a big space as the input files are.
 
-## Day 6
+### Day 6
 There is no way we can solve this problem with an exponential algorithm, especially with the 256 number of steps of the second exercise. So we use a linear approach where we do not actually generate a representation of individual fishes, but just keep track of the number of newborns that will be born each day in the future. When we add a fish, either at the start or because it is born on the day, we just increment the count of future newborns at the days its timer will reach zero.
 
 We can then just iterate on the days and add the its newborn fishes this way. Details in the comments of `d06-1.sh`.
@@ -95,7 +111,7 @@ I have kept some attempts that were correct but too slow for reference. They pro
 
 *Also:* Most people on reddit used a similar approach of only having a set of counters, but instead of having one count per day like me, they just keep for all the timer values (0 to 8) the count of how many fishes have this timer. And they "rotate the bins" each day. See the [solutions megathread for day 6](https://www.reddit.com/r/adventofcode/comments/r9z49j/2021_day_6_solutions/)
 
-## Day 8
+### Day 8
 The second part was quite tricky.
 The trick was to detect the four digits 2 4 7 8 that have unique "word" lengths, and then distinguish the digits with lengths 5 and 6 by their intersections with (number of characters not in) the 2 and 4 digits.
 

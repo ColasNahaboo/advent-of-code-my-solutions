@@ -1,0 +1,29 @@
+#!/bin/bash
+# benchmarks all the *-2 tests with the full input
+# with numeric args, bench only these tests
+
+err(){ echo "***ERROR: $*" >&2; exit 1;}
+export TIMEFORMAT='%3R'
+bar='#########################################################################'
+barunit=10                     # one "#" is 10 decimal log of time in ms
+
+echo "| test | time | logarithmic visualisation |"
+echo "| :--- | ---: | :---- |"
+
+bench(){
+    local script="$1"
+    [[ -x $script ]] || err "Script not found: $script"
+    time=$(bash -c "time $script 1>/dev/null" 2>&1)
+    ms=${time//./}
+    [[ $ms =~ ^0+([[:digit:]]+)$ ]] && ms="${BASH_REMATCH[1]}"
+    len=$(echo "l($ms)/l(10)*$barunit" | bc -l)
+    len="${len%.*}"
+    barline="${bar:1:$len}"
+    echo "| ${script%%-*} | $time | $barline |"
+}
+
+if [[ -z $1 ]]; then
+    for script in d*-2.sh; do bench "$script"; done
+else
+    for n in "$@"; do [[ ${#n} == 1 ]] && n="0$n"; bench "d$n-2.sh"; done
+fi
