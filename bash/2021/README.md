@@ -64,7 +64,7 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 ## Benchmarks
 These are the execution times in seconds of the second exercises of each day on their full inputs, done with the script `BENCHALL`.
 
-| test | time | graph |
+| test | time | bar graph of times (logarithmic) |
 | :--- | ---: | :---- |
 | d01 | 0.053 | ################# |
 | d02 | 0.008 | ######### |

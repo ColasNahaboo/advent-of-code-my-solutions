@@ -7,7 +7,7 @@ export TIMEFORMAT='%3R'
 bar='#########################################################################'
 barunit=10                     # one "#" is 10 decimal log of time in ms
 
-echo "| test | time | logarithmic visualisation |"
+echo "| test | time | bar graph of times (logarithmic) |"
 echo "| :--- | ---: | :---- |"
 
 bench(){
