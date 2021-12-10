@@ -66,22 +66,22 @@ These are the execution times in seconds of the second exercises of each day on 
 
 | test | time | bar graph of times (logarithmic) |
 | :--- | ---: | :---- |
-| d01 | 0.055 | ----------------- |
+| d01 | 0.025 | ------------- |
 | d02 | 0.005 | ------ |
-| d03 | 17.128 | ########################################## |
-| d04 | 53.749 | ############################################### |
-| d05 | 0.710 | ++++++++++++++++++++++++++++ |
-| d06 | 0.055 | ----------------- |
-| d07 | 7.580 | ====================================== |
-| d08 | 0.277 | ~~~~~~~~~~~~~~~~~~~~~~~~ |
-| d09 | 0.382 | ~~~~~~~~~~~~~~~~~~~~~~~~~ |
-| d10 | 0.111 | ~~~~~~~~~~~~~~~~~~~~ |
+| d03 | 0.086 | ------------------- |
+| d04 | 6.543 | ====================================== |
+| d05 | 0.727 | ++++++++++++++++++++++++++++ |
+| d06 | 0.052 | ----------------- |
+| d07 | 7.717 | ====================================== |
+| d08 | 0.226 | ~~~~~~~~~~~~~~~~~~~~~~~ |
+| d09 | 0.395 | ~~~~~~~~~~~~~~~~~~~~~~~~~ |
+| d10 | 0.108 | ~~~~~~~~~~~~~~~~~~~~ |
 
 
 ## Algorithmic tricks
 For some problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions to stay under a minute execution time, and if possible, a second. I have commented them in the scripts, but here they are, collected for reference.
 
-I Solve all the problems myself first, without looking for any hint, but afterwards, I often look for other interesting solutions on the web, that I list under the label "Also:".
+I solve all the problems myself first, without looking for any hint, but afterwards, I often look for other interesting solutions on the web, that I list under the label "Also:".
 
 ### Day 3
 To split a binary number into an array `digits` of its bits, in reverse (little endian) order, I use: `rev < "$in" | sed -e 's/./\0 /g | read -a digits'`
@@ -113,6 +113,11 @@ I have kept some attempts that were correct but too slow for reference. They pro
 - `d06-other2.sh` a version trying to capitalize on the speed of grep with a full representation of the fishes in a file, but inverted.
 
 *Also:* Most people on reddit used a similar approach of only having a set of counters, but instead of having one count per day like me, they just keep for all the timer values (0 to 8) the count of how many fishes have this timer. And they "rotate the bins" each day. See the [solutions megathread for day 6](https://www.reddit.com/r/adventofcode/comments/r9z49j/2021_day_6_solutions/)
+
+### Day 7
+Nothing special, but:
+
+*Also:* "throwaway7824365346" has written a math paper on the problem: https://www.reddit.com/r/adventofcode/comments/rawxad/2021_day_7_part_2_i_wrote_a_paper_on_todays/
 
 ### Day 8
 The second part was quite tricky.

@@ -5,7 +5,7 @@ in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 #TEST: example-1 5353
 #TEST: example 61229
-#TEST: input 
+#TEST: input 1073431
 
 max=0                           # debug: max number of lines to process
 

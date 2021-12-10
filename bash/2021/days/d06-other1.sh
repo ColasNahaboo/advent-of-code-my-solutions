@@ -3,7 +3,7 @@
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
-tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
+export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
 # This is the naive version, but it is too slow to tackle the input
 # It took more than one hour for the 80 days

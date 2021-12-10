@@ -3,7 +3,7 @@
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
-tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
+export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
 steps="${2:-80}"                # 2nd argument is the number of steps (def, 80)
 

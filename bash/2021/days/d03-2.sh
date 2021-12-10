@@ -4,7 +4,7 @@
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 
 err(){ echo "***ERROR: $*" >&2; exit 1;}
-tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
+export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
 # Brute force script, so a bit slow, can take about 10 seconds.
 # pre-compute dimensions of the bit array in input
