@@ -17,7 +17,7 @@ levels_len=$((cols * rows))
 
 total=0                         # global: total number of flashes
 
-# performs a step. Updates "total"
+# performs a step. Stops when all octupuses flashed in it.
 # If an octopus flashes, it splashes +1 on neighbors, that can overload
 # and are then queued for next pass in "new"
 step(){
