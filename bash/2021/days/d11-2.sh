@@ -15,8 +15,6 @@ read -r -a levels < <(sed -r -e 's/./ \0/g' <"$in" | tr '\n' ' ')
 levels_len=$((cols * rows))
 [[ ${#levels[@]} != "$levels_len" ]] && err "input not a rectangle"
 
-total=0                         # global: total number of flashes
-
 # performs a step. Stops when all octupuses flashed in it.
 # If an octopus flashes, it splashes +1 on neighbors, that can overload
 # and are then queued for next pass in "new"
@@ -84,7 +82,7 @@ display-levels(){
     done
     if [[ -n "$pause" ]]; then
         read -r -p "[Return to continue]" rep # Pause
-        [[ $rep =~ [qQnN] ]] && echo "$total" && exit 0
+        [[ $rep =~ [qQnN] ]] && echo "$step" && exit 0
     fi
 }    
 
