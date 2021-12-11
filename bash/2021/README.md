@@ -76,6 +76,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d08 | 0.226 | ~~~~~~~~~~~~~~~~~~~~~~~ |
 | d09 | 0.395 | ~~~~~~~~~~~~~~~~~~~~~~~~~ |
 | d10 | 0.108 | ~~~~~~~~~~~~~~~~~~~~ |
+| d11 | 0.370 | ~~~~~~~~~~~~~~~~~~~~~~~~~ |
 
 
 ## Algorithmic tricks
