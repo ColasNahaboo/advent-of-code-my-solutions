@@ -26,16 +26,17 @@ step(){
     local i flashed=0 toflash new
     # [1] increase by 1 and mark the overloaded for [2]
     for ((i=0; i<levels_len; i++)); do
-        (( (levels[i] += 1 ) == 10 )) && new="$new $i"
+        (( (levels[i] += 1 ) == 10 )) && new+=("$i")
     done
     # [2] flash all marked, splash around them, mark overloaded ones
     # repeat pass [2] for the marked
-    while [[ -n $new ]]; do
-        toflash="$new"
-        new=
+    while [[ ${#new[@]} != 0 ]]; do
+        toflash="${new[*]}"
+        unset new
         for i in $toflash; do
             ((levels[i])) || continue # already flashed ==> nothing
             flash "$i"
+            # splashes the 8 adjacent position around it
             (( i >= cols)) &&   # previous row, not for first one
                 splash-row $((i - cols))
             splash-row "$i"                  # center row. i is marked so immune
@@ -46,16 +47,15 @@ step(){
     ((total += flashed))
 }
 
-# splash: add 1 and if over 9, mark for flash in later pass
+# splash: add 1 and if over 9, mark in "new" for flash in later pass
 splash(){
     local i="$1"
     ((levels[i])) || return   # already flashed, abort
     # only mark for next flash pass on the first time we go over 9
-    (( (levels[i] += 1 ) == 10 )) && new="$new $i"
+    (( (levels[i] += 1 ) == 10 )) && new+=("$i")
 }
 
-# flashes i and left and right neigbors if they exists (not on border)
-# Updates globals flashed and new
+# splashes i and left and right neigbors if they exists (not on border)
 splash-row(){
     local i="$1"
     (( (i % cols) > 0 )) && ((levels[i-1])) && splash $((i - 1))
@@ -63,11 +63,11 @@ splash-row(){
     (( (i % cols) < (cols - 1) )) && ((levels[i+1])) && splash $((i + 1))
 }
 
-# flashes i, and spashes the 8 adjacent position around it
+# flashes i
 flash(){
     local i="$1"
     levels[i]=0                           # flashed!
-    (( ++flashed ))                       # increment flashed count
+    (( ++flashed ))                       # increment global step flashed count
 }
 
 # functions to show a levels map, for tracing and debugging

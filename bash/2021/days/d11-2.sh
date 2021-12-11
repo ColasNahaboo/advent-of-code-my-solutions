@@ -32,7 +32,7 @@ step(){
         for i in $toflash; do
             ((levels[i])) || continue # already flashed ==> nothing
             flash "$i"
-            # spashes the 8 adjacent position around it
+            # splashes the 8 adjacent position around it
             (( i >= cols)) &&   # previous row, not for first one
                 splash-row $((i - cols))
             splash-row "$i"                  # center row. i is marked so immune
@@ -44,7 +44,7 @@ step(){
     (( flashed == levels_len )) && return 1 || return 0
 }
 
-# splash: add 1 and if over 9, mark for flash in later pass
+# splash: add 1 and if over 9, mark in "new" for flash in later pass
 splash(){
     local i="$1"
     ((levels[i])) || return   # already flashed, abort
@@ -52,8 +52,7 @@ splash(){
     (( (levels[i] += 1 ) == 10 )) && new+=("$i")
 }
 
-# flashes i and left and right neigbors if they exists (not on border)
-# Updates globals flashed and new
+# splashes i and left and right neigbors if they exists (not on border)
 splash-row(){
     local i="$1"
     (( (i % cols) > 0 )) && ((levels[i-1])) && splash $((i - 1))
@@ -65,7 +64,7 @@ splash-row(){
 flash(){
     local i="$1"
     levels[i]=0                           # flashed!
-    (( ++flashed ))                       # increment flashed count
+    (( ++flashed ))                       # increment global step flashed count
 }
 
 # functions to show a levels map, for tracing and debugging
