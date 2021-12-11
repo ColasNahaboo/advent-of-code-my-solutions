@@ -1,8 +1,8 @@
 #!/bin/bash
 # a simple regression test framework for my bash advent-of-code solutions
-USAGE='TEST [-v] scripts...
-Runs the test on a solution (script name or number), or on all tests
-for the argument ALL.
+USAGE='TESTALL [-v] [scripts...]
+Runs the test on a solution (script name or number), or on all tests if no
+argument.
 To define a test, in a script put comments like:
   #TEST: input-name expected-value
 This program will then run the script for each #TEST: line, with
