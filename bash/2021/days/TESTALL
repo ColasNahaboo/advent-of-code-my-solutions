@@ -44,7 +44,7 @@ runtest(){
     while read -r name value; do
         V "  TEST $radix.$name"
         if "$timer"; then
-            "$verbose" || export TIMEFORMAT="  Time: %3R s for $radix.$name"
+            "$verbose" || export TIMEFORMAT="  Time: %3R s for $script $radix.$name"
             result=$(time ./"$script" "$radix.$name" | tail -1)
         else
             result=$(./"$script" "$radix.$name" | tail -1)

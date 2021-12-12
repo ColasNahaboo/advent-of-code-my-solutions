@@ -62,7 +62,7 @@ Author: (c)2021 Colas Nahaboo, https://colas.nahaboo.net
 License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_License).
 
 ## Benchmarks
-These are the execution times in seconds of the second exercises of each day on their full inputs, done with the script `BENCHALL`.
+These are the execution times in seconds of the second exercises of each day on their full inputs, done with the script `BENCHALL -l`.
 
 | test | time | bar graph of times (logarithmic) |
 | :--- | ---: | :---- |
@@ -77,7 +77,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d09 | 0.395 | ~~~~~~~~~~~~~~~~~~~~~~~~~ |
 | d10 | 0.108 | ~~~~~~~~~~~~~~~~~~~~ |
 | d11 | 0.370 | ~~~~~~~~~~~~~~~~~~~~~~~~~ |
-
+| d12 | 12.202 | ######################################## |
 
 ## Algorithmic tricks
 For some problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions to stay under a minute execution time, and if possible, a second. I have commented them in the scripts, but here they are, collected for reference.

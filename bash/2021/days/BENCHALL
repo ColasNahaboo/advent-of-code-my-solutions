@@ -1,12 +1,23 @@
 #!/bin/bash
 # benchmarks all the *-2 tests with the full input
 # with numeric args, bench only these tests
+# Options:
+# -l    use logarithmic scale
 
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 export TIMEFORMAT='%3R'
-barunit=10                     # one "#" is 10 decimal log of time in ms
+if [[ $1 = '-l' ]]; then
+    shift
+    log=true
+    legend=" (logarithmic)"
+    barunit=10                  # 1 char is barunit decimal log of time in ms
+else
+    log=false
+    legend=
+    barunit=200                 # 1 char is barunit of time in ms
+fi
 
-echo "| test | time | bar graph of times (logarithmic) |"
+echo "| test | time | bar graph of times$legend |"
 echo "| :--- | ---: | :---- |"
 
 bench(){
@@ -15,8 +26,12 @@ bench(){
     time=$(bash -c "time $script 1>/dev/null" 2>&1)
     ms=${time//./}
     [[ $ms =~ ^0+([[:digit:]]+)$ ]] && ms="${BASH_REMATCH[1]}"
-    len=$(echo "l($ms)/l(10)*$barunit" | bc -l)
-    len="${len%.*}"
+    if "$log"; then
+        len=$(echo "l($ms)/l(10)*$barunit" | bc -l)
+        len="${len%.*}"
+    else
+        len=$((ms / barunit))
+    fi
     barline=$(barline "$len" "$ms")
     echo "| ${script%%-*} | $time | $barline |"
 }
