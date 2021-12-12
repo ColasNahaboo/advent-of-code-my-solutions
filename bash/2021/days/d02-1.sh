@@ -3,6 +3,9 @@
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 
+#TEST: example 150
+#TEST: input 1507611
+
 # Brute force. Ignore invalid lines.
 horiz=0
 depth=0

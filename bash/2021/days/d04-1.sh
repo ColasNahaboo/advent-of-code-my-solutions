@@ -5,7 +5,10 @@ in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
-# This can be slow, around 30s.
+#TEST: example 4512
+#TEST: input 8136
+
+# This can be slow, around 4s.
 
 # Globals
 rows=5; cols=5                  # size of board rows & columns
@@ -75,6 +78,7 @@ for draw in $draws; do
         done
         score=$(( sum * draw ))
         echo "Winner: Board #$board, sum=$sum, draw #$ndraw=$draw, score=$score"
+        echo "$score"
     done
     exit 0
 done

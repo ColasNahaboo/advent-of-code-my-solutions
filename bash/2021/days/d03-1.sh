@@ -3,6 +3,9 @@
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 
+#TEST: example 198
+#TEST: input 2954600
+
 # Uses commands: rev
 
 # The problem is ambiguous if there are as many set and unset bits in a
@@ -52,3 +55,4 @@ done
 (( power = gamma * epsilon ))
 
 echo "gamma = $gamma, epsilon = $epsilon, power = $power"
+echo "$power"

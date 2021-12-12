@@ -2,9 +2,11 @@
 # https://adventofcode.com/2021/day/3 puzzle #2
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
-
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
+
+#TEST: example 230
+#TEST: input 1662846
 
 # Brute force script, so a bit slow, can take about 10 seconds.
 # pre-compute dimensions of the bit array in input
@@ -79,3 +81,4 @@ done
 (( lsr = osr * csr ))
 
 echo "osr = $osr, csr = $csr, lsr = $lsr"
+echo "$lsr"

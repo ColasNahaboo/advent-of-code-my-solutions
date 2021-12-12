@@ -4,6 +4,9 @@
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
+#TEST: example 5
+#TEST: input 1737
+
 # converts input to sliding sums of n1,n2,n3 
 # and feed it to 1-1.sh to count the increases
 n1=

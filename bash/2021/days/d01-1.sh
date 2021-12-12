@@ -3,6 +3,9 @@
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 
+#TEST: example 7
+#TEST: input 1696
+
 # brute force
 previous=
 count=0
