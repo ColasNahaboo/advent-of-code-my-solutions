@@ -4,6 +4,9 @@
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 
+# with a second arg, display all found paths
+display_paths=false; (( $# == 2 )) && display_paths=true
+
 #TEST: example1 10
 #TEST: example2 19
 #TEST: example3 226
@@ -77,7 +80,7 @@ display-path(){
 name-of-cave(){
     local cave="$1"
     for name in "${!names[@]}"; do
-        [[ ${names[$name]} == "$cave" ]] && return
+        (( ${names[$name]} == cave )) && return
     done
     name='?'
 }
@@ -103,7 +106,7 @@ explore(){
     local next
     for next in ${tunnels[cave]}; do
         if ! ((next)); then     # end: found a path
-            # display-path "$path$next " # DEBUG
+            "$display_paths" && display-path "$path$next "
             ((++paths))
         elif ((caves[next])); then # big cave, OK, go through it
             explore "$next" "$path$next "
