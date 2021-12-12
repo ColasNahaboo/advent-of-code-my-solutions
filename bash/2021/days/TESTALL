@@ -1,6 +1,6 @@
 #!/bin/bash
 # a simple regression test framework for my bash advent-of-code solutions
-USAGE='TESTALL [-v] [scripts...]
+USAGE='TESTALL [-v] [-t] [scripts...]
 Runs the test on a solution (script name or number), or on all tests if no
 argument.
 To define a test, in a script put comments like:
@@ -22,6 +22,7 @@ Note: adding a comment #TEST_EXCLUDED: prevents the script to be run with ALL
 
 Options:
   -v    verbose, prints what tests are being done after it
+  -t    times, print the time taken by each test
 '
 
 #TEST_EXCLUDED:
@@ -30,6 +31,7 @@ Options:
 nl=$'\n'
 shopt -s nullglob
 verbose=false
+export timer=false
 V(){ "$verbose" && echo "$*";}
 
 # runs all the tests of a script. Returns the number of failed tests
@@ -41,7 +43,12 @@ runtest(){
     V "Running tests in $script"
     while read -r name value; do
         V "  TEST $radix.$name"
-        result=$(./"$script" "$radix.$name" | tail -1)
+        if "$timer"; then
+            "$verbose" || export TIMEFORMAT="  Time: %3R s for $radix.$name"
+            result=$(time ./"$script" "$radix.$name" | tail -1)
+        else
+            result=$(./"$script" "$radix.$name" | tail -1)
+        fi
         if [[ $result != "$value" ]]; then
             echo "***TEST ERROR: $script $radix.$name: found \"$result\", expecting \"$value\""
             (( fails++ ))
@@ -56,6 +63,9 @@ errors=0
 for arg in "$@"; do
     if [[ $arg == '-v' ]]; then
         verbose=true
+    elif [[ $arg == '-t' ]]; then
+        timer=true
+        export TIMEFORMAT='       Time: %3R s'
     elif [[ $arg =~ ^- ]]; then   # any option ==> usage
         echo "USAGE: $USAGE"; exit 1
     elif [[ $arg == ALL ]]; then # run all tests found in d*.sh files
