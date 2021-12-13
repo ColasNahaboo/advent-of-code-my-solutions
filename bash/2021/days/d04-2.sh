@@ -3,44 +3,39 @@
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
-export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
 #TEST: example 1924
 #TEST: input 12738
 
-# This can be slow, around 8s.
+# This is a rewrite without using files with arraus
 
 # Globals
-rows=5; cols=5                  # size of board rows & columns
-(( cols < rows )) && min="$cols" || min="$rows"
+size=5                          # size of square boards: 5x5
+size2=$((size*2))
+declare -a rows
 
-# Parses the board number N, store it in a $tmp.board.N file,
-# containing the rows and then the columns (inverted matrix)
-# We pad the values with spaces so sed and grep do not need special cases for
-# the first and last values
+# We store a board as size2 size strings (10 5-numbers strings), first the size rows
+# then the size columns
+# into a big array rows, so that board N occupies indexes N*size2 to (N+1)*size2-1
+# A row is the string of numbers delimited by spaces and inside <RN: ... > where RN is
+# the row number
 readboard(){
-    local boardnum="$1"
     local row                   # array of values in the row
     local col                   # array of columns, space-separated values
-    local r c value             # current row and col index, and the value
+    local i c value             # current row and col index, and the value
     # shellcheck disable=SC2034 # we do not use the empty var
     read -r empty || return 1   # error on EOF
-    for ((c=0; c<cols; c++)); do col[c]=' '; done
-    # first, copy the rows into the file
-    for ((r=0; r<rows; r++)); do
-        # short read? abort
-        read -r -a row || { rm -f "$tmp.board.$boardnum"; return 1;}
-        echo " ${row[*]} " >>"$tmp.board.$boardnum"
-        c=0
-        for value in "${row[@]}"; do
-            col[c]="${col[c]}$value "
-            (( ++c ))
+    # first, read the size rows, pad with space, and store in rows[]
+    for ((i=0; i<size; i++)); do
+        read -r -a row
+        rows+=("<${#rows[@]}: ${row[*]} >")
+        # accumulate row per row on each of the columns
+        for((c=0; c<size; c++)); do
+            col[c]="${col[c]}${row[c]} "
         done
     done
-    # then, append the columns as lines of space-separated values
-    for ((c=0; c<cols; c++)); do
-        echo "${col[c]}" >>"$tmp.board.$boardnum"
-    done
+    # then, append the completed columns as lines of space-separated values
+    for ((c=0; c<size; c++)); do rows+=("<${#rows[@]}: ${col[c]}>"); done
 }
 
 # Parse the full input.
@@ -49,46 +44,46 @@ readboard(){
     read -r drawline
     draws="${drawline//,/ }"
     # We parse all boards
-    boardnum=0
-    while readboard "$boardnum"; do (( ++boardnum )); done
+    while readboard; do :; done
 } <"$in"                        # we read the input sequentially for the parsing
 
-# Now, draw all the numbers, remove them from the boards in place by sed
-# Detecting a cleared row or column is then just grep-ing for an empty line
-# in the board files
-# When a board wins, if some losers remain, we remove its files and continue
+# Now, draw all the numbers, remove them from the boards in place by string replaces
+# Detecting a cleared row or column is then just finding an empty line in rows[]
+# When a board wins, we stop
 ndraw=0
+score=
 for draw in $draws; do
     (( ++ndraw ))
-    for file in "$tmp".board.*; do # remove drawn number from all boards
-        grep -q " $draw " "$file" && sed -r -i -e "s/ $draw / /g" "$file"
-    done
+    # we 's/ N / /g' in all rows in one command. This is the time saver!
+    rows=("${rows[@]// $draw / }")
     # now check if some boards have won
-    (( draw < min )) && continue # no board can win yet
-    # grep for cleared row or col: empty lines
-    grep -ls '^[[:space:]]*$' "$tmp".board.* >"$tmp".winners
-    [[ -s $tmp.winners ]] || continue
-    # we have winner(s)! See if some losers remain
-    ls -1 "$tmp".board.* >$tmp.all
-    if cmp -s $tmp.winners $tmp.all; then # these are the last winners
-        winners=$(grep -oP '[.]board[.]\K[[:digit:]]+' $tmp.winners)
-        for board in $winners; do
-            sum=0
-            # shellcheck disable=SC2013 # yes, we want to iterate on the words
-            for unmarked in $(head -"$rows" "$tmp.board.$board"); do
-                (( sum += unmarked ))
+    (( ndraw < size )) && continue # no board can win yet
+    while [[ "${rows[@]}" =~ \<([[:digit:]]+):\ *\> ]]; do
+        # we have a winner!
+        row="${BASH_REMATCH[1]}"
+        winner=$(( (row / size2) * size2)) # 1rst row of board
+        # compute its score
+        sum=0
+        # shellcheck disable=SC2013 # yes, we want to iterate on the words
+        for((i=winner; i<(winner+size);i++)); do
+            for number in ${rows[i]//[<>]/}; do
+                [[ $number =~ : ]] || (( sum += number )) # sum all except RN:
             done
-            score=$(( sum * draw ))
-            echo "Loser: Board #$board, sum=$sum, draw #$ndraw=$draw, score=$score"
-            echo "$score"
         done
-        exit 0
-    else
-        # remove the winners, they are not the last ones, and continue
-        # shellcheck disable=SC2046 # the filenames there are safe, don't worry
-        rm -f $(cat "$tmp.winners")
-    fi
+        score=$(( sum * draw ))
+        # clear the board so that it doesn't re-match
+        for((i=0; i<size2;i++)); do rows[winner+i]=''; done
+        # if we do not have any boards left, stop
+        [[ "${rows[@]}" =~ \<([[:digit:]]+):\ *[[:digit:]] ]] || break
+    done
 done
 
-err "No losing board found!"
+# last board to score was our loser
+if [[ -n $score ]]; then
+    echo "Loser: Board #$((winner/size2)), sum=$sum, draw #$ndraw=$draw, score=$score"
+    echo "$score"
+    exit 0
+else
+    err "No losing board found!"
+fi
 

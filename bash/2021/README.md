@@ -69,7 +69,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d01 | 0.025 | ------------- |
 | d02 | 0.005 | ------ |
 | d03 | 0.086 | ------------------- |
-| d04 | 6.543 | ====================================== |
+| d04 | 0.265 | ~ |
 | d05 | 0.727 | ++++++++++++++++++++++++++++ |
 | d06 | 0.052 | ----------------- |
 | d07 | 7.717 | ====================================== |
@@ -91,6 +91,8 @@ To split a binary number into an array `digits` of its bits, in reverse (little 
 - `read -a` to create an array of these bits
 
 ### Day 4
+
+**Naive first version, using files** (`d04-files-1.sh` and `d04-files-2.sh`)
 In a textural representation of a board as lines of space-separated numbers, detecting an empty row is just grep-ing for empty lines. I thus used files containing the board followed by its "inverted" version, each line being a column instead of a row, so that looking for empty rows or columns is done by a grep of empty lines.
 
 I also pad the lines of numbers by spaces before and after, so I can perform a sed to remove the drawn number `N` in all files by replacing `{space}N{space}` by `{space}` without taking into account the special case of the first or last number in the line.
@@ -100,6 +102,8 @@ The code is generic and has variables to adjust the size of boards.
 *Also:* I have seen on the Reddit post [Big inputs for AOC 2021](https://www.reddit.com/r/adventofcode/comments/r9s5pz/2021_big_inputs_for_advent_of_code_2021_puzzles/) a smart hack by "p_tseng":
 
 > For each board, figure out what time it wins at. By building a map of called number -> time it's called, you can determine this very quickly. For each board, take maximum across each row/column, take minimum of those maxima.
+
+*Also:* "einarjon" has a much [faster bash solution](https://github.com/einarjon/adventofcode.sh/blob/main/2021/04.sh), by doing everything in memory with arrays and strings, and replacement in strings without changing their lengths.
 
 ### Day 5
 Creating a (huge) 2-dimensional aray and plotting the  lines in it would be too slow in bash, so we just list the lines points one by one, each on a line in a sequential file. The points that are thus parts of more than one line are simply the coordinates that appears multiple times in the file! So a simple classic `sort|uniq -d` can find them quickly. This is a huge gain in efficiency, both in time and space, for data with few lines sparse in a big space as the input files are.
@@ -119,6 +123,8 @@ I have kept some attempts that were correct but too slow for reference. They pro
 Nothing special, but:
 
 *Also:* "throwaway7824365346" has written a math paper on the problem: https://www.reddit.com/r/adventofcode/comments/rawxad/2021_day_7_part_2_i_wrote_a_paper_on_todays/
+
+*Also:* "einarjon" has a much [faster bash solution](https://github.com/einarjon/adventofcode.sh/blob/main/2021/07.sh)
 
 ### Day 8
 The second part was quite tricky.

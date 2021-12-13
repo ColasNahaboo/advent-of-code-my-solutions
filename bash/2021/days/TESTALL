@@ -60,7 +60,7 @@ runtest(){
 }        
 
 errors=0
-default=ALL                     # if no arguments
+default=ALL; for arg in "$@"; do [[ $arg =~ ^- ]] || { default=; break;}; done
 for arg in "$@" $default; do
     if [[ $arg == '-v' ]]; then
         verbose=true
