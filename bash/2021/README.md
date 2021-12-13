@@ -78,6 +78,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d10 | 0.108 | ~~~~~~~~~~~~~~~~~~~~ |
 | d11 | 0.370 | ~~~~~~~~~~~~~~~~~~~~~~~~~ |
 | d12 | 12.202 | ######################################## |
+| d13 | 0.098 |  |
 
 ## Algorithmic tricks
 For some problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions to stay under a minute execution time, and if possible, a second. I have commented them in the scripts, but here they are, collected for reference.
@@ -99,11 +100,23 @@ I also pad the lines of numbers by spaces before and after, so I can perform a s
 
 The code is generic and has variables to adjust the size of boards.
 
+**Current fast version**
+
+I then concatenated all the tables in a big  array "rows" in memory instead of having files. Each board thus occupied 10 consecutive elements of it, 5 strings for each row and 4 for each column. The strings were in the form: `<index-in-rows: n1 n2 n3 n4 n5 >` so that I could apply the ultrafast methods to:
+
+- remove the drawn number `N` on all the boards: 
+  `rows=("${rows[@]// $N / }")`
+
+- check on all the boards for a cleared row or column:  
+
+  `[[ "${rows[@]}" =~ \<([[:digit:]]+):\ *\> ]]`
+  With the index of the matching row  in `rows[]` being thus in `${BASH_REMATCH[1]}`
+
 *Also:* I have seen on the Reddit post [Big inputs for AOC 2021](https://www.reddit.com/r/adventofcode/comments/r9s5pz/2021_big_inputs_for_advent_of_code_2021_puzzles/) a smart hack by "p_tseng":
 
 > For each board, figure out what time it wins at. By building a map of called number -> time it's called, you can determine this very quickly. For each board, take maximum across each row/column, take minimum of those maxima.
 
-*Also:* "einarjon" has a much [faster bash solution](https://github.com/einarjon/adventofcode.sh/blob/main/2021/04.sh), by doing everything in memory with arrays and strings, and replacement in strings without changing their lengths.
+*Also:* "einarjon" has a much [faster bash solution](https://github.com/einarjon/adventofcode.sh/blob/main/2021/04.sh), by doing everything in memory with arrays and strings, and replacement in strings without changing their lengths. It inspired me to come up with my current fast version.
 
 ### Day 5
 Creating a (huge) 2-dimensional aray and plotting the  lines in it would be too slow in bash, so we just list the lines points one by one, each on a line in a sequential file. The points that are thus parts of more than one line are simply the coordinates that appears multiple times in the file! So a simple classic `sort|uniq -d` can find them quickly. This is a huge gain in efficiency, both in time and space, for data with few lines sparse in a big space as the input files are.

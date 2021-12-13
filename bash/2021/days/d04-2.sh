@@ -22,7 +22,7 @@ declare -a rows
 readboard(){
     local row                   # array of values in the row
     local col                   # array of columns, space-separated values
-    local i c value             # current row and col index, and the value
+    local i c                   # current row and col index, and the value
     # shellcheck disable=SC2034 # we do not use the empty var
     read -r empty || return 1   # error on EOF
     # first, read the size rows, pad with space, and store in rows[]
@@ -58,10 +58,11 @@ for draw in $draws; do
     rows=("${rows[@]// $draw / }")
     # now check if some boards have won
     (( ndraw < size )) && continue # no board can win yet
+    # shellcheck disable=SC2199 # yes, we want to match the whole array
     while [[ "${rows[@]}" =~ \<([[:digit:]]+):\ *\> ]]; do
         # we have a winner!
-        row="${BASH_REMATCH[1]}"
-        winner=$(( (row / size2) * size2)) # 1rst row of board
+        rownum="${BASH_REMATCH[1]}"
+        winner=$(( (rownum / size2) * size2)) # 1rst row of board
         # compute its score
         sum=0
         # shellcheck disable=SC2013 # yes, we want to iterate on the words

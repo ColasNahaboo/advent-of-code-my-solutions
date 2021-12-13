@@ -27,7 +27,6 @@ Options:
 
 #TEST_EXCLUDED:
 
-[[ -z $1 ]] && { echo "USAGE: $USAGE"; exit 1;}
 nl=$'\n'
 shopt -s nullglob
 verbose=false
@@ -39,7 +38,7 @@ runtest(){
     local script="$1"
     grep -q '^[[:space:]]*#TEST_EXCLUDED:' "$script" && return 0
     local name value result fails=0 radix="$script"
-    [[ $script =~ ^(.*)-[0-9][.]sh$ ]] && radix="${BASH_REMATCH[1]}"
+    [[ $script =~ ^(d[0-9]+).*-[0-9][.]sh$ ]] && radix="${BASH_REMATCH[1]}"
     V "Running tests in $script"
     while read -r name value; do
         V "  TEST $radix.$name"
