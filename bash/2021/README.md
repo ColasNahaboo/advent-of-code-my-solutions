@@ -149,4 +149,4 @@ The trick was to detect the four digits 2 4 7 8 that have unique "word" lengths,
 ### Day 14
 The naive approach to expanse the polymer is exponential.
 Since the computation at each step is done pair per pair, independently, we can just on each step compute the new set of pairs and number letters used in the polymer to linearize the solution.
-`dq14-1.sh` is the naive, not scalable approach, and `d14-2.sh implements the efficient linear one.
+`dq14-1.sh` is the naive, not scalable approach, and `d14-2.sh` implements the efficient linear one.
