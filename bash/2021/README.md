@@ -79,6 +79,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d11 | 0.370 | ~~~~~~~~~~~~~~~~~~~~~~~~~ |
 | d12 | 12.202 | ######################################## |
 | d13 | 0.098 |  |
+| d14 | 0.095 |  |
 
 ## Algorithmic tricks
 For some problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions to stay under a minute execution time, and if possible, a second. I have commented them in the scripts, but here they are, collected for reference.
@@ -94,7 +95,7 @@ To split a binary number into an array `digits` of its bits, in reverse (little 
 ### Day 4
 
 **Naive first version, using files** (`d04-files-1.sh` and `d04-files-2.sh`)
-In a textural representation of a board as lines of space-separated numbers, detecting an empty row is just grep-ing for empty lines. I thus used files containing the board followed by its "inverted" version, each line being a column instead of a row, so that looking for empty rows or columns is done by a grep of empty lines.
+In a textual representation of a board as lines of space-separated numbers, detecting an empty row is just grep-ing for empty lines. I thus used files containing the board followed by its "inverted" version, each line being a column instead of a row, so that looking for empty rows or columns is done by a grep of empty lines.
 
 I also pad the lines of numbers by spaces before and after, so I can perform a sed to remove the drawn number `N` in all files by replacing `{space}N{space}` by `{space}` without taking into account the special case of the first or last number in the line.
 
@@ -144,3 +145,8 @@ The second part was quite tricky.
 The trick was to detect the four digits 2 4 7 8 that have unique "word" lengths, and then distinguish the digits with lengths 5 and 6 by their intersections with (number of characters not in) the 2 and 4 digits.
 
 *Also:* I didnt realise that the part before the left bar consisted of **exactly** the 10 digits. With this insight, "mnufat17" designed this [nice solution](https://www.reddit.com/r/adventofcode/comments/rc5s3z/2021_day_8_part_2_a_simple_fast_and_deterministic/). My solution worked for a variable number of inputs, and is the same as the first comment on the above post by "bunceandbean".
+
+### Day 14
+The naive approach to expanse the polymer is exponential.
+Since the computation at each step is done pair per pair, independently, we can just on each step compute the new set of pairs and number letters used in the polymer to linearize the solution.
+`dq14-1.sh` is the naive, not scalable approach, and `d14-2.sh implements the efficient linear one.
