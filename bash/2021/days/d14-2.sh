@@ -6,12 +6,12 @@ err(){ echo "***ERROR: $*" >&2; exit 1;}
 #export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
 #TEST: example 2188189693529
-#TEST: input 
+#TEST: input 3459174981021
 
 steps="${2:-40}"
 
 # we linearize the problem by considering only the possible pairs,
-# Simple straightforward implementation, no other oprtimizations
+# Simple straightforward implementation, no other optimizations
 # The poly is thus just an array of the numbers of each pair ID in it
 declare -A poly                 # the polymer as pairs: {pair, count-in-poly}
 declare -A letters              # the count of letters in poly {letter, count}
@@ -33,7 +33,8 @@ declare -A rules                # {pair, inserted-letter}
 } <"$in"
 
 # then, in each step, "expanse" the rules, but do not store the polymer letters
-# just increment the counts of created pairs and letters in a "todo" list
+# just increment the counts of created/deleted pairs in a "todo" list
+# The letters, we can increase immediately, as it has no impact on computations
 for((step=0; step < steps; step++)); do
     unset todo; declare -A todo
     for pair in "${!poly[@]}"; do
@@ -44,6 +45,7 @@ for((step=0; step < steps; step++)); do
         ((todo[$newletter${pair:1:1}]+=number))
         ((letters[$newletter]+=number)) # add the new one to the counts
     done
+    # apply the todo list
     for pair in "${!todo[@]}"; do
         ((poly[$pair]+=todo[$pair]))
         ((poly[$pair])) || unset poly["$pair"] # remove entries at count 0
