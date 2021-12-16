@@ -26,57 +26,49 @@ for((h=0; h<${#hexstring}; h++)); do
     c=$((16#${hexstring:h:1}))
     S="$S${D2B[$c]}"
 done
+
+# The array of operateors indexed by their IDs
 operators=(op_sum op_product op_minimum op_maximum '' op_greater op_less op_equal)
 
-# To work around the bash limitation of not having rw globals across
-# subprocesses forked by $(...) for the accessing state of the input,
-# we just use our readpacket as a read, readin on stdin
-# And we fake a multiple return value to return both the number of bits
-# read and the value as a string  with both of them concatenated around a colon
-
+# we just use our readpacket as a read, reading on stdin
 # reads the binary string on stdin
-# returns number of bits read + ":" + value of the packet read (recursively)
+# returns the value of the packet read (recursively)
+
 readpacket(){
     local s res
-    local -i n i len type lentid value vtype l=0
-    read -r -N 3 s; ((l+=3))
+    local -i n i len type lentid value vtype
+    read -r -N 3 s || return 1  # EOF
     # ((version = 2#$s))
-    read -r -N 3 s; ((l+=3))
+    read -r -N 3 s
     ((type = 2#$s))
-    if ((type == 4)); then      # value packets list
+    if ((type == 4)); then      # value packets list, concatenate the chunks
         local valuestring
         while true; do 
-            read -r -N 1 vtype; ((l++))
-            read -r -N 4 s; ((l+=4))
+            read -r -N 1 vtype
+            read -r -N 4 s
             valuestring+="$s"
             [[ $vtype == 0 ]] && break
         done
         ((value = 2#$valuestring))
     else                        # operator packet
         local subvalues=()      # array of sub-values
-        read -r -N 1 lentid; ((l++))
+        read -r -N 1 lentid
         if ((lentid == 1)); then # N sub packets
-            read -r -N 11 s; ((l+=11))
+            read -r -N 11 s
             ((n = 2#$s)) # 11-bit number
             for ((i=0; i<n; i++)); do
-                res="$(readpacket)"
-                ((l+="${res%%:*}"))
-                subvalues+=("${res#*:}")
+                subvalues+=($(readpacket))
             done
         else                     # sub packets in the next "len" bits
-            read -r -N 15 s; ((l+=15))
+            read -r -N 15 s
             ((len = 2#$s)) # 15-bit number
-            while ((len >0)); do
-                res="$(readpacket)"
-                ((l+="${res%%:*}"))
-                ((len-="${res%%:*}"))
-                subvalues+=("${res#*:}")
-            done
+            read -r -N "$len" s    # we read from this substring till its EOF
+            { while subvalues+=($(readpacket)); do :; done;} <<<"$s"
         fi
         [[ -z ${operators[type]} ]] && err "Invalid operator ID: $type"
         value=$("${operators[type]}" "${subvalues[@]}")
     fi
-    echo "$l:$value"
+    echo "$value"
     return 0
 }
 
@@ -116,5 +108,4 @@ op_equal(){
     (("$1" == "$2")) && echo 1 || echo 0
 }
 
-value=$(readpacket <<<"$S")
-echo "${value#*:}"
+readpacket <<<"$S"
