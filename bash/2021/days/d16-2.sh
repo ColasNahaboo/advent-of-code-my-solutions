@@ -19,7 +19,7 @@ export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 # bashism: letter-as-decimal-to-binary array: echo ${D2B[16#A]} ==> 1010
 D2B=({0..1}{0..1}{0..1}{0..1})
 
-# defines&parse global S, biunary input string
+# defines & parse global S, binary input string
 read -r hexstring <"$in"
 S=
 for((h=0; h<${#hexstring}; h++)); do
@@ -29,8 +29,8 @@ done
 operators=(op_sum op_product op_minimum op_maximum '' op_greater op_less op_equal)
 
 # To work around the bash limitation of not having rw globals across
-# subprocesses forked by $(...) for the accessing state of the input, and
-# we just use our readpacket as aread, readin on stdin
+# subprocesses forked by $(...) for the accessing state of the input,
+# we just use our readpacket as a read, readin on stdin
 # And we fake a multiple return value to return both the number of bits
 # read and the value as a string  with both of them concatenated around a colon
 
