@@ -63,7 +63,7 @@ readpacket(){
                 ((l+="${res%%:*}"))
                 subvalues+=("${res#*:}")
             done
-        else                     # sub packets in S substrings
+        else                     # sub packets in the next "len" bits
             read -r -N 15 s; ((l+=15))
             ((len = 2#$s)) # 15-bit number
             while ((len >0)); do
