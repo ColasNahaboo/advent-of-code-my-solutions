@@ -81,6 +81,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d13 | 0.098 |  |
 | d14 | 0.095 |  |
 | d15 | 989.442 | ########################################################### |
+| d16 | 0.171 | ~~~~~~~~~~~~~~~~~~~~~~ |
 
 ## Algorithmic tricks
 For some problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions to stay under a minute execution time, and if possible, a second. I have commented them in the scripts, but here they are, collected for reference.
