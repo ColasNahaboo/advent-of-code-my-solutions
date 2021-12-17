@@ -27,42 +27,35 @@ for((h=0; h<${#hexstring}; h++)); do
     S="$S${D2B[$c]}"
 done
 
-# The array of operateors indexed by their IDs
-operators=(op_sum op_product op_minimum op_maximum '' op_greater op_less op_equal)
-
 # we just use our readpacket as a read, reading on stdin
 # reads the binary string on stdin
 # returns the value of the packet read (recursively)
 
 readpacket(){
     local s res
-    local -i n i len type lentid value vtype
-    read -r -N 3 s || return 1  # EOF
-    # ((version = 2#$s))
-    read -r -N 3 s
-    ((type = 2#$s))
+    local -i n i sublen type lentid value vtype version
+    read-bitint 3 version || return 1  # EOF
+    read-bitint 3 type
     if ((type == 4)); then      # value packets list, concatenate the chunks
         local valuestring
         while true; do 
-            read -r -N 1 vtype
-            read -r -N 4 s
+            read-bitint 1 vtype
+            read-bitstring 4 s
             valuestring+="$s"
             [[ $vtype == 0 ]] && break
         done
         ((value = 2#$valuestring))
     else                        # operator packet
         local subvalues=()      # array of sub-values
-        read -r -N 1 lentid
-        if ((lentid == 1)); then # N sub packets
-            read -r -N 11 s
-            ((n = 2#$s)) # 11-bit number
+        read-bitint 1 lentid
+        if ((lentid == 1)); then # n sub packets
+            read-bitint 11 n
             for ((i=0; i<n; i++)); do
                 subvalues+=($(readpacket))
             done
-        else                     # sub packets in the next "len" bits
-            read -r -N 15 s
-            ((len = 2#$s)) # 15-bit number
-            read -r -N "$len" s    # we read from this substring till its EOF
+        else                     # sub packets fit in the next "sublen" bits
+            read-bitint 15 sublen
+            read-bitstring "$sublen" s # read from this substring till its EOF
             { while subvalues+=($(readpacket)); do :; done;} <<<"$s"
         fi
         [[ -z ${operators[type]} ]] && err "Invalid operator ID: $type"
@@ -72,6 +65,26 @@ readpacket(){
     return 0
 }
 
+# read next $1 bits into $2 variable
+read-bitint(){
+    local -n _intvar="$2"
+    local string
+    read -r -N "$1" string || return 1 # EOF
+    ((_intvar = 2#$string))
+    return 0
+}
+
+# same for string variable, for consistency / readability
+read-bitstring(){
+    local -n _strvar="$2"
+    read -r -N "$1" _strvar
+}
+
+# operators
+# The array of operateors indexed by their IDs
+operators=(op_sum op_product op_minimum op_maximum '' op_greater op_less op_equal)
+
+#their code
 op_sum(){
     local -i i v=0
     for i in "$@"; do ((v += i)); done
