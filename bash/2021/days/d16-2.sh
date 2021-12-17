@@ -34,7 +34,8 @@ done
 # returns the value of the packet read (recursively)
 
 readpacket(){
-    local s res
+    local s
+    # shellcheck disable=SC2034 # unused values for reads
     local -i n i sublen type lentid value vtype version
     read-bitint 3 version || return 1  # EOF
     read-bitint 3 type
@@ -53,11 +54,13 @@ readpacket(){
         if ((lentid == 1)); then # n sub packets
             read-bitint 11 n
             for ((i=0; i<n; i++)); do
+                # shellcheck disable=SC2207 
                 subvalues+=($(readpacket))
             done
         else                     # sub packets fit in the next "sublen" bits
             read-bitint 15 sublen
             read-bitstring "$sublen" s # read from this substring till its EOF
+            # shellcheck disable=SC2207 
             { while subvalues+=($(readpacket)); do :; done;} <<<"$s"
         fi
         [[ -z ${operators[type]} ]] && err "Invalid operator ID: $type"
@@ -73,6 +76,7 @@ read-bitint(){
     local -n _intvar="$2"
     local string
     read -r -N "$1" string || return 1 # EOF
+    # shellcheck disable=SC2034 # unused values for reads
     ((_intvar = 2#$string))
     return 0
 }
@@ -80,6 +84,7 @@ read-bitint(){
 # same for string variable, for consistency / readability
 read-bitstring(){
     local -n _strvar="$2"
+    # shellcheck disable=SC2034 # unused values for reads
     read -r -N "$1" _strvar
 }
 
