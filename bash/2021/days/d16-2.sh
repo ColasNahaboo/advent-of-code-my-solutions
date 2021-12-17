@@ -3,7 +3,7 @@
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
-export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
+#export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
 #TEST: example01 2021 
 #TEST: example21 3
@@ -16,6 +16,7 @@ export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 #TEST: example28 1
 #TEST: input 1725277876501
 
+############ Preprocess hexa input string to a bitstring
 # bashism: letter-as-decimal-to-binary array: echo ${D2B[16#A]} ==> 1010
 D2B=({0..1}{0..1}{0..1}{0..1})
 
@@ -27,6 +28,7 @@ for((h=0; h<${#hexstring}; h++)); do
     S="$S${D2B[$c]}"
 done
 
+############ Reading and parsing packets
 # we just use our readpacket as a read, reading on stdin
 # reads the binary string on stdin
 # returns the value of the packet read (recursively)
@@ -59,6 +61,7 @@ readpacket(){
             { while subvalues+=($(readpacket)); do :; done;} <<<"$s"
         fi
         [[ -z ${operators[type]} ]] && err "Invalid operator ID: $type"
+        # map operator on subvalues
         value=$("${operators[type]}" "${subvalues[@]}")
     fi
     echo "$value"
@@ -80,8 +83,8 @@ read-bitstring(){
     read -r -N "$1" _strvar
 }
 
-# operators
-# The array of operateors indexed by their IDs
+############ operators
+# The array of operators indexed by their IDs
 operators=(op_sum op_product op_minimum op_maximum '' op_greater op_less op_equal)
 
 #their code
@@ -120,5 +123,7 @@ op_less(){
 op_equal(){
     (("$1" == "$2")) && echo 1 || echo 0
 }
+
+############ Now, read!
 
 readpacket <<<"$S"

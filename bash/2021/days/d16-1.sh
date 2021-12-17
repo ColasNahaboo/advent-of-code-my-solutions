@@ -5,6 +5,8 @@ in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 #export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
+# Warning: this code is quite crude, d16-2 has much cleaner logic.
+
 #TEST: example01 6
 #TEST: example02 9
 #TEST: example03 14
