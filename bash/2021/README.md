@@ -152,3 +152,13 @@ The trick was to detect the four digits 2 4 7 8 that have unique "word" lengths,
 The naive approach to expanse the polymer is exponential.
 Since the computation at each step is done pair per pair, independently, we can just on each step compute the new set of pairs and number letters used in the polymer to linearize the solution.
 `dq14-1.sh` is the naive, not scalable approach, and `d14-2.sh` implements the efficient linear one.
+
+## Lessons learned
+This Advent of Code was quite fun, and quite instructive. What I learned:
+- Coding in bash is not so bad, even if it can border on insanity at times :-).
+- Modern bash features are often overlooked but very useful.
+- Passing shellcheck should be a mandatory goal for each bash programmer. I resented it at first since I thought it was adding unecessary syntaxic sugar to my code until I realized that it was a symptom that my coding style was the problem.
+- Use `[[...]]` for strings and `((...))` for integers other any of the legacy constructs like `[...]`, `test`, etc... The code is then much cleaner and safer, as you do not have to quote as much. E.g: `[[ -z foo ]]` instead of `[ -z "$foo" ]`, or even `((i=j))` instead of `i="$j"`
+  - **but**, this makes traditional debugging with `set -x` less useful as the values of variables are not displayed anymore. E.g if j is 2, the tracing of `i="$j"` shows `i=2` whereas the tracing of `((i=j))` only shows `((i=j))`. It can be a good things however, since it made me look at proper bash debuggers like [bashdb](http://bashdb.sourceforge.net/bashdb.html).
+- I avoided arrays in bash because I found out they were abysmally slow when first introduced, to the point that managing data in files with grep, sec, etc.. was actually faster than using arrays. But not anymore! Bash arrays should now be used as much as possible.
+- Bash can have typed variables: integer ones via `declare -i` or `local -i`, and using them makes your code safer.
