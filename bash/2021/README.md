@@ -83,6 +83,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d15 | 989.442 | ########################################################### |
 | d16 | 0.171 | ~~~~~~~~~~~~~~~~~~~~~~ |
 | d17 | 12.453 | ######################################## |
+| d18 | 84.399 | ################################################# |
 
 ## Algorithmic tricks
 For some problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions to stay under a minute execution time, and if possible, a second. I have commented them in the scripts, but here they are, collected for reference.
@@ -160,7 +161,8 @@ This Advent of Code was quite fun, and quite instructive. What I learned:
 - Modern bash features are often overlooked but very useful.
 - Passing shellcheck should be a mandatory goal for each bash programmer. I resented it at first since I thought it was adding unecessary syntaxic sugar to my code until I realized that it was a symptom that my coding style was the problem.
 - Use `[[...]]` for strings and `((...))` for integers other any of the legacy constructs like `[...]`, `test`, etc... The code is then much cleaner and safer (and a tad faster), as you do not have to quote as much. E.g: `[[ -z foo ]]` instead of `[ -z "$foo" ]`, or even `((i=j))` instead of `i="$j"`
-  - **but**, this makes traditional debugging with `set -x` less useful as the values of variables are not displayed anymore. E.g if j is 2, the tracing of `i="$j"` shows `i=2` whereas the tracing of `((i=j))` only shows `((i=j))`. This could be where a bash debugger would be useful, but I know only one, [bashdb](http://bashdb.sourceforge.net/bashdb.html), and it does not seem updated anymore, and I could not find a version working with bash 5.1. The `trap DEBUG` can be useful, though.
+  - **but**, this makes traditional debugging with `set -x` less useful as the values of variables are not displayed anymore. E.g if j is 2, the tracing of `i="$j"` shows `i=2` whereas the tracing of `((i=j))` only shows `((i=j))`. This could be where a bash debugger would be useful, but I know only one, [bashdb](http://bashdb.sourceforge.net/bashdb.html), and it does not seem updated anymore, and I could not find a version working with bash 5.1. The `trap DEBUG` trick can be useful, though.
+  - So, I tend to write now `i=$((j+k))` while developing code, and maybe later for production switch to the a bit more efficient `((i = j+k))`
 - I avoided arrays in bash because I found out they were abysmally slow when first introduced, to the point that managing data in files with grep, sed, ... was actually faster than using arrays. But not anymore! Bash arrays should now be used as much as possible.
 - A lot of bash functions can "map" on arrays. For instance `${tab[@]//x/y}` will string-replace x by y in all the elements of the array tab, and is super fast.
 - Use arrays rather than the classic way to represent lists in bash by space-separated (or tab-separated) substrings in a  string.
