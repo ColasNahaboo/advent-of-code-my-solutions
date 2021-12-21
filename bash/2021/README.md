@@ -84,6 +84,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d16 | 0.171 | ~~~~~~~~~~~~~~~~~~~~~~ |
 | d17 | 12.453 | ######################################## |
 | d18 | 84.399 | ################################################# |
+| d18 | 78.641 | ################################################ |
 
 ## Algorithmic tricks
 For some problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions to stay under a minute execution time, and if possible, a second. I have commented them in the scripts, but here they are, collected for reference.
@@ -154,6 +155,9 @@ The trick was to detect the four digits 2 4 7 8 that have unique "word" lengths,
 The naive approach to expanse the polymer is exponential.
 Since the computation at each step is done pair per pair, independently, we can just on each step compute the new set of pairs and number letters used in the polymer to linearize the solution.
 `dq14-1.sh` is the naive, not scalable approach, and `d14-2.sh` implements the efficient linear one.
+
+### Day 18
+The problem is interestinge because it requires processing the SailFish Numbers both as flat strings (for the add, reduce, and split operations), and as hierachical trees (magnitude computation). I started implementing a general tree structure in `d18-1.sh`, with string data on a heap, (wrongly) anticipating that part 2 would consist in tree processing. But no, so I kept the tree+heap structure in d18-1.sh for reference, and implemented a simple one shot tree walk for computing mangnitudes in `d18-2.sh`, without actually building the tree structure, to same some time (about 8%) and complexity.
 
 ## Lessons learned
 This Advent of Code was quite fun, and quite instructive. What I learned:
