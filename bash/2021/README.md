@@ -83,8 +83,10 @@ These are the execution times in seconds of the second exercises of each day on 
 | d15 | 989.442 | ########################################################### |
 | d16 | 0.171 | ~~~~~~~~~~~~~~~~~~~~~~ |
 | d17 | 12.453 | ######################################## |
-| d18 | 84.399 | ################################################# |
 | d18 | 78.641 | ################################################ |
+| d19 | TODO | |
+| d20 | 64.393 | ################################################ |
+
 
 ## Algorithmic tricks
 For some problems, solving the problem the straightforward way is too slow in Bash. So I have used algorithmic tricks in some solutions to stay under a minute execution time, and if possible, a second. I have commented them in the scripts, but here they are, collected for reference.
@@ -157,7 +159,15 @@ Since the computation at each step is done pair per pair, independently, we can 
 `dq14-1.sh` is the naive, not scalable approach, and `d14-2.sh` implements the efficient linear one.
 
 ### Day 18
-The problem is interestinge because it requires processing the SailFish Numbers both as flat strings (for the add, reduce, and split operations), and as hierachical trees (magnitude computation). I started implementing a general tree structure in `d18-1.sh`, with string data on a heap, (wrongly) anticipating that part 2 would consist in tree processing. But no, so I kept the tree+heap structure in d18-1.sh for reference, and implemented a simple one shot tree walk for computing mangnitudes in `d18-2.sh`, without actually building the tree structure, to same some time (about 8%) and complexity.
+The problem is interesting because it requires processing the SailFish Numbers both as flat strings (for the add, reduce, and split operations), and as hierachical trees (magnitude computation). I started implementing a general tree structure in `d18-1.sh`, with string data on a heap, (wrongly) anticipating that part 2 would consist in tree processing. But no, so I kept the tree+heap structure in d18-1.sh for reference, and implemented a simple one shot tree walk for computing mangnitudes in `d18-2.sh`, without actually building the tree structure, to same some time (about 8%) and complexity.
+
+### Day 19
+*skipped for now, to be done later*
+
+### Day 20
+It was a trick question, as the "image enhancement algorithm" started with a 0 in the example, but with a 1 (a `#`) in the input. Thus all the points away from the image would be surrounded by 0 and the algorithm would set them on 1 on next step. But back to 0 on next step if the result was not to be infinite. So the computation would have to "pad" around the image with sufficient space for "simulating" and infinity, and only compute the parts that may have an impact on the "main" image after N steps.
+
+And since the main image area of influence grows by 1 at each step, the final area to count the pixels wil be the original image plus N pixels on each side. And we need to add also N pixels padding to take into accoun the possible effect of the faw away pixels. I means that when we process an image of size `S`, we insert it into a blank image of size `(S + 2 * 2 * steps)`, apply `steps` times the algoritm, and count the pixels only in a area of size `(S + steps)`.
 
 ## Lessons learned
 This Advent of Code was quite fun, and quite instructive. What I learned:
