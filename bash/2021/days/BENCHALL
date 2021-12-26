@@ -33,7 +33,7 @@ bench(){
         len=$((ms / barunit))
     fi
     barline=$(barline "$len" "$ms")
-    echo "| ${script%%-*} | $time | $barline |"
+    echo "| ${script%%-*} | $time | \`$barline\` |"
 }
 
 barline(){
