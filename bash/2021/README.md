@@ -84,7 +84,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d16 | 0.171 | ~~~~~~~~~~~~~~~~~~~~~~ |
 | d17 | 12.453 | ######################################## |
 | d18 | 78.641 | ################################################ |
-| d19 | TODO | |
+| d19 | 16.839 | ########################################## |
 | d20 | 64.393 | ################################################ |
 
 
@@ -162,7 +162,7 @@ Since the computation at each step is done pair per pair, independently, we can 
 The problem is interesting because it requires processing the SailFish Numbers both as flat strings (for the add, reduce, and split operations), and as hierachical trees (magnitude computation). I started implementing a general tree structure in `d18-1.sh`, with string data on a heap, (wrongly) anticipating that part 2 would consist in tree processing. But no, so I kept the tree+heap structure in d18-1.sh for reference, and implemented a simple one shot tree walk for computing mangnitudes in `d18-2.sh`, without actually building the tree structure, to same some time (about 8%) and complexity.
 
 ### Day 19
-*skipped for now, to be done later*
+I used a distance that was the concatenation of 3 distances that are independant of rotations and translations: sum of the distances on the axes (aka: manhattan), sum of the squares of them, and product of them. This way I could find the matching pairs via their distances.
 
 ### Day 20
 It was a trick question, as the "image enhancement algorithm" started with a 0 in the example, but with a 1 (a `#`) in the input. Thus all the points away from the image would be surrounded by 0 and the algorithm would set them on 1 on next step. But back to 0 on next step if the result was not to be infinite. So the computation would have to "pad" around the image with sufficient space for "simulating" and infinity, and only compute the parts that may have an impact on the "main" image after N steps.

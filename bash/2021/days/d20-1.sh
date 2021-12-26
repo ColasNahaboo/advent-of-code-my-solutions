@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2206
 # https://adventofcode.com/days/day/20 puzzle #1
 # See README.md in the parent directory
 in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
@@ -89,5 +90,5 @@ for((x=2; x<(cols-2); x++)); do
     done
 done
 
-echo $lit
+echo "$lit"
 
