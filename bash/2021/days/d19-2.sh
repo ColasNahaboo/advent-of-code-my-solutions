@@ -30,7 +30,7 @@ while true; do
     ((++n_scan))
 done <"$in"
 
-# compute an unique distance into global d
+# compute an unique distance into global "d"
 # this distance should uniquely identify a vector, but be invariant
 # via rotation or offset
 distance(){
@@ -41,6 +41,7 @@ distance(){
     d="$((d1+d2+d3)).$((d1**2+d2**2+d3**2)).$((d1*d2*d3))"
 }
 
+# only the manhattan distance, returned in global "d"
 manhattan-distance(){
     local -i d1="$1" d2="$2" d3="$3"
     if (($4 > d1)); then ((d1=$4-d1)); else ((d1-=$4)); fi
@@ -49,7 +50,8 @@ manhattan-distance(){
     d="$((d1+d2+d3))"
 }
 
-# computes distances between all the readings of a scanner N into distancesN
+# computes distances between all the readings of a scannerN[] into distancesN[]
+# key=distance, value="i j" indexes of beacons in scannerN
 scanner-distances(){
     local -n scanner="$1" distances="$2"
     local -i i j
@@ -57,13 +59,13 @@ scanner-distances(){
         for((j=i+1; j<${#scanner[@]}; j++)); do
             distance ${scanner[i]} ${scanner[j]}
             # shellcheck disable=SC2034
-            distances["$d"]=" $i $j $i "
+            distances["$d"]="$i $j"
         done
     done
 }
 
 # number of common distances between two scanners, returned in scanners_common
-declare -i scanners_common
+scanners_common=
 scanners-common(){
     local -n dist1="$1" dist2="$2"
     local d
@@ -89,38 +91,35 @@ scanner-bestmatch(){
             ((scanner_bestmatch=j))
         fi
     done
-    if ((max < min_common)); then         # Less than 12 common distances, skip
-        return 1
-    fi
-    return 0
+    # Less than 12 common distances, skip
+    ((max >= min_common))
 }
 
 # position scanner n relative to scanner n0
 scanner-match(){
-    local -i n="$1" n0="$4" i j i0 j0
+    local -i n="$1" n0="$4" i j 
     local -n scan="$2" dist="$3" scan0="$5" dist0="$6"
     local d b1 b2 b01 b02 o b
-    local rots=() rot maxrot=0 pairs
+    local rots rot maxrot=0 pairs
 
+    # take the most distances matches for each possible rotation,
+    # to avoid false positives
     for d in "${!dist[@]}"; do
-        if [[ ${dist0[$d]} =~ [[:space:]]([-[:digit:]]+)[[:space:]]([-[:digit:]]+) ]]; then
-            i0="${BASH_REMATCH[1]}"
-            j0="${BASH_REMATCH[2]}"
-            [[ ${dist[$d]} =~ [[:space:]]([-[:digit:]]+)[[:space:]]([-[:digit:]]+) ]]
-            i="${BASH_REMATCH[1]}"
-            j="${BASH_REMATCH[2]}"
-            
-            if rotated $(deltas "scan0" $i0 $j0) $(deltas "scan" $i $j); then
+        if [[ ${dist0[$d]} ]]; then
+            if rotated $(deltas "scan0" ${dist0[$d]}) $(deltas "scan" ${dist[$d]}); then
                 ((rots[rotated]++))
-                pairs=($i0 $j0 $i $j)
                 if ((rots[rotated]>maxrot)); then
+                    # these are distance+pairs we are sure are the good ones
                     ((maxrot=rots[rotated]))
                     ((rot=rotated))
+                    pairs=(${dist0[$d]} ${dist[$d]})
                 fi
             fi
         fi
     done
     ((maxrot)) || return 1    # no matches
+    
+    # offset: take the 2 possible ones, and apply to the other to choose one
     b1=$(rotate ${scan[${pairs[2]}]} $rot)
     b2=$(rotate ${scan[${pairs[3]}]} $rot)
     b01=${scan0[${pairs[0]}]}
@@ -132,12 +131,15 @@ scanner-match(){
         b=$(sub3 $b2 $o)
         equ3 $b $b01 || err "Could not determine offset"
     fi
+
     echo "  ==>  Rotation+Offset of scanner$n from scanner$n0: $rot / $o"
+    # normalize the coordinates in scannerN to coords of scanner0, mark as done
     scanner-fix scan $rot $o
     scanpos[n]="$o"
     return 0
 }
 
+# fix all beacons coordinates on place in scanner with rotation and offset
 scanner-fix(){
     local -n scantofix="$1"
     local -i rot="$2" x="$3" y="$4" z="$5" i
@@ -149,6 +151,7 @@ scanner-fix(){
     done
 }
 
+# triplets arithmetic
 add3(){ echo $(($1+$4)) $(($2+$5)) $(($3+$6));}
 sub3(){ echo $(($1-$4)) $(($2-$5)) $(($3-$6));}
 equ3(){ (($1==$4)) && (($2==$5)) && (($3==$6));}
@@ -163,7 +166,7 @@ deltas(){
     echo "$((x2-x1)) $((y2-y1)) $((z2-z1))"
 }
 
-# rotate x y z by N (0..23)
+# rotate x y z by N: (0..23) possible rotations
 rotate(){
     local -i x="$1" y="$2" z="$3" n="$4"
     case "$n" in
@@ -201,6 +204,8 @@ rotate(){
     esac
 }
 
+# if $x1 $y1 $z1 are $x2 $y2 $z2 rotated by r, returns true
+# stores found r value in global "rotated"
 rotated(){
     local -i x1="$1" y1="$2" z1="$3" x2="$4" y2="$5" z2="$6" r
     for((r=0; r<24; r++)); do
