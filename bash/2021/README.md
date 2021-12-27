@@ -186,4 +186,5 @@ This Advent of Code was quite fun, and quite instructive. What I learned:
 - Bash functions can be passed variables by name, useful for efficiency to avoid copying big arrays or strings, and to provide multiple return values by modifying passed variables. But it cannot recurse as it is not a passing by reference, but by name.
 - Working with arrays makes using `$(...)` impractical, as commands are executed in a subshell and cannot access arrays anymore to update them in the parent shell. So I tend to pass the return value(s) into global variables of the same name of a function. E.g. instead of `x=$(foo)`, I write `foo; x="$foo"`
 - To parse a space-separated string, the `${string#* }` and `${string% *}` operators are the fastest, closely followed by a read, the full `[[ $string =~ ([-[:digit:]]+)[[:space:]]... ]]` being 3 times slower.
+- Use the faster `$(< filename)` instead of `$(cat filename)`.
 

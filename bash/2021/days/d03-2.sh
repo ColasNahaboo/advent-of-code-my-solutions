@@ -48,7 +48,7 @@ filter_col(){
     fi
     numof_res=$(wc -l <"$file")
     if [[ $numof_res == 1 ]]; then
-        res=$(cat "$file")
+        res=$(< "$file")
         echo "$((2#$res))"      # print res converted to decimal & stop
     elif [[ $numof_res == 0 ]]; then
         err "$mode found no number at col #$col"
