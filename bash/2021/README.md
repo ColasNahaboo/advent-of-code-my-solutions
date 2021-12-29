@@ -86,6 +86,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d18 | 78.641 | `################################################` |
 | d19 | 16.839 | `##########################################` |
 | d20 | 64.393 | `################################################` |
+| d21 | 8.028 | `=======================================` |
 
 Legend:
 0s < `------` < 0.1s < `~~~~~~` < 0.5s < `++++++` < 1s < `======` < 10s < `######`
@@ -187,4 +188,5 @@ This Advent of Code was quite fun, and quite instructive. What I learned:
 - Working with arrays makes using `$(...)` impractical, as commands are executed in a subshell and cannot access arrays anymore to update them in the parent shell. So I tend to pass the return value(s) into global variables of the same name of a function. E.g. instead of `x=$(foo)`, I write `foo; x="$foo"`
 - To parse a space-separated string, the `${string#* }` and `${string% *}` operators are the fastest, closely followed by a read, the full `[[ $string =~ ([-[:digit:]]+)[[:space:]]... ]]` being 3 times slower.
 - Use the faster `$(< filename)` instead of `$(cat filename)`.
-
+- To copy an associative array A1 to A2 in bash 4.4+, do:
+  `A1_def=$(declare -p A1) && declare -A A2="${A1_def#*=}"`
