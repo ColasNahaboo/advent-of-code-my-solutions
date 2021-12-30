@@ -68,6 +68,7 @@ echo "== XYZ coords: 0..100 to 0..$Xlen 0..$Ylen 0..$Zlen, $((Xlen * Ylen * Zlen
 
 # we read the boot orders in reverse (|tac), as "paint' layers
 # so that finding a XYZ point can stop the search
+# shellcheck disable=SC2206,SC2020 # no need to quote integer values
 while read -r type x1 x2 y1 y2 z1 z2; do
     if ((x1 >= -50)) && ((x2 <= 50)) &&
            ((y1 >= -50)) && ((y2 <= 50)) &&

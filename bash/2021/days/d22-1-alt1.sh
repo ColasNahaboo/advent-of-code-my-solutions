@@ -14,11 +14,9 @@ err(){ echo "***ERROR: $*" >&2; exit 1;}
 
 nl=$'\n'
 declare -ai Xx Yy Zz            # conversion tables
-declare -Ai xX yY zZ            # index can be negative, so associtaive array
 declare -ai Xsize Ysize Zsize   # the distance till next coord 
 # layers: type (on=1, off=0), x y z
 declare -ai layt layx1 layx2 layy1 layy2 layz1 layz2 
-declare -i i
 
 while read -r x1 x2 y1 y2 z1 z2; do
     if ((x1 >= -50)) && ((x2 <= 50)) &&
@@ -38,10 +36,6 @@ declare -i Xlen=$((${#Xx[@]}-1)) # last value is excluded [x1,x2[
 declare -i Ylen=$((${#Yy[@]}-1))
 declare -i Zlen=$((${#Zz[@]}-1))
 
-for((i=0; i<Xlen+1; i++)); do xX["${Xx[i]}"]="$i"; done
-for((i=0; i<Ylen+1; i++)); do yY["${Yy[i]}"]="$i"; done
-for((i=0; i<Zlen+1; i++)); do zZ["${Zz[i]}"]="$i"; done
-
 for((X=0; X<Xlen; X++)); do Xsize[X]=$((Xx[X+1] - Xx[X])); done
 for((Y=0; Y<Ylen; Y++)); do Ysize[Y]=$((Yy[Y+1] - Yy[Y])); done
 for((Z=0; Z<Zlen; Z++)); do Zsize[Z]=$((Zz[Z+1] - Zz[Z])); done
@@ -50,6 +44,7 @@ echo "== XYZ coords: 0..100 to 0..$Xlen 0..$Ylen 0..$Zlen, $((Xlen * Ylen * Zlen
 
 # we read the boot orders in reverse (|tac), as "paint' layers
 # so that finding a XYZ point can stop the search
+# shellcheck disable=SC2206,SC2020 # no need to quote integer values
 while read -r type x1 x2 y1 y2 z1 z2; do
     if ((x1 >= -50)) && ((x2 <= 50)) &&
            ((y1 >= -50)) && ((y2 <= 50)) &&
@@ -58,7 +53,7 @@ while read -r type x1 x2 y1 y2 z1 z2; do
         layx1+=($x1)
         layx2+=($((x2+1)))
         layy1+=($y1)
-        layy2+=($(($y2+1)))
+        layy2+=($((y2+1)))
         layz1+=($z1)
         layz2+=($((z2+1)))
     fi

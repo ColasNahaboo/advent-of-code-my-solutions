@@ -20,7 +20,6 @@ err(){ echo "***ERROR: $*" >&2; exit 1;}
 
 # A cuboid is described by "type x1 x2 y1 y2 z1 z2", type: 1=on, -1=off
 
-declare -a cins                 # array of input cuboids
 declare -a clist                # list of processed cuboids
 declare -i clistvol             # total volume of clist
 
@@ -28,6 +27,7 @@ declare -i clistvol             # total volume of clist
 merge-cuboid(){
     local -i i clistLen=${#clist[@]}
     for((i=0; i<clistLen; i++)); do
+        # shellcheck disable=SC2086 # yes we split the cuboids by param passing
         add-cuboid-intersection ${clist[i]} "$@"
     done
     (($1 > 0)) && append-cuboid "$@"
@@ -36,7 +36,7 @@ merge-cuboid(){
 # compute cuboids intersection, and append with inverted sign wrt first
 add-cuboid-intersection(){
     local -i sign1="$1" x11="$2" x12="$3" y11="$4" y12="$5" z11="$6" z12="$7"
-    local -i sign2="$8" x21="$9" x22="${10}" y21="${11}" y22="${12}" z21="${13}" z22="${14}"
+    local -i x21="$9" x22="${10}" y21="${11}" y22="${12}" z21="${13}" z22="${14}"
     local -i x1 x2 y1 y2 z1 z2
     if ((x21 <= x12)); then
         ((x22 < x11)) && return
@@ -72,7 +72,9 @@ append-cuboid(){
 # we read the cuboids, and apply them to the clist
 n=0
 tot=$(wc -l <"$in")
+# shellcheck disable=SC2020 # tr use is legit!
 while read -r line; do          # sign x1 x2 y1 y2 z1 z2
+    # shellcheck disable=SC2086 # yes we split the cuboids by param passing
     merge-cuboid $line
     echo "==[$((++n))/$tot] \"$line\", clist: ${#clist[@]}"
 done < <(tr -cs '\n[onf0-9]-' ' ' <"$in" |sed -e 's/on/1/' -e 's/off/-1/')

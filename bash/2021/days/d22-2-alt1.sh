@@ -51,12 +51,13 @@ echo "== XYZ coords: 0..100 to 0..$Xlen 0..$Ylen 0..$Zlen, $((Xlen * Ylen * Zlen
 
 # we read the boot orders in reverse (|tac), as "paint' layers
 # so that finding a XYZ point can stop the search
+# shellcheck disable=SC2206,SC2020 # no need to quote integer values
 while read -r type x1 x2 y1 y2 z1 z2; do
     [[ $type = on ]] && layt+=(1) || layt+=(0)
     layx1+=($x1)
     layx2+=($((x2+1)))
     layy1+=($y1)
-    layy2+=($(($y2+1)))
+    layy2+=($((y2+1)))
     layz1+=($z1)
     layz2+=($((z2+1)))
 done < <(tr -cs '\n[onf0-9]-' ' ' <"$in" |tac)
@@ -81,6 +82,7 @@ echo "== $((laylen - ${#intersections[@]})) loners and ${#intersections[@]} enta
 
 on=0
 for((i=0; i<laylen; i++)); do
+    # shellcheck disable=SC2206,SC2020 # no need to quote integer values
     if ((intersections[i])); then
         #echo "== el[${#elt[@]}] = \"${layt[i]} ${layx1[i]} ${layx2[i]} ${layy1[i]} ${layy2[i]} ${layz1[i]} ${layz2[i]}"
         elt+=(${layt[i]})
@@ -90,7 +92,7 @@ for((i=0; i<laylen; i++)); do
         ely2+=(${layy2[i]})
         elz1+=(${layz1[i]})
         elz2+=(${layz2[i]})
-    elif ((${layt[i]} == 1)); then
+    elif ((layt[i] == 1)); then
         ((on += (layx2[i]-layx1[i]) * (layy2[i]-layy1[i]) * (layz2[i]-layz1[i])))
     fi
 done
