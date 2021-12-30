@@ -87,6 +87,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d19 | 16.839 | `##########################################` |
 | d20 | 64.393 | `################################################` |
 | d21 | 8.028 | `=======================================` |
+| d22 | 520.855 | `#########################################################` |
 
 Legend:
 0s < `------` < 0.1s < `~~~~~~` < 0.5s < `++++++` < 1s < `======` < 10s < `######`
@@ -172,6 +173,15 @@ It was a trick question, as the "image enhancement algorithm" started with a 0 i
 
 And since the main image area of influence grows by 1 at each step, the final area to count the pixels wil be the original image plus N pixels on each side. And we need to add also N pixels padding to take into accoun the possible effect of the faw away pixels. I means that when we process an image of size `S`, we insert it into a blank image of size `(S + 2 * 2 * steps)`, apply `steps` times the algoritm, and count the pixels only in a area of size `(S + steps)`.
 
+### Day 22
+I implemented part in with a bands +  painting algorithm:
+- I only consider points at the border of any cube, and I work in a coordinate system of only these points. I call XYZ this system of "bands" between cube borders and xyz the original coordinates
+- I then consider the boot orders as layers of paint, so I only peek at the latest ones to get the state of a point.
+I implemented `d22-1.sh` by explicitely creating the XYZ space with origin -50 so that all XYZ could be used as array indexes since positive. Then I made a variant `d22-1-alt1.sh` without this constraint, to anticipate the second part.
+Alas, this same algorithm, in `d22-1-alt1.sh` was not scaling enough to tackle the full input. I this coded `d22-2.sh` by the intersection of cuboids methods as described by "aexl" in the reddit megathread for Day 22:
+  > Algorithm: Parse the input cuboids. Then start with an empty list (clist) of cuboids. For each cuboid from the input, calculate the intersections with the cuboids in the clist. If the intersection is non-empty add it to the clist with inverted sign w.r.t to the current cuboid in clist. If that cuboid from the input is set on, add it to the clist as well. Then add together all the volumes (cuboids with a negative sign will have a negative volume).
+
+
 ## Lessons learned
 This Advent of Code was quite fun, and quite instructive. What I learned:
 - Coding in bash is not so bad, even if it can border on insanity at times :-).
@@ -186,7 +196,8 @@ This Advent of Code was quite fun, and quite instructive. What I learned:
 - Bash can have typed variables: integer ones via `declare -i` or `local -i`, and using them makes your code safer.
 - Bash functions can be passed variables by name, useful for efficiency to avoid copying big arrays or strings, and to provide multiple return values by modifying passed variables. But it cannot recurse as it is not a passing by reference, but by name.
 - Working with arrays makes using `$(...)` impractical, as commands are executed in a subshell and cannot access arrays anymore to update them in the parent shell. So I tend to pass the return value(s) into global variables of the same name of a function. E.g. instead of `x=$(foo)`, I write `foo; x="$foo"`
-- To parse a space-separated string, the `${string#* }` and `${string% *}` operators are the fastest, closely followed by a read, the full `[[ $string =~ ([-[:digit:]]+)[[:space:]]... ]]` being 3 times slower.
+- To parse a space-separated string, the `${string#* }` and `${string% *}` operators are the fastest, closely followed by a read, the full `[[ $string =~ ([-[:digit:]]+)[[:space:]]... ]]` being 3 times slower. And if possible, using indexes is even faster: `${string:i:j}`.
 - Use the faster `$(< filename)` instead of `$(cat filename)`.
 - To copy an associative array A1 to A2 in bash 4.4+, do:
   `A1_def=$(declare -p A1) && declare -A A2="${A1_def#*=}"`
+- To access more than 9 parameters in a function: use braces: `$10` wont work, but `${10}` does.

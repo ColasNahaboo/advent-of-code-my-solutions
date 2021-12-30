@@ -1,6 +1,8 @@
 #!/bin/bash
 # benchmarks all the *-2 tests with the full input
 # with numeric args, bench only these tests
+# with NN:time-in-s.ms just pretend the test was run in time-in-s
+# e.g: 21, 9:23, 22:34.567
 # Options:
 # -l    use logarithmic scale
 
@@ -21,9 +23,13 @@ echo "| test | time | bar graph of times$legend |"
 echo "| :--- | ---: | :---- |"
 
 bench(){
-    local script="$1"
+    local script="$1" faketime="$2" time ms len barline
     [[ -x $script ]] || err "Script not found: $script"
-    time=$(bash -c "time $script 1>/dev/null" 2>&1)
+    if [[ -z $faketime ]]; then
+        time=$(bash -c "time $script 1>/dev/null" 2>&1)
+    else
+        time="$faketime"
+    fi
     ms=${time//./}
     [[ $ms =~ ^0+([[:digit:]]+)$ ]] && ms="${BASH_REMATCH[1]}"
     if "$log"; then
@@ -50,5 +56,14 @@ barline(){
 if [[ -z $1 ]]; then
     for script in d*-2.sh; do bench "$script"; done
 else
-    for n in "$@"; do [[ ${#n} == 1 ]] && n="0$n"; bench "d$n-2.sh"; done
+    for n in "$@"; do
+        faketime=
+        if [[ $n =~ ^([[:digit:]]+):([.[:digit:]]+)$ ]]; then
+            n="${BASH_REMATCH[1]}"
+            faketime="${BASH_REMATCH[2]}"
+            [[ $faketime =~ [.] ]] || faketime="$faketime.000"
+        fi
+        ((n <10)) && pad=0 || pad=
+        bench "d$pad$n-2.sh" "$faketime"
+    done
 fi

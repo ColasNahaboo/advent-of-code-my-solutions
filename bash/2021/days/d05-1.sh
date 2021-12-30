@@ -5,6 +5,9 @@ in="${1:-${0%-[0-9].*}.input}"; [[ -e $in ]] || exit 1
 err(){ echo "***ERROR: $*" >&2; exit 1;}
 export tmp=tmp.$$; clean(){ rm -f "$tmp" "$tmp".*;}; trap clean 0
 
+#TEST: example 5
+#TEST: input 5690
+
 # As the naive method of creating a 2-dimensional aray and plotting the
 # lines could be too slow in bash, we try the following hack:
 # We will just store lines as the set of their points in X,Y form
