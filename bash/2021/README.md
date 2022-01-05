@@ -88,8 +88,10 @@ These are the execution times in seconds of the second exercises of each day on 
 | d20 | 64.393 | `################################################` |
 | d21 | 8.028 | `=======================================` |
 | d22 | 520.855 | `#########################################################` |
-| d23 |  | |
+| d23 | TODO | |
 | d24 | 2494.000 | `###############################################################` |
+| d25 | 61.705 | `###############################################` |
+
 
 Legend:
 0s < `------` < 0.1s < `~~~~~~` < 0.5s < `++++++` < 1s < `======` < 10s < `######`
@@ -189,7 +191,7 @@ Alas, this same algorithm, in `d22-1-alt1.sh` was not scaling enough to tackle t
 - I had to understand the input to use its peculiarities, I was not going to solve the general case. I found that the programe was actually a serie of 14 distinct nearly identical sections of 18 instructions, each one working only the current input digit of the model number, and the Z value of the previous section. I thus separated the code in 18 similar simple computations steps of the form `z[n+1] = function-of(z[n], input-digit[n])`. Still too slow in bash, but this time the C translation was able to complete in less than an hour, so I decided to stop there.
 - More optimisations could be done by abstracting more the code into some stack machine as is done in the reddit thread, but I will leave this as an exercise to the reader.
 
-In the end, one could say I cheated by using C code, but it is debatable, as prototyping in shell and only rewriting too slow parts in C is a traditional unix culture of mixed programming, and moreover the C code is using the exact arithmetic syntax of the bash version, just copied untranslated. In a way I just used C as a ... bash compiler. I have left the genertwed C code, `d24.c` in the sources so that you can see what it is like, but it is re-generated, compiled and run on the fly by `d24-1.sh` and `d24-2.sh`.
+In the end, one could say I cheated by using C code, but it is debatable, as prototyping in shell and only rewriting too slow parts in C is a traditional unix culture of mixed programming, and moreover the C code is using the exact arithmetic syntax of the bash version, just copied untranslated. In a way I just used C as a ... bash compiler. I have left the generated C code, `d24.c` in the sources so that you can see what it is like, but it is re-generated, compiled and run on the fly by `d24-1.sh` and `d24-2.sh`.
 
 ## Lessons learned
 This Advent of Code was quite fun, and quite instructive. What I learned:
