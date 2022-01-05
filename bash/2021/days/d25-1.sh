@@ -11,6 +11,9 @@ err(){ echo "***ERROR: $*" >&2; exit 1;}
 verbose="${2}"                  # 2nd argument prints maps
 
 # we use as map values .=0, >=1, v=cols so that to move, we just add its value
+# Note: the idea was to advance by just adding the value
+# But I ended up not using it as it was not handling properluy the wraparound
+# so the code below just considers the values 0, 1, and anything else.
 declare -i cols rows size
 declare -ai map                 # [col, row] == map[row*cols+col]
 
@@ -31,6 +34,7 @@ done <"$in"
 rows="$r"
 ((size=rows*cols))
 
+# just used in verbose mode for debugging
 print-map(){
     local -i r c i
     for((r=0; r<rows; r++)); do
@@ -48,13 +52,17 @@ print-map(){
 [[ -n $verbose ]] && { echo "Initial:"; print-map;}
 step=0
 moved=true
+# each step consists of 2 passes, one for > the other for v
+# on each padd we register the moves to do in new[], but only apply them
+# at the end of each pass. new[] is then a sparse array.
 while "$moved"; do
     moved=false
     # first, all the >
     new=()
     for((i=0; i<size; i++)); do
         if ((map[i]==1)); then
-            ((j=(i/cols)*cols+((i%cols)+1)%cols)) # to right, with wrap
+            # j is the position to move to, with wraparound
+            ((j=(i/cols)*cols+((i%cols)+1)%cols))
             if ((map[j]==0)); then
                 ((new[i]=0))    # register move for later
                 ((new[j]=1))
@@ -67,6 +75,7 @@ while "$moved"; do
     new=()
     for((i=0; i<size; i++)); do
         if ((map[i]==cols)); then
+            # j is the position to move to, with wraparound
             ((j=((i/cols)+1)%rows*cols+i%cols))
             if ((map[j]==0)); then
                 ((new[i]=0))
