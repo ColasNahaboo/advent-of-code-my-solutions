@@ -88,6 +88,8 @@ These are the execution times in seconds of the second exercises of each day on 
 | d20 | 64.393 | `################################################` |
 | d21 | 8.028 | `=======================================` |
 | d22 | 520.855 | `#########################################################` |
+| d23 |  | |
+| d24 | 2494.000 | `###############################################################` |
 
 Legend:
 0s < `------` < 0.1s < `~~~~~~` < 0.5s < `++++++` < 1s < `======` < 10s < `######`
@@ -181,6 +183,13 @@ I implemented `d22-1.sh` by explicitely creating the XYZ space with origin -50 s
 Alas, this same algorithm, in `d22-1-alt1.sh` was not scaling enough to tackle the full input. I this coded `d22-2.sh` by the intersection of cuboids methods as described by "aexl" in the reddit megathread for Day 22:
   > Algorithm: Parse the input cuboids. Then start with an empty list (clist) of cuboids. For each cuboid from the input, calculate the intersections with the cuboids in the clist. If the intersection is non-empty add it to the clist with inverted sign w.r.t to the current cuboid in clist. If that cuboid from the input is set on, add it to the clist as well. Then add together all the volumes (cuboids with a negative sign will have a negative volume).
 
+### Day 24
+- I first implemented a straightforward interpreter of the machine code in `d24-1-alt1.sh` but it was too slow to complete in months
+- Then I translated the machine code into bash arithmetic expressions, and implemented a crude symbolic optimisations based on the max and min possible values of the symbols, in `d24-1-alt2.sh`. Suprisingly, it was even slower than before. However, the bash arithmetic is exactly the same as the C one, so it was trvial to just use the computed bash expressions to create a C version. Alas, it was still too slow. The expression was 1 megabyte of text, I guess too much to process efficiently.
+- I had to understand the input to use its peculiarities, I was not going to solve the general case. I found that the programe was actually a serie of 14 distinct nearly identical sections of 18 instructions, each one working only the current input digit of the model number, and the Z value of the previous section. I thus separated the code in 18 similar simple computations steps of the form `z[n+1] = function-of(z[n], input-digit[n])`. Still too slow in bash, but this time the C translation was able to complete in less than an hour, so I decided to stop there.
+- More optimisations could be done by abstracting more the code into some stack machine as is done in the reddit thread, but I will leave this as an exercise to the reader.
+
+In the end, one could say I cheated by using C code, but it is debatable, as prototyping in shell and only rewriting too slow parts in C is a traditional unix culture of mixed programming, and moreover the C code is using the exact arithmetic syntax of the bash version, just copied untranslated. In a way I just used C as a ... bash compiler. I have left the genertwed C code, `d24.c` in the sources so that you can see what it is like, but it is re-generated, compiled and run on the fly by `d24-1.sh` and `d24-2.sh`.
 
 ## Lessons learned
 This Advent of Code was quite fun, and quite instructive. What I learned:
