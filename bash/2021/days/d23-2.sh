@@ -240,8 +240,6 @@ done
     echo ')'
 }
 
-############ Read input
-
 ############ semi-generic code: can work with any board sizes
 
 # state-next puts a list of "cost:neighbors-state" in global costnexts[]
@@ -458,7 +456,7 @@ states=0
 export TIMEFORMAT="Computations done in %3lR"
 time while true; do
     frontier-get current || break
-    s=${current//[^,]/}; ((${#s} == 4*room_depth-1)) || err "state $current has not $((4*room_depth)) elements" # DDDD
+    # s=${current//[^,]/}; ((${#s} == 4*room_depth-1)) || err "state $current has not $((4*room_depth)) elements" # DDDD
     ((states++))
     # shellcheck disable=SC2154 # current is assigned by the above
     [[ $current == "$goal" ]] && break # found!
