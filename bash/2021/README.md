@@ -181,16 +181,20 @@ And since the main image area of influence grows by 1 at each step, the final ar
 I implemented part in with a bands +  painting algorithm:
 - I only consider points at the border of any cube, and I work in a coordinate system of only these points. I call XYZ this system of "bands" between cube borders and xyz the original coordinates
 - I then consider the boot orders as layers of paint, so I only peek at the latest ones to get the state of a point.
-I implemented `d22-1.sh` by explicitely creating the XYZ space with origin -50 so that all XYZ could be used as array indexes since positive. Then I made a variant `d22-1-alt1.sh` without this constraint, to anticipate the second part.
-Alas, this same algorithm, in `d22-1-alt1.sh` was not scaling enough to tackle the full input. I this coded `d22-2.sh` by the intersection of cuboids methods as described by "aexl" in the reddit megathread for Day 22:
+  I implemented `d22-1.sh` by explicitely creating the XYZ space with origin -50 so that all XYZ could be used as array indexes since positive. Then I made a variant `d22-1-alt1.sh` without this constraint, to anticipate the second part.
+  Alas, this same algorithm, in `d22-1-alt1.sh` was not scaling enough to tackle the full input. I this coded `d22-2.sh` by the intersection of cuboids methods as described by "aexl" in the reddit megathread for Day 22:
+  
   > Algorithm: Parse the input cuboids. Then start with an empty list (clist) of cuboids. For each cuboid from the input, calculate the intersections with the cuboids in the clist. If the intersection is non-empty add it to the clist with inverted sign w.r.t to the current cuboid in clist. If that cuboid from the input is set on, add it to the clist as well. Then add together all the volumes (cuboids with a negative sign will have a negative volume).
 
 ## Day 23
 This was the hardest puzzle for me. But I took the opportunity to properly implement the A-Star graph search algorithm, something that I had never done. I thus tried to have a quite generic code tha can be used for any room depth.
+
 What I ended up doing is to pre-compute the topological properties of the graph of the possible moves bewteen states, with "rules" attached to positions. For instance, to find neighbor states, I create a table `mapnexts` that for all position gives the list of possible moves, each being a path (a list) of places, with the cost associated (the path length). To find the places deeper in the room, I have a `deeper_rooms` table, etc...
+
 I represent a state as a comma-separated list of `{pod class},{place number}` always ordered, such as ` A14,A17,A19,A22,B7,B9,B13,B16,C8,C12,C18,C21,D10,D11,D15,D20` for the example. I hesitated with a more compact representation such as `...........BCBDCADCA`, which may have been better or worse. But I do not feel the courage to try to re-code it this way.
-As I had a hard time debugging my code (I was really feeling the pain of the lack of structures in bash) I resorted to dowloading a solution (in python), not looking at its code, but using it to generate test cases for evaluating my code against.
-  
+
+As I had a hard time debugging my code (I was really feeling the pain of the lack of structures in bash) I resorted to downloading a solution (in python), not looking at its code, but using it to generate test cases for evaluating my code against.
+
 ### Day 24
 - I first implemented a straightforward interpreter of the machine code in `d24-1-alt1.sh` but it was too slow to complete in months
 - Then I translated the machine code into bash arithmetic expressions, and implemented a crude symbolic optimisations based on the max and min possible values of the symbols, in `d24-1-alt2.sh`. Suprisingly, it was even slower than before. However, the bash arithmetic is exactly the same as the C one, so it was trvial to just use the computed bash expressions to create a C version. Alas, it was still too slow. The expression was 1 megabyte of text, I guess too much to process efficiently.
@@ -205,7 +209,7 @@ This Advent of Code was quite fun, and quite instructive. What I learned:
 - Modern bash features are often overlooked but very useful.
 - Passing shellcheck should be a mandatory goal for each bash programmer. I resented it at first since I thought it was adding unecessary syntaxic sugar to my code until I realized that it was a symptom that my coding style was the problem.
 - Use `[[...]]` for strings and `((...))` for integers other any of the legacy constructs like `[...]`, `test`, etc... The code is then much cleaner and safer (and a tad faster), as you do not have to quote as much. E.g: `[[ -z foo ]]` instead of `[ -z "$foo" ]`, or even `((i=j))` instead of `i="$j"`
-  - **but**, this makes traditional debugging with `set -x` less useful as the values of variables are not displayed anymore. E.g if j is 2, the tracing of `i="$j"` shows `i=2` whereas the tracing of `((i=j))` only shows `((i=j))`. This could be where a bash debugger would be useful, but I know only one, [bashdb](http://bashdb.sourceforge.net/bashdb.html), and it does not seem updated anymore, and I could not find a version working with bash 5.1. The `trap DEBUG` trick can be useful, though.
+  - **but**, this makes traditional debugging with `set -x` less useful as the values of variables are not displayed anymore. E.g if j is 2, the tracing of `i="$j"` shows `i=2` whereas the tracing of `((i=j))` only shows `((i=j))`. This could be where a bash debugger would be useful, but I know only one, [bashdb](http://bashdb.sourceforge.net/bashdb.html), and it does not seem updated frequently, but I could find a  beta version that I could compile with bash 5.1. The `trap DEBUG` trick can also be useful,.
   - So, I tend to write now `i=$((j+k))` while developing code, and maybe later for production switch to the a bit more efficient `((i = j+k))`
 - I avoided arrays in bash because I found out they were abysmally slow when first introduced, to the point that managing data in files with grep, sed, ... was actually faster than using arrays. But not anymore! Bash arrays should now be used as much as possible.
 - A lot of bash functions can "map" on arrays. For instance `${tab[@]//x/y}` will string-replace x by y in all the elements of the array tab, and is super fast.
