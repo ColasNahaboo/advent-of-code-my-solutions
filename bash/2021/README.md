@@ -2,7 +2,7 @@
 Here are my solutions to the "Advent of code" challenge of 2021 implemented in bash.
 See https://adventofcode.com/2021
 
-I tried to implement "smart" bash solutions (see at the end, "Algorithmic tricks"), that rely on fast GNU/Linux utilities like grep, sed, sort... (the way I use bash in real life), but most of the time my goal was readability and compliance with shellcheck, not terseness or efficiency. I am an old (retired) proficient bash programmer, so my goal here is not to learn bash, but rather un-learn some bad dirty habits accumulated over the years and force myself to code in a "shellcheck-friendly" modern way.
+I tried to implement "smart" bash solutions (see at the end, "Algorithmic tricks"), that rely on fast GNU/Linux utilities like grep, sed, sort... (the way I use bash in real life), but most of the time my goal was readability and compliance with shellcheck, not terseness or efficiency. I am an old (retired) proficient bash programmer, so my goal here is not to learn bash, but rather un-learn some bad dirty habits accumulated over the years and force myself to code in a "shellcheck-friendly" modern way. Only once (for day 24) I resorting to having the bash script generate C code to compile a brute force calculation part.
 
 Although I invented, designed and implemented a commercial programming language (The SML - System Management Language - in the Bull ISM Network Management platform), and worked professionnally with "real" languages, I grew in love with bash because the intellectual challenges it poses to write efficient code, making mundane tasks exciting, and that it (nearly) never breaks backwards compatibility, a code that runs now will still run in 20 years and more... And since I retired in 2021 I now have time to play with things, and discovered the "Advent of code" challenge.
 
@@ -88,7 +88,7 @@ These are the execution times in seconds of the second exercises of each day on 
 | d20 | 64.393 | `################################################` |
 | d21 | 8.028 | `=======================================` |
 | d22 | 520.855 | `#########################################################` |
-| d23 | TODO | |
+| d23 | 1078.000 | `############################################################` |
 | d24 | 2494.000 | `###############################################################` |
 | d25 | 61.705 | `###############################################` |
 
@@ -185,6 +185,12 @@ I implemented `d22-1.sh` by explicitely creating the XYZ space with origin -50 s
 Alas, this same algorithm, in `d22-1-alt1.sh` was not scaling enough to tackle the full input. I this coded `d22-2.sh` by the intersection of cuboids methods as described by "aexl" in the reddit megathread for Day 22:
   > Algorithm: Parse the input cuboids. Then start with an empty list (clist) of cuboids. For each cuboid from the input, calculate the intersections with the cuboids in the clist. If the intersection is non-empty add it to the clist with inverted sign w.r.t to the current cuboid in clist. If that cuboid from the input is set on, add it to the clist as well. Then add together all the volumes (cuboids with a negative sign will have a negative volume).
 
+## Day 23
+This was the hardest puzzle for me. But I took the opportunity to properly implement the A-Star graph search algorithm, something that I had never done. I thus tried to have a quite generic code tha can be used for any room depth.
+What I ended up doing is to pre-compute the topological properties of the graph of the possible moves bewteen states, with "rules" attached to positions. For instance, to find neighbor states, I create a table `mapnexts` that for all position gives the list of possible moves, each being a path (a list) of places, with the cost associated (the path length). To find the places deeper in the room, I have a `deeper_rooms` table, etc...
+I represent a state as a comma-separated list of `{pod class},{place number}` always ordered, such as ` A14,A17,A19,A22,B7,B9,B13,B16,C8,C12,C18,C21,D10,D11,D15,D20` for the example. I hesitated with a more compact representation such as `...........BCBDCADCA`, which may have been better or worse. But I do not feel the courage to try to re-code it this way.
+As I had a hard time debugging my code (I was really feeling the pain of the lack of structures in bash) I resorted to dowloading a solution (in python), not looking at its code, but using it to generate test cases for evaluating my code against.
+  
 ### Day 24
 - I first implemented a straightforward interpreter of the machine code in `d24-1-alt1.sh` but it was too slow to complete in months
 - Then I translated the machine code into bash arithmetic expressions, and implemented a crude symbolic optimisations based on the max and min possible values of the symbols, in `d24-1-alt2.sh`. Suprisingly, it was even slower than before. However, the bash arithmetic is exactly the same as the C one, so it was trvial to just use the computed bash expressions to create a C version. Alas, it was still too slow. The expression was 1 megabyte of text, I guess too much to process efficiently.
@@ -206,8 +212,8 @@ This Advent of Code was quite fun, and quite instructive. What I learned:
 - Use arrays rather than the classic way to represent lists in bash by space-separated (or tab-separated) substrings in a  string.
 - Bash can have typed variables: integer ones via `declare -i` or `local -i`, and using them makes your code safer.
 - Bash functions can be passed variables by name, useful for efficiency to avoid copying big arrays or strings, and to provide multiple return values by modifying passed variables. But it cannot recurse as it is not a passing by reference, but by name.
-- Working with arrays makes using `$(...)` impractical, as commands are executed in a subshell and cannot access arrays anymore to update them in the parent shell. So I tend to pass the return value(s) into global variables of the same name of a function. E.g. instead of `x=$(foo)`, I write `foo; x="$foo"`
-- To parse a space-separated string, the `${string#* }` and `${string% *}` operators are the fastest, closely followed by a read, the full `[[ $string =~ ([-[:digit:]]+)[[:space:]]... ]]` being 3 times slower. And if possible, using indexes is even faster: `${string:i:j}`.
+- Working with arrays makes using `$(...)` impractical, as commands are executed in a subshell and cannot access arrays anymore to update them in the parent shell. So I tend to pass the return value(s) into global variables of the same name of a function. E.g. instead of `x=$(foo)`, I write `foo; x="$foo"`. Or pass variables by name to set them if I want to return multiple results.
+- To parse a space-separated string, the fastest is using `set` to map the elements in the positional parameters `$1`, `$2`, ... then the `${string#* }` and `${string% *}` operators are the fastest, closely followed by a read, the full `[[ $string =~ ([-[:digit:]]+)[[:space:]]... ]]` being 3 times slower. And if possible, using indexes is even faster: `${string:i:j}`.
 - Use the faster `$(< filename)` instead of `$(cat filename)`.
 - To copy an associative array A1 to A2 in bash 4.4+, do:
   `A1_def=$(declare -p A1) && declare -A A2="${A1_def#*=}"`

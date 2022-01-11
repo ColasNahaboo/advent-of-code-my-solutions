@@ -70,6 +70,7 @@ while "$moved"; do
             fi
         fi
     done
+    # shellcheck disable=SC2068 # yes, elements are space-splitted
     for i in ${!new[@]}; do ((map[i]=new[i])); done # apply moves
     # then, all the v
     new=()
@@ -84,6 +85,7 @@ while "$moved"; do
             fi
         fi
     done
+    # shellcheck disable=SC2068 # yes, elements are space-splitted
     for i in ${!new[@]}; do ((map[i]=new[i])); done # apply moves
 
     ((++step))
