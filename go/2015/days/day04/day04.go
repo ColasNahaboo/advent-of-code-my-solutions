@@ -7,12 +7,13 @@ package main
 
 import (
 	"crypto/md5"
+	"encoding/hex"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"regexp"
 	"strconv"
+	"strings"
 )
 
 func main() {
@@ -39,25 +40,19 @@ func main() {
 }
 
 func Part1(key []byte) int {
-	keystr := string(key)
-	fivezero := regexp.MustCompile("^00000")
-	for i := 0; true; i++ {
-		data := keystr + strconv.Itoa(i)
-		hash := fmt.Sprintf("%x", md5.Sum([]byte(data)))
-		if fivezero.MatchString(hash) {
-			return i
-		}
-	}
-	return 0
+	return lowestnum(key, "00000")
 }
 
 func Part2(key []byte) int {
+	return lowestnum(key, "000000")
+}
+
+func lowestnum(key []byte, prefix string) int {
 	keystr := string(key)
-	sixzero := regexp.MustCompile("^000000")
 	for i := 0; true; i++ {
 		data := keystr + strconv.Itoa(i)
-		hash := fmt.Sprintf("%x", md5.Sum([]byte(data)))
-		if sixzero.MatchString(hash) {
+		hash := md5.Sum([]byte(data))
+		if strings.HasPrefix(hex.EncodeToString(hash[:]), prefix) {
 			return i
 		}
 	}
