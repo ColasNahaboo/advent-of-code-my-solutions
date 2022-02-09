@@ -10,8 +10,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"regexp"
-	"strconv"
 )
 
 func main() {
@@ -21,37 +19,34 @@ func main() {
 	if flag.NArg() > 0 {
 		infile = flag.Arg(0)
 	}
-	presents := ReadInput(infile)
+	input, err := ioutil.ReadFile(infile)
+	if err != nil {
+		os.Exit(1)
+	}
 
 	var result int
 	if *partOne {
 		fmt.Println("Running Part1")
-		result = Part1(presents)
+		result = Part1(input)
 	} else {
 		fmt.Println("Running Part2")
-		result = Part2(presents)
+		result = Part2(input)
 	}
 	fmt.Println(result)
 }
 
-func ReadInput(infile string) []Present {
-	i, err := ioutil.ReadFile(infile)
-	if err != nil {
-		os.Exit(1)
-	}
-	presents := new([]Present)
-	var present Present
-	re := regexp.MustCompile("([[:digit:]]+)x([[:digit:]]+)x([[:digit:]]+)")
-	presentsStrings := re.FindAllStringSubmatch(string(i), -1)
-	for _, presentString := range presentsStrings {
-		l, err := strconv.Atoi(presentString[1])
-		w, err := strconv.Atoi(presentString[2])
-		h, err := strconv.Atoi(presentString[3])
-		if err != nil {
-			os.Exit(2)
-		}
-		present = Present{l, w, h}
-		*presents = append(*presents, present)
-	}
-	return *presents
+//func ReadInput(infile string) string {
+//	i, err := ioutil.ReadFile(infile)
+//	if err != nil {
+//		os.Exit(1)
+//	}
+//	return i
+//}
+
+func Part1(input []byte) int {
+	return 0
+}
+
+func Part2(input []byte) int {
+	return 0
 }
