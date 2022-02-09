@@ -1,6 +1,6 @@
 # Colas: advent-of-code-my-solutions
 
-These are my solutions for the advent-of-code puzzles.
+These are my solutions for the [advent-of-code](https://adventofcode.com/) puzzles.
 The code is reasonably commented, and the top README in each directory details the tricks/tweaks/hacks I used.
 
 Available for now:
