@@ -6,6 +6,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -35,18 +36,24 @@ func main() {
 	fmt.Println(result)
 }
 
-//func ReadInput(infile string) string {
-//	i, err := ioutil.ReadFile(infile)
-//	if err != nil {
-//		os.Exit(1)
-//	}
-//	return i
+//func ReadInput(input *bufio.Scanner) []string {
+//	var text []string
+//    for input.Scan() {
+//        text = append(text, scanner.Text())
+//    }
+//	return text
 //}
 
-func Part1(input []byte) int {
+func Part1(input *bufio.Scanner) int {
+	for input.Scan() {
+		line := input.Text()
+	}
 	return 0
 }
 
-func Part2(input []byte) int {
+func Part2(input *bufio.Scanner) int {
+	for input.Scan() {
+		line := input.Text()
+	}
 	return 0
 }
