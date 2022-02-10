@@ -25,3 +25,7 @@ The code is in standard GO, with some housekeeping scripts in bash.
 - Unit tests are performed via the standard GO testing system, in the source file `days/dayNN/dayNN_test.go`
 - Integration tests are done by looking at the comments `// TEST: [option] input-file result` in source files and running the code with the option and input and checking the last printed line is the result. The `days/TESTALL` bash script runs all the unit and integration tests, see it for technical details.
 - The examples given in the problem descriptions are used in GO unit tests `dayNN_test.go` , whereas the input file is used for the high-level integration tests of `TESTALL`.
+
+**Notes:**
+
+- `days/MAKEDAY NN` is what I used to create a new day directory.

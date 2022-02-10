@@ -3,30 +3,42 @@ package main
 
 import (
 	"bufio"
-	"fmt"
-	"log"
 	"os"
+	"strings"
 )
 
-func main() {
-	file, err := os.Open("/path/to/file.txt")
-	if err != nil {
-		log.Fatal(err)
+func StringToLines(s string) (lines []string) {
+	scanner := bufio.NewScanner(strings.NewReader(s))
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
 	}
-	defer file.Close()
+	err := scanner.Err()
+	if err != nil {
+		os.Exit(1)
+	}
+	return
+}
 
-	scanner := bufio.NewScanner(file)
+func FileToLines(filePath string) (lines []string) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
 	// optionally, resize scanner's capacity for lines over 64K (65536)
-	const maxCapacity = longLineLen // your required line length
+	const maxCapacity = 1000000 // your required line length
 	buf := make([]byte, maxCapacity)
 	scanner.Buffer(buf, maxCapacity)
 	// end optional
-
 	for scanner.Scan() {
-		fmt.Println(scanner.Text())
+		lines = append(lines, scanner.Text())
+	}
+	err = scanner.Err()
+	if err != nil {
+		os.Exit(1)
 	}
 
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
+	return
 }

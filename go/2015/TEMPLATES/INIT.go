@@ -9,8 +9,8 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -20,40 +20,71 @@ func main() {
 	if flag.NArg() > 0 {
 		infile = flag.Arg(0)
 	}
-	input, err := ioutil.ReadFile(infile)
-	if err != nil {
-		os.Exit(1)
-	}
+	lines := FileToLines(infile)
 
 	var result int
 	if *partOne {
 		fmt.Println("Running Part1")
-		result = Part1(input)
+		result = Part1(lines)
 	} else {
 		fmt.Println("Running Part2")
-		result = Part2(input)
+		result = Part2(lines)
 	}
 	fmt.Println(result)
 }
 
-//func ReadInput(input *bufio.Scanner) []string {
-//	var text []string
-//    for input.Scan() {
-//        text = append(text, scanner.Text())
-//    }
-//	return text
-//}
+//////////// Part 1
 
-func Part1(input *bufio.Scanner) int {
-	for input.Scan() {
-		line := input.Text()
+func Part1(lines []string) int {
+	for _, line := range lines {
+		fmt.Println(line)
 	}
 	return 0
 }
 
-func Part2(input *bufio.Scanner) int {
-	for input.Scan() {
-		line := input.Text()
+//////////// Part 2
+func Part2(lines []string) int {
+	for _, line := range lines {
+		fmt.Println(line)
 	}
 	return 0
+}
+
+//////////// Common Parts code
+
+//////////// Generic code
+func StringToLines(s string) (lines []string) {
+	scanner := bufio.NewScanner(strings.NewReader(s))
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	err := scanner.Err()
+	if err != nil {
+		os.Exit(1)
+	}
+	return
+}
+
+func FileToLines(filePath string) (lines []string) {
+	f, err := os.Open(filePath)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+
+	scanner := bufio.NewScanner(f)
+	// optionally, resize scanner's capacity for lines over 64K (65536)
+	const maxCapacity = 1000000 // your required line length
+	buf := make([]byte, maxCapacity)
+	scanner.Buffer(buf, maxCapacity)
+	// end optional
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	err = scanner.Err()
+	if err != nil {
+		os.Exit(1)
+	}
+
+	return
 }
