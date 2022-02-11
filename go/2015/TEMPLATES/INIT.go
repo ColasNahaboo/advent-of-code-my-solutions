@@ -9,6 +9,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 )
@@ -60,7 +61,7 @@ func StringToLines(s string) (lines []string) {
 	}
 	err := scanner.Err()
 	if err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 	return
 }
@@ -68,7 +69,7 @@ func StringToLines(s string) (lines []string) {
 func FileToLines(filePath string) (lines []string) {
 	f, err := os.Open(filePath)
 	if err != nil {
-		return
+		log.Fatal(err)
 	}
 	defer f.Close()
 
@@ -83,7 +84,7 @@ func FileToLines(filePath string) (lines []string) {
 	}
 	err = scanner.Err()
 	if err != nil {
-		os.Exit(1)
+		log.Fatal(err)
 	}
 
 	return

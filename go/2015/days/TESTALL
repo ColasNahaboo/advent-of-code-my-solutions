@@ -67,7 +67,7 @@ runtest(){
         else
             result=$(./"${radix##*/}" $opt "$name.txt" | tail -1)
         fi
-        cd "$OPWD"
+        cd "$OPWD" || exit 1
         if [[ $result != "$value" ]]; then
             echo "***TEST ERROR: $script $name.txt: found \"$result\", expecting \"$value\""
             (( fails++ ))

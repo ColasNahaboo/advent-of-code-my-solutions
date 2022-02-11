@@ -23,7 +23,7 @@ Although I invented, designed and implemented a commercial programming language 
   `for i in d*.sh; do shellcheck -f gcc $i; done`
 - When temporary files are used, they are cleaned with a clean function called on any exit with trap 0
 - If we detect errors, they are listed on stderr, with the function `err`
-- Simple regression tests embedded in the scripts with the comments `#TEST: input-name expected-value` can be run with the command [TEST](days/TEST). Usage by `./TEST`.
+- Simple regression tests embedded in the scripts with the comments `#TEST: input-name expected-value` can be run with the command [TESTALL](days/TESTALL). Usage by `./TESTALL`.
 
 **Style:**
 - We use `(( ... ))` and `[[ ... ]]` rather than let and `[ ... ]`

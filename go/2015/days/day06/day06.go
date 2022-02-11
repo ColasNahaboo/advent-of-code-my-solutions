@@ -115,8 +115,7 @@ func Part2(lines []string) int {
 	bright := 0
 	reInst := regexp.MustCompile("(turn on|turn off|toggle)[[:space:]]+([0-9]+),([0-9]+)[[:space:]]+through[[:space:]]+([0-9]+),([0-9]+)")
 	for _, line := range lines {
-		s := reInst.FindStringSubmatch(line)
-		if s != nil {
+		if s := reInst.FindStringSubmatch(line); s != nil {
 			x1, err1 := strconv.Atoi(s[2])
 			y1, err2 := strconv.Atoi(s[3])
 			x2, err3 := strconv.Atoi(s[4])
