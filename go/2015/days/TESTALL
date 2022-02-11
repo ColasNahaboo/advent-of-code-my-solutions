@@ -49,15 +49,19 @@ runtest(){
             value="${BASH_REMATCH[2]}"
         else
             echo "***TEST SYNTAX ERROR in $script: $line"
+            cd "$OPWD" || exit 1
             continue
         fi
         V "  TEST ${script##*/} $name.txt"
         cd "${script%%/*}" || exit 1
         # compile if needed
-        go build || continue
+        go build || { cd "$OPWD" || exit 1; continue;}
         if [[ -e  ${radix##*/}_test.go ]]; then
             # GO unit tests
-            go test >/dev/null || continue
+            go test >/dev/null || {
+                echo "Tests ${radix##*/}_test.go FAILED!, aborting"
+                cd "$OPWD" || exit 1; continue
+            }
         fi
         # final test
         # shellcheck disable=SC2086
@@ -101,7 +105,7 @@ for arg in "$@" $default; do
         while read -r script; do
             runtest "$script"
             (( errors += $? ))
-        done < <(find . -name day\*.go |sed -e 's|^[.]/||' |grep -v '_test[.]go')
+        done < <(find . -name day\*.go |sed -e 's|^[.]/||' |grep -v '_test[.]go' |sort)
     elif [[ $arg =~ ^day[[:digit:]]+$ ]]; then
         runtest "$arg/$arg.go"
         (( errors += $? ))
