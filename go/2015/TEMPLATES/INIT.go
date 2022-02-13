@@ -11,9 +11,9 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	// "regexp"
-	// "strconv"
 )
 
 func main() {
@@ -56,6 +56,8 @@ func Part2(lines []string) int {
 //////////// Common Parts code
 
 //////////// Generic code
+
+// useful in tests to feed Part1 & Part2 with a simple string (with newlines)
 func StringToLines(s string) (lines []string) {
 	scanner := bufio.NewScanner(strings.NewReader(s))
 	for scanner.Scan() {
@@ -68,6 +70,7 @@ func StringToLines(s string) (lines []string) {
 	return
 }
 
+// read the input file into a string array for feeding Parts
 func FileToLines(filePath string) (lines []string) {
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -90,4 +93,19 @@ func FileToLines(filePath string) (lines []string) {
 	}
 
 	return
+}
+
+// simplified functions to not bother with error handling. Just abort.
+
+func Atoi(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return i
+}
+
+// for completeness
+func Itoa(i int) string {
+	return strconv.Itoa(i)
 }

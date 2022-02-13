@@ -1,0 +1,17 @@
+#!/bin/bash
+# clean the directories before git-commiting
+
+export d
+for d in day??; do
+    ( cd "$d" || exit 1
+      rm -f -- day[0-9][0-9] __debug_bin *~ \#*
+    )
+    missing=$(grep '^// TEST: .*[^[:alnum:]]$' day??/*.go)
+done
+
+if [[ -n $missing ]]; then
+    echo "### Warning: some TEST declarations are missing values!"
+    echo "$missing"
+    echo "=== Please fix them"
+fi
+

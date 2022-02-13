@@ -39,11 +39,11 @@ runtest(){
     V "Running tests in $script"
     while read -r line; do
         cd "$OPWD" || exit 1
-        if [[ $line =~ ^(-[-[:alnum:]]+)[[:space:]]+([[:alnum:]]+)[[:space:]]+(-?[[:digit:]]+) ]]; then
+        if [[ $line =~ ^(-[-[:alnum:]]+)[[:space:]]+([[:alnum:]]+)[[:space:]]+(-?[[:alnum:]]+) ]]; then
             opt="${BASH_REMATCH[1]}"
             name="${BASH_REMATCH[2]}"
             value="${BASH_REMATCH[3]}"
-        elif [[ $line =~ ^([[:alnum:]]+)[[:space:]]+(-?[[:digit:]]+) ]]; then
+        elif [[ $line =~ ^([[:alnum:]]+)[[:space:]]+(-?[[:alnum:]]+) ]]; then
             opt=
             name="${BASH_REMATCH[1]}"
             value="${BASH_REMATCH[2]}"
@@ -78,7 +78,7 @@ runtest(){
         else
             V "       OK"
         fi
-    done < <(grep -oP '^[[:space:]]*//[[:space:]]*TEST:[[:space:]]*\K[-_[:alnum:][:space:]]+[[:space:]]+-?[[:digit:]]+' "$script")
+    done < <(grep -oP '^[[:space:]]*//[[:space:]]*TEST:[[:space:]]*\K[-_[:alnum:][:space:]]+[[:space:]]+-?[[:alnum:]]+' "$script")
     return "$fails"
 }        
 

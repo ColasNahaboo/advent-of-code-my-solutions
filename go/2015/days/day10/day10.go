@@ -2,7 +2,7 @@
 // -1: use solve part 1 of the problem, default is the second one
 // the input file name: default: input.txt
 // TEST: -1 input 492982
-// TEST: input
+// TEST: input 6989950
 package main
 
 import (
