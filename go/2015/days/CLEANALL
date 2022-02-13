@@ -1,17 +1,28 @@
 #!/bin/bash
 # clean the directories before git-commiting
 
+# remove non-commitable files
 export d
 for d in day??; do
     ( cd "$d" || exit 1
       rm -f -- day[0-9][0-9] __debug_bin *~ \#*
     )
-    missing=$(grep '^// TEST: .*[^[:alnum:]]$' day??/*.go)
 done
 
+# check that all GO source files have their TEST: lines completed
+missing=$(grep '^// TEST: .*[^[:alnum:]]$' day??/*.go)
 if [[ -n $missing ]]; then
     echo "### Warning: some TEST declarations are missing values!"
     echo "$missing"
     echo "=== Please fix them"
 fi
+
+# check that we added the notes for the completed day
+for day in day??; do
+    d="${day#day}"
+    [[ -s $day/input.txt ]] || continue
+    if ! grep -q "^- [*][*]Day${d}[*][*][[:space:]]*[^[:space:]]" ../README.md; then
+        echo "### Warning: missing $day note in ../README.md"
+    fi
+done
 

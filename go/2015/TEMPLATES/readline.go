@@ -3,6 +3,8 @@ package main
 
 import (
 	"bufio"
+	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 )
@@ -41,4 +43,22 @@ func FileToLines(filePath string) (lines []string) {
 	}
 
 	return
+}
+
+// read the whole input file into a single string
+func FileToString(filename string) string {
+	bytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Print(err)
+	}
+	return string(bytes)
+}
+
+// read the whole input file into a byte array
+func FileToBytes(filename string) []byte {
+	bytes, err := ioutil.ReadFile(filename)
+	if err != nil {
+		fmt.Print(err)
+	}
+	return bytes
 }

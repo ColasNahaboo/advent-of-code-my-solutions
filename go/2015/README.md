@@ -26,6 +26,35 @@ The code is in standard GO, with some housekeeping scripts in bash.
 - Integration tests are done by looking at the comments `// TEST: [option] input-file result` in source files and running the code with the option and input and checking the last printed line is the result. The `days/TESTALL` bash script runs all the unit and integration tests, see it for technical details.
 - The examples given in the problem descriptions are used in GO unit tests `dayNN_test.go` , whereas the input file is used for the high-level integration tests of `TESTALL`.
 
-**Notes:**
+**Misc:**
 
 - `days/MAKEDAY NN` is what I used to create a new day directory.
+- `days/CLEANALL` prepares for a git commit: cleans dir, check missing info
+
+## Notes per day
+- **Day01** Starting simple, deciding on the directopry and file structure, experimenting with testing and debugging via dlv
+- **Day02** Working with regexps.
+- **Day03** Working with maps.
+- **Day04** Using package md5.
+- **Day05** Compensing the limits of GO RE2 regexp standard.
+- **Day06** Working with 2-dimensional arrays.
+- **Day07** Working with function pointers and kind of closures.
+- **Day08** Simple.
+- **Day09** A brute-force Traveling Salesman Problem. I used a nice hack to generate all the routes (permutations), found at https://golangbyexample.com/all-permutations-string-golang/
+- **Day10** Interesting discovery of the "Look and say" analysis by John Conway, with a [video](https://www.youtube.com/watch?v=ea7lJkEhytA). A naive strings-based implementation was much too slow, but using arrays of integers proved very fast.
+- **Day11** Converted strings to work on arrays of integers.
+- **Day12** Working with JSON, interfaces and type switches.
+- **Day13** 
+- **Day14** 
+- **Day15** 
+- **Day16** 
+- **Day17** 
+- **Day18** 
+- **Day19** 
+- **Day20** 
+- **Day21** 
+- **Day22** 
+- **Day23** 
+- **Day24** 
+- **Day25** 
+
