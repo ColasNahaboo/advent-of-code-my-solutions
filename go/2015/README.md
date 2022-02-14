@@ -32,6 +32,7 @@ The code is in standard GO, with some housekeeping scripts in bash.
 - `days/CLEANALL` prepares for a git commit: cleans dir, check missing info
 
 ## Notes per day
+Note: all solutions run under one second, unless mentioned.
 - **Day01** Starting simple, deciding on the directopry and file structure, experimenting with testing and debugging via dlv
 - **Day02** Working with regexps.
 - **Day03** Working with maps.
@@ -41,11 +42,17 @@ The code is in standard GO, with some housekeeping scripts in bash.
 - **Day07** Working with function pointers and kind of closures.
 - **Day08** Simple.
 - **Day09** A brute-force Traveling Salesman Problem. I used a nice hack to generate all the routes (permutations), found at https://golangbyexample.com/all-permutations-string-golang/
-- **Day10** Interesting discovery of the "Look and say" analysis by John Conway, with a [video](https://www.youtube.com/watch?v=ea7lJkEhytA). A naive strings-based implementation was much too slow, but using arrays of integers proved very fast.
+- **Day10** Interesting discovery of the ["Look and say"](https://en.wikipedia.org/wiki/Look-and-say_sequence) analysis by John Conway, with a nice [video](https://www.youtube.com/watch?v=ea7lJkEhytA) of him detailing it. A naive strings-based implementation was much too slow, but using arrays of integers proved very fast.
 - **Day11** Converted strings to work on arrays of integers.
 - **Day12** Working with JSON, interfaces and type switches.
 - **Day13** Same type of problem (and solution) than Day09, so I reused the code.
-- **Day14** 
+- **Day14** Use of index + pointers to be able to modify structs in ranges. See https://stackoverflow.com/questions/20185511/range-references-instead-values
+  ```
+  for i := range array {
+    e := &array[i]
+    e.field = "foo"
+  }
+  ```
 - **Day15** 
 - **Day16** 
 - **Day17** 
