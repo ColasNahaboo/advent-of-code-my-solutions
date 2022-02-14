@@ -44,7 +44,7 @@ The code is in standard GO, with some housekeeping scripts in bash.
 - **Day10** Interesting discovery of the "Look and say" analysis by John Conway, with a [video](https://www.youtube.com/watch?v=ea7lJkEhytA). A naive strings-based implementation was much too slow, but using arrays of integers proved very fast.
 - **Day11** Converted strings to work on arrays of integers.
 - **Day12** Working with JSON, interfaces and type switches.
-- **Day13** 
+- **Day13** Same type of problem (and solution) than Day09, so I reused the code.
 - **Day14** 
 - **Day15** 
 - **Day16** 
