@@ -6,19 +6,18 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
-	"log"
-	"os"
-	"strconv"
-	"strings"
 	// "regexp"
 )
 
+var verbose bool
+
 func main() {
 	partOne := flag.Bool("1", false, "run part one code, instead of part 2 (default)")
+	verboseFlag := flag.Bool("v", false, "verbose: print routes")
 	flag.Parse()
+	verbose = *verboseFlag
 	infile := "input.txt"
 	if flag.NArg() > 0 {
 		infile = flag.Arg(0)
@@ -55,57 +54,6 @@ func Part2(lines []string) int {
 
 //////////// Common Parts code
 
-//////////// Generic code
+//////////// Part1 functions
 
-// useful in tests to feed Part1 & Part2 with a simple string (with newlines)
-func StringToLines(s string) (lines []string) {
-	scanner := bufio.NewScanner(strings.NewReader(s))
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	err := scanner.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-	return
-}
-
-// read the input file into a string array for feeding Parts
-func FileToLines(filePath string) (lines []string) {
-	f, err := os.Open(filePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	scanner := bufio.NewScanner(f)
-	// optionally, resize scanner's capacity for lines over 64K (65536)
-	const maxCapacity = 1000000 // your required line length
-	buf := make([]byte, maxCapacity)
-	scanner.Buffer(buf, maxCapacity)
-	// end optional
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	err = scanner.Err()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return
-}
-
-// simplified functions to not bother with error handling. Just abort.
-
-func Atoi(s string) int {
-	i, err := strconv.Atoi(s)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return i
-}
-
-// for completeness
-func Itoa(i int) string {
-	return strconv.Itoa(i)
-}
+//////////// Part2 functions

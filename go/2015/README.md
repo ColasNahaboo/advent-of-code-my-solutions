@@ -14,7 +14,8 @@ The code is in standard GO, with some housekeeping scripts in bash.
 - Run them with input data file (with suffix `.txt`) as argument (defaults to `input.txt`).
 - The result will always be a number, alone on the last line of the output.
 - They run the algorithm for Part 2 of the daily problems, unless you give the option `-1` where they will run the Part 1.
-- All source code is standalone, I will try to use only standard GO and standard library functions. I will copy common code from templates in the `TEMPLATES/` directory rather than making proper packages, so you can just download a day directory and run it, it is self-contained.
+- The `-v` argument ("verbose") prints more tracing / debugging info.
+- All source code is standalone, I will try to use only standard GO and standard library functions. I keep common convenience functions in the utils.go file in the same package "main" (copied from the `TEMPLATES/` directory) rather than making a proper separate packages, as I am learning as I go, and can evolve it without fear of breaking backwards compatibility with the ones used in previous days.
 - Basically, all the `dayNN.go` solutions consist of:
   - a `main` function
   - that read and preparse the input file via the function `ReadInput`
@@ -53,7 +54,7 @@ Note: all solutions run under one second, unless mentioned.
     e.field = "foo"
   }
   ```
-- **Day15** 
+- **Day15** Put the convenience functions in a separate file, utils.go, but still in the main package. Passes `golint`. Use of variadic functions.
 - **Day16** 
 - **Day17** 
 - **Day18** 

@@ -13,6 +13,7 @@ name="day$n"
 
 mkdir -p "$name"
 cp ../TEMPLATES/TEST.go  "$name/${name}_test.go"
+cp ../TEMPLATES/utils.go .
 sed -r -e "s/YYYY/$YYYY/g" -e "s/dayNN/$name/g" \
     <../TEMPLATES/INIT.go >"$name/$name.go"
 touch "$name/input.txt"
