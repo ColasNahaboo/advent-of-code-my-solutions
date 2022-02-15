@@ -55,7 +55,7 @@ Note: all solutions run under one second, unless mentioned.
   }
   ```
 - **Day15** Put the convenience functions in a separate file, utils.go, but still in the main package. Passes `golint`. Use of variadic functions.
-- **Day16** 
+- **Day16** Working with successive sub-matches of a regexp in a line
 - **Day17** 
 - **Day18** 
 - **Day19** 
