@@ -57,7 +57,7 @@ Note: all solutions run under one second, unless mentioned.
 - **Day15** Generate all ways of dispatching items in boxes. Put the convenience functions in a separate file, utils.go, but still in the main package. Passes `golint`. Use of variadic functions.
 - **Day16** Working with successive sub-matches of a regexp in a line
 - **Day17** We use a bitset (bits sets of a uint64 number) to represent a combination of containers.
-- **Day18** 
+- **Day18** Working with 2-dimensional arrays.
 - **Day19** 
 - **Day20** 
 - **Day21** 
