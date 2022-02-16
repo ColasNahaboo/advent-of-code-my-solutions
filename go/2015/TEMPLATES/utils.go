@@ -69,6 +69,35 @@ func fileToBytes(filename string) []byte {
 	return bytes
 }
 
+//////////// Exponentials / Power of integers. Use package math/big for >64bits
+
+// IntPower calculates n to the mth power.
+// it avoids messing with the rounding problems of float arthmeticm
+// and is faster
+
+func intPower(n int, m int) int {
+	if m <= 0 {
+		return 1
+	}
+	result := n
+	for i := 2; i <= m; i++ {
+		result *= n
+	}
+	return result
+}
+
+// version explicitely using uint64 for results
+func intPower64(n int, m int) uint64 {
+	if m <= 0 {
+		return 1
+	}
+	result := uint64(n)
+	for i := 2; i <= m; i++ {
+		result *= uint64(n)
+	}
+	return result
+}
+
 //////////// Convenience functions
 
 ////// simplified functions to not bother with error handling. Just abort.

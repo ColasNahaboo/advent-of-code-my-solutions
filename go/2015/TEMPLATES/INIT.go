@@ -14,30 +14,30 @@ import (
 var verbose bool
 
 func main() {
-	partOne := flag.Bool("1", false, "run part one code, instead of part 2 (default)")
-	verboseFlag := flag.Bool("v", false, "verbose: print routes")
+	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
+	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
 	flag.Parse()
 	verbose = *verboseFlag
 	infile := "input.txt"
 	if flag.NArg() > 0 {
 		infile = flag.Arg(0)
 	}
-	lines := FileToLines(infile)
+	lines := fileToLines(infile)
 
 	var result int
 	if *partOne {
-		fmt.Println("Running Part1")
-		result = Part1(lines)
+		VP("Running Part1")
+		result = part1(lines)
 	} else {
-		fmt.Println("Running Part2")
-		result = Part2(lines)
+		VP("Running Part2")
+		result = part2(lines)
 	}
 	fmt.Println(result)
 }
 
 //////////// Part 1
 
-func Part1(lines []string) int {
+func part1(lines []string) int {
 	for _, line := range lines {
 		fmt.Println(line)
 	}
@@ -45,7 +45,7 @@ func Part1(lines []string) int {
 }
 
 //////////// Part 2
-func Part2(lines []string) int {
+func part2(lines []string) int {
 	for _, line := range lines {
 		fmt.Println(line)
 	}
