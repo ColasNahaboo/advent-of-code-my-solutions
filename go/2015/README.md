@@ -60,7 +60,7 @@ Note: all solutions run under one second, unless mentioned.
 - **Day18** Working with 2-dimensional arrays.
 - **Day19** Brute force could not solve the second part. So we implemented an heuristics by keeping at each step only the permutations that were the closest to the expect result. Here, since we were looking to obtain the string "e", we just took the 20 shortest strings at each step.
 - **Day20** Started by for each house, decompose in divisors: backwards chaining. But it did not scale, had to just forward-simulate elves running deliveries, then looking into houses.
-- **Day21** 
+- **Day21** Simple.
 - **Day22** 
 - **Day23** 
 - **Day24** 
