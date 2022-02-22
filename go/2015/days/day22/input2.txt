@@ -1,0 +1,5 @@
+Hit Points: 58
+Damage: 9
+# source: devjobe
+# mana -1: 1269
+# mana: 1309

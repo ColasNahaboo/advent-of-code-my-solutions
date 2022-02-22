@@ -1,0 +1,5 @@
+Hit Points: 55
+Damage: 8
+# source: schwern
+# mana -1: 953
+# mana: 1289

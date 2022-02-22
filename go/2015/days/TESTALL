@@ -39,20 +39,16 @@ runtest(){
     V "Running tests in $script"
     while read -r line; do
         cd "$OPWD" || exit 1
-        if [[ $line =~ ^(-[-[:alnum:]]+)[[:space:]]+([[:alnum:]]+)[[:space:]]+(-?[[:alnum:]]+) ]]; then
+        if [[ $line =~ ^((-[-[:alnum:]]+[[:space:]]+)*)([[:alnum:]]+)[[:space:]]+(-?[[:alnum:]]+) ]]; then
             opt="${BASH_REMATCH[1]}"
-            name="${BASH_REMATCH[2]}"
-            value="${BASH_REMATCH[3]}"
-        elif [[ $line =~ ^([[:alnum:]]+)[[:space:]]+(-?[[:alnum:]]+) ]]; then
-            opt=
-            name="${BASH_REMATCH[1]}"
-            value="${BASH_REMATCH[2]}"
+            name="${BASH_REMATCH[3]}"
+            value="${BASH_REMATCH[4]}"
         else
             echo "***TEST SYNTAX ERROR in $script: $line"
             cd "$OPWD" || exit 1
             continue
         fi
-        V "  TEST ${script##*/} $name.txt"
+        V "  TEST ${radix##*/} $opt $name.txt == $value"
         cd "${script%%/*}" || exit 1
         # compile if needed
         go build || { cd "$OPWD" || exit 1; continue;}

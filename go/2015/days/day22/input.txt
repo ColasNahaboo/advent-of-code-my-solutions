@@ -1,0 +1,4 @@
+Hit Points: 71
+Damage: 10
+# mana -1: 1824
+# mana: 1937

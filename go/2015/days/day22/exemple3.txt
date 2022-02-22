@@ -1,0 +1,3 @@
+Hit Points: 24
+Damage: 9
+# mana -1: 318
