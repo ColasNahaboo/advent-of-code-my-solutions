@@ -1,0 +1,4 @@
+inc b
+jio b, +2
+tpl b
+inc b

@@ -62,7 +62,7 @@ Note: all solutions run under one second, unless mentioned.
 - **Day20** Started by for each house, decompose in divisors: backwards chaining. But it did not scale, had to just forward-simulate elves running deliveries, then looking into houses.
 - **Day21** Simple.
 - **Day22** An interesting problem. I explored the branches of possibilities by recursing a function, separating data that were specific to the branch from the invariants in tow different structures. It made me understand well how to copy or pass by reference in Go, The code has a lot of tracing functions, as the debug was quite hairy.
-- **Day23** 
+- **Day23** A refreshingly simple problem. I tried to use types as much as possible
 - **Day24** 
 - **Day25** 
 
