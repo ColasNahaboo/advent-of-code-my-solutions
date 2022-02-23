@@ -86,7 +86,6 @@ func intPower(n int, m int) int {
 	return result
 }
 
-// IntPower64 calculates n to the mth power.
 // version explicitely using uint64 for results
 func intPower64(n int, m int) uint64 {
 	if m <= 0 {

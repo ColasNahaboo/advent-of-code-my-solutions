@@ -34,6 +34,9 @@ The code is in standard GO, with some housekeeping scripts in bash.
 
 ## Notes per day
 Note: all solutions run under one second, unless mentioned.
+
+For debugging, I used sometings solutions by []devjobe](https://github.com/devjobe/advent-of-code-2015-golang) and [schwern](https://github.com/schwern/adventofcode.go) to generate more test data. And once my solutions worked, compared with them (and others in the [reddit megathread](https://www.reddit.com/r/adventofcode/wiki/solution_megathreads#wiki_december_2015) for inspiration.
+
 - **Day01** Starting simple, deciding on the directopry and file structure, experimenting with testing and debugging via dlv
 - **Day02** Working with regexps.
 - **Day03** Working with maps.
@@ -63,6 +66,6 @@ Note: all solutions run under one second, unless mentioned.
 - **Day21** Simple.
 - **Day22** An interesting problem. I explored the branches of possibilities by recursing a function, separating data that were specific to the branch from the invariants in tow different structures. It made me understand well how to copy or pass by reference in Go, The code has a lot of tracing functions, as the debug was quite hairy.
 - **Day23** A refreshingly simple problem. I tried to use types as much as possible
-- **Day24** 
+- **Day24** Quite simple, so I decided to use the math/big package to experiment.
 - **Day25** 
 
