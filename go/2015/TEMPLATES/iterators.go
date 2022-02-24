@@ -1,6 +1,7 @@
 // Fastest iterator as of Go 1.17
 // From https://ewencp.org/blog/golang-iterators/index.html
 
+// benchmarks on my machine, 2022-02-24
 // goos: linux
 // goarch: amd64
 // pkg: github.com/ewencp/golang-iterators-benchmark
