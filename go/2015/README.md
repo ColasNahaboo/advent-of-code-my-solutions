@@ -66,6 +66,6 @@ For debugging, I used sometings solutions by []devjobe](https://github.com/devjo
 - **Day21** Simple.
 - **Day22** An interesting problem. I explored the branches of possibilities by recursing a function, separating data that were specific to the branch from the invariants in tow different structures. It made me understand well how to copy or pass by reference in Go, The code has a lot of tracing functions, as the debug was quite hairy.
 - **Day23** A refreshingly simple problem. I tried to use types as much as possible
-- **Day24** Quite simple, so I decided to use the math/big package to experiment.
+- **Day24** Quite simple, so I decided to use the math/big package to experiment. I also used a smart way to generate all the subsets of size k from a set of size n using bitsets.
 - **Day25** Simple.
 
