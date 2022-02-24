@@ -5,9 +5,16 @@
 export d
 for d in day??; do
     ( cd "$d" || exit 1
-      rm -f -- day[0-9][0-9] __debug_bin *~ \#* .nfs*
+      rm -f -- day[0-9][0-9] __debug_bin *~ \#*
     )
 done
+
+# check some problematic files do not remain
+nfs=$(find -name .nfs\*)
+if [[ n $nfs ]]; then
+    echo "### Warning: some .nfs files remain!"
+    echo "$nfs"
+fi
 
 # check that all GO source files have their TEST: lines completed
 missing=$(grep '^// TEST: .*[^[:alnum:]]$' day??/*.go)
