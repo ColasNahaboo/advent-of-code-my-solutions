@@ -87,18 +87,17 @@ func part1(nums []int, maxweight int) big.Int {
 		if len(set) > 0 {
 			if len(set) == 1 {
 				return subsetQE(nums, set[0])
-			} else {
-				var minqe, minqe0 big.Int
-				minqe0 = minqe
-				for _, setn := range set {
-					qe := subsetQE(nums, setn)
-					if qe.Cmp(&minqe) == -1 || minqe.Cmp(&minqe0) == 0 {
-						minqe = qe
-					}
-				}
-				fmt.Println("Found:", minqe.String())
-				return minqe
 			}
+			var minqe, minqe0 big.Int
+			minqe0 = minqe
+			for _, setn := range set {
+				qe := subsetQE(nums, setn)
+				if qe.Cmp(&minqe) == -1 || minqe.Cmp(&minqe0) == 0 {
+					minqe = qe
+				}
+			}
+			fmt.Println("Found:", minqe.String())
+			return minqe
 		}
 	}
 	return *big.NewInt(int64(0))

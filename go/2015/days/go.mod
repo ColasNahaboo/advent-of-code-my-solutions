@@ -5,6 +5,7 @@ go 1.17
 require github.com/RyanCarrier/dijkstra v1.1.0
 
 require (
+	github.com/BurntSushi/toml v0.4.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
@@ -23,10 +24,12 @@ require (
 	github.com/sourcegraph/ctxvfs v0.0.0-20180418081416-2b65f1b1ea81 // indirect
 	github.com/sourcegraph/go-langserver v2.0.0+incompatible // indirect
 	github.com/sourcegraph/jsonrpc2 v0.1.0 // indirect
-	golang.org/x/mod v0.5.1 // indirect
+	golang.org/x/exp/typeparams v0.0.0-20220218215828-6cf2b201936e // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
 	golang.org/x/net v0.0.0-20220127200216-cd36cc0744dd // indirect
 	golang.org/x/sys v0.0.0-20220114195835-da31bd327af9 // indirect
-	golang.org/x/tools v0.1.9 // indirect
+	golang.org/x/tools v0.1.11-0.20220316014157-77aa08bb151a // indirect
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
+	honnef.co/go/tools v0.3.1 // indirect
 )

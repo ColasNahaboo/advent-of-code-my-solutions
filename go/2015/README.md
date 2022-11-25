@@ -1,6 +1,6 @@
 # Advent of code challenge 2015, in GO
 
-Here are my solutions to the "Advent of code" challenge of 2015 implemented in bash.
+Here are my solutions to the "Advent of code" challenge of 2015 implemented in GO (aka Golang).
 See https://adventofcode.com/2015
 
 I am doing this to learn GO, so this must be considered as "student code". I am coding it to try my hand at various GO idioms, not seeking efficiency, scalability nor optimality. But feedback is very welcome.
@@ -35,9 +35,9 @@ The code is in standard GO, with some housekeeping scripts in bash.
 ## Notes per day
 Note: all solutions run under one second, unless mentioned.
 
-For debugging, I used sometings solutions by []devjobe](https://github.com/devjobe/advent-of-code-2015-golang) and [schwern](https://github.com/schwern/adventofcode.go) to generate more test data. And once my solutions worked, compared with them (and others in the [reddit megathread](https://www.reddit.com/r/adventofcode/wiki/solution_megathreads#wiki_december_2015) for inspiration.
+For debugging, I used sometings solutions by [devjobe](https://github.com/devjobe/advent-of-code-2015-golang) and [schwern](https://github.com/schwern/adventofcode.go) to generate more test data. And once my solutions worked, compared with them (and others in the [reddit megathread](https://www.reddit.com/r/adventofcode/wiki/solution_megathreads#wiki_december_2015) for inspiration.
 
-- **Day01** Starting simple, deciding on the directopry and file structure, experimenting with testing and debugging via dlv
+- **Day01** Starting simple, deciding on the directory and file structure, experimenting with testing and debugging via dlv
 - **Day02** Working with regexps.
 - **Day03** Working with maps.
 - **Day04** Using package md5.
