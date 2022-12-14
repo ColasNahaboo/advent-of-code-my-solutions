@@ -1,0 +1,136 @@
+// This is an example of a naive, brute force, explore all the paths code.
+
+// Adventofcode 2022, d12, in go. Arguments:
+// -1: use solve part 1 of the problem, default is the second one
+// the input file name: default: input.txt
+// TEST: -1 input
+// TEST: input
+package main
+
+import (
+	"flag"
+	"fmt"
+	"log"
+	// "regexp"
+)
+
+// the grid is a contiguous slice of the rows
+// we pad by a border of elevation 1000 to avoid testing for edges
+
+type Grid struct {
+	width, height, area int
+	grid []int
+}
+// some elevations
+const start = 0					// S has elevation 'a'
+const end = 'z' - 'a'			// E has elevation 'z'
+const border = 1000
+
+var startp, endp int					//  its position on the grid
+var bestpathlen int
+var bestpath []int				// a path is the sequence of pos
+const maxint = 2000000000		// eye-catching round number, easier to debug
+var dirs [4]int
+
+var verbose bool
+
+func main() {
+	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
+	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
+	flag.Parse()
+	verbose = *verboseFlag
+	infile := "input.txt"
+	if flag.NArg() > 0 {
+		infile = flag.Arg(0)
+	}
+	lines := fileToLines(infile)
+	grid := parseGrid(lines)
+	VP(grid)
+
+	var result int
+	if *partOne {
+		VP("Running Part1")
+		result = part1(grid)
+	} else {
+		VP("Running Part2")
+		result = part2(grid)
+	}
+	fmt.Println(result)
+}
+
+//////////// Part 1
+
+func part1(grid Grid) int {
+	VPf("Starting at %d, looking for %d\n", startp, endp)
+	bpl := maxint
+	explore(grid, startp, make([]int, 0), &bpl)
+	return bpl
+}
+
+//////////// Part 2
+func part2(grid Grid) int {
+	bpl := maxint
+	explore(grid, startp, make([]int, 0), &bpl)
+	return bpl
+}
+
+//////////// Common Parts code
+
+func parseGrid(lines []string) (g Grid) {
+	g.height = len(lines)
+	if g.height < 1 {log.Fatalln("No grid!");}
+	g.width = len(lines[0])
+	g.area = (g.width + 2) * (g.height + 2) // room for the edges
+	g.grid = make([]int, g.area, g.area)
+	for y := 0; y < g.height; y++ {
+		for x := 0; x < g.width; x++ {
+			g.grid[((y+1)*(g.width+2)) + x + 1] = int(lines[y][x]) - 'a'
+			if lines[y][x] == 'S' {
+				startp = ((y+1)*(g.width+2)) + x + 1
+				g.grid[startp] = start
+			} else if lines[y][x] == 'E' {
+				endp = ((y+1)*(g.width+2)) + x + 1
+				g.grid[endp] = end
+			}
+		}
+		//  left & right borders
+		g.grid[((y+1)*(g.width+2))] = border
+		g.grid[((y+1)*(g.width+2)) + g.width + 1] = border
+	}
+	//  top and bottom borders
+	for x := 0; x < (g.width + 2); x++ {
+		g.grid[x] = border
+		g.grid[((g.height+1)*(g.width+2)) + x] = border
+	}
+	// delta of position for one step in R D U L dirs
+	dirs = [4]int{1, g.width + 2, - g.width - 2, -1}
+	return
+}
+
+// from position pos, explore all sub-paths and return the shortest path length to E
+// prevpath is the sequence of pos we went through before p
+func explore(g Grid, p int, prevpath []int, bplp *int) {
+	// VPf("Exploring %d:%d from %v: ^%d:%d >%d:%d v%d:%d <%d:%d\n", p, g.grid[p], prevpath, p+dirs[0], g.grid[p+dirs[0]], p+dirs[1], g.grid[p+dirs[1]], p+dirs[2], g.grid[p+dirs[2]], p+dirs[3], g.grid[p+dirs[3]])
+	for _, dir := range dirs {
+		new := p + dir
+		if new == p { continue;} // cant U-turn
+		for _, op := range prevpath {
+			if op == new { goto NEXTDIR;} // loops, dead end.
+		}
+		if g.grid[new] > g.grid[p] + 1 { continue;} // too steep
+		if new == endp {				 // found end
+			if (len(prevpath) + 1) < *bplp {
+				VPf("Found a best path, len %d: %v + %d\n", len(prevpath) + 1, prevpath, new)
+				*bplp = len(prevpath) + 1 // best path so far
+			}
+		} else {				// else continue exploring from there
+			explore(g, new, append(prevpath, p), bplp)
+		}
+	NEXTDIR:
+	}
+}
+
+	
+//////////// Part1 functions
+
+//////////// Part2 functions
