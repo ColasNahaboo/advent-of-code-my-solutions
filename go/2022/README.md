@@ -40,3 +40,4 @@ Note: all solutions run under one second, unless mentioned.
 
 - **d01** to **d11** Simple problems, nothing to say. I made use of the new `sort.Slice` functionality of Go 1.18, very cool!
 - **d12** First difficulty, finding shortest path in a graph. I used a simple BFS search, using a FIFO by the package `github.com/gammazero/deque`, quite simple in Go after having done it in bash...
+- **d15** The second part is interesting, as the huge size of the grid (4 million sides) makes looking at each position too slow. So we need to work with intervals of positions.

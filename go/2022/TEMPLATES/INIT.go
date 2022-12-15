@@ -1,14 +1,16 @@
 // Adventofcode YYYY, dNN, in go. Arguments:
 // -1: use solve part 1 of the problem, default is the second one
 // the input file name: default: input.txt
+// TEST: -1 example
 // TEST: -1 input
+// TEST: example
 // TEST: input
 package main
 
 import (
 	"flag"
 	"fmt"
-	"log"
+	// "log"
 	// "regexp"
 )
 

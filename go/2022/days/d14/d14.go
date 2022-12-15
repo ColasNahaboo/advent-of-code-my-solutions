@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"log"
 	"regexp"
+	"time"
 )
 
 type Point struct {
@@ -32,13 +33,20 @@ const source = 3
 var gridglyphs = []string{".", "#", "o", "+"}
 
 var verbose bool
+var anim bool
+var lastlines int
 var repath = regexp.MustCompile("([[:digit:]]+),([[:digit:]]+)")
 
 func main() {
 	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
 	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
+	animFlag := flag.Bool("a", false, "animation: simple ascii-art animation")
+	lastFlag := flag.Int("l", 0, "in anim and verbose mode, only display last L lines")
 	flag.Parse()
 	verbose = *verboseFlag
+	anim = *animFlag
+	lastlines = *lastFlag
+	if anim { verbose = true;}
 	infile := "input.txt"
 	if flag.NArg() > 0 {
 		infile = flag.Arg(0)
@@ -168,11 +176,17 @@ func parse(lines []string) Cave {
 
 func VPcave(c Cave) {
 	if verbose {
-		for y := 0; y < c.height; y++ {
+		start := 0
+		if lastlines > 0 { start = c.height - lastlines;}
+		for y := start; y < c.height; y++ {
 			for x := 0; x < c.width; x++ {
 				fmt.Printf("%s", gridglyphs[c.grid[x+y*c.width]])
 			}
 			fmt.Printf("\n")
+		}
+		fmt.Printf("\n")
+		if anim {
+			time.Sleep(200 * time.Millisecond)
 		}
 	}
 }
