@@ -125,34 +125,6 @@ func prependInt(x []int, y int) []int {
     return x
 }
 
-func indexOfInt(list []int, number int) (int) {
-   for i, v := range list {
-       if number == v {
-           return i
-       }
-   }
-   return -1    //not found.
-}
-
-// Generic versions
-
-func prepend[T comparable](list []T, elt T) []T {
-    list = append(list, *new(T))
-    copy(list[1:], list)
-    list[0] = elt
-    return list
-}
-
-
-func IndexOf[T comparable](collection []T, el T) int {
-    for i, x := range collection {
-        if x == el {
-            return i
-        }
-    }
-    return -1
-}
-
 ////// VP ("Verbose Print") wrappers: print only if verbose var is true
 
 // VP = fmt.Println

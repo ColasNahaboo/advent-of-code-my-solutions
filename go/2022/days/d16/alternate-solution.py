@@ -89,8 +89,8 @@ def main():
 
         best_scores = list(best_scores.items())
         
-        print(len(best_scores))
-        print(len(ways))
+        #print(len(best_scores))
+        #print(len(ways))
 
         ans = 0
         for human_idx in range(len(best_scores)):
@@ -103,8 +103,8 @@ def main():
 
         return ans
 
-    print("Answer 1:", solution_1())
-    print("Answer 2:", solution_2())
+    print(solution_1())
+    print(solution_2())
 
 
 if __name__ == "__main__":
