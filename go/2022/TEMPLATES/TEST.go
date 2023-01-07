@@ -6,21 +6,24 @@ import (
 )
 
 // reflect.DeepEqual(got, expected)
-func Test_part1(t *testing.T) {
-	t.Run("1", func(t *testing.T) {
-		got := part1([]string{("foo")})
-		expected := 2
-		if got != expected {
-			t.Errorf("expected '%v' but got '%v'", expected, got)
-		}
-	})
+func Test_1(t *testing.T) {
+	// setup code
+
+	// table-driven tests: calls to test function(s) with various args
+	// adapt args and expected as needed
+	t_1("1.1", t, args, expected)
+	t_1("1.2", t, args, expected)
+	t_1("1.3", t, args, expected)
+
+	// cleanup code
 }
 
-func Test_part2(t *testing.T) {
-	t.Run("1", func(t *testing.T) {
-		got := part1([]string{("foo")})
-		expected := 2
-		if !reflect.DeepEqual(got, expected) {
+// test function
+func t_wc(label string, t *testing.T, args, expected int) {
+	// setup here
+	t.Run(label, func(t *testing.T) {
+		got := theFunctionToTest(args)
+		if reflect.DeepEqual(got, expected) {
 			t.Errorf("expected '%v' but got '%v'", expected, got)
 		}
 	})

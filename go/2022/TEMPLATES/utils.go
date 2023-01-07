@@ -175,3 +175,8 @@ func VPf(f string, v ...interface{}) {
 		fmt.Printf(f, v...)
 	}
 }
+
+////// Convenience panic
+func panicf(f string, v ...interface{}) {
+	panic(fmt.Sprintf(f, v...))
+}
