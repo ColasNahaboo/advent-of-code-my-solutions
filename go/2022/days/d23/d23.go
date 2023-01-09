@@ -15,9 +15,10 @@ import (
 
 var verbose bool
 // coordinates x,y start at top left. A border of size rounds is added around it for growth
+// the 2D maps are re-used, it would be too costly to re-create them on each round
 var elves []int			    // current positions of elves (scalar): position = x + y * gw
 var gw, gh int				// grid width & height
-var pgrid []int			   // 2d map of props. Value is id of elf proposing + 1
+var pgrid []int			   // 2D map of props. Value is id of elf proposing + 1
 var	egrid []bool		   // 2D map of elves
 var delta [4]int			// delta pos for each dir: 0=-gw, 1=gw, 2=-1, E=1
 var rim [8]int				// the 8 positions around a space
