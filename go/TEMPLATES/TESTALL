@@ -1,0 +1,124 @@
+#!/bin/bash
+# a simple regression test framework for my go advent-of-code solutions
+USAGE='TESTALL [-v] [-t] [days...]
+Runs the test on a solution (script name or number), or on all tests if no
+argument and run in dir ".../go/days/".
+To define a test, in a script put comments like:
+  // TEST: [-option] input-name expected-value
+This program will then run the program for each #TEST: line, with
+day/input-name.txt as argument, expecting expected-value (a number) as the last
+line of output (so the program can print extra info before)
+Nothing is printed in case of success, unless -v is used.
+Comments starting with TEST but not in the proper syntax are ignored, e.g. with
+a missing or non-numeric value.
+Comments can be added at the end of line, like:
+  // TEST: mini 17 // the simplest value, runs with dNN.mini
+  // TEST: -1 huge 51275276 // stress test of part1 code with dNN.huge
+E.g:
+in a file d06/d06.go, the line "// TEST: input 365131" means that calling
+"./TESTALL d06" (or "./TESTALL 6") will run "d06/d06 input.txt" and expect
+that the last line of output will be 365131
+
+Options:
+  -v    verbose, prints what tests are being done after it
+  -t    times, print the time taken by each test
+'
+
+nl=$'\n'
+shopt -s nullglob
+verbose=false
+export timer=false
+V(){ "$verbose" && echo "$*";}
+export TIMEFORMAT='       Time: %3R s'
+
+# runs all the tests of a go source. Returns the number of failed tests
+runtest(){
+    local script="$1"
+    local opt name value result fails=0 radix="${script%.go}" line
+    local OPWD="$PWD"
+    V "Running tests in $script"
+    while read -r line; do
+        cd "$OPWD" || exit 1
+        if [[ $line =~ ^((-[-[:alnum:]]+[[:space:]]+)*)([[:alnum:]]+)[[:space:]]+(-?[[:alnum:]]+) ]]; then
+            opt="${BASH_REMATCH[1]}"
+            name="${BASH_REMATCH[3]}"
+            value="${BASH_REMATCH[4]}"
+        else
+            echo "***TEST SYNTAX ERROR in $script: $line"
+            echo "   Must be: TEST: [-1] filename expected-value"
+            cd "$OPWD" || exit 1
+            continue
+        fi
+        V "  TEST ${radix##*/} $opt $name.txt == $value"
+        cd "${script%%/*}" || exit 1
+        # compile if needed
+        go build || { cd "$OPWD" || exit 1; continue;}
+        if [[ -e  ${radix##*/}_test.go ]]; then
+            # GO unit tests
+            go test >/dev/null || {
+                echo "Tests ${radix##*/}_test.go FAILED!, aborting"
+                cd "$OPWD" || exit 1; continue
+            }
+        fi
+        # final test
+        # shellcheck disable=SC2086
+        if "$timer"; then
+            "$verbose" || export TIMEFORMAT="  Time: %3R s for $radix $opt $name"
+            result=$(time ./"${radix##*/}" $opt "$name.txt" | tail -1)
+        else
+            result=$(./"${radix##*/}" $opt "$name.txt" | tail -1)
+        fi
+        cd "$OPWD" || exit 1
+        if [[ $result != "$value" ]]; then
+            echo "***TEST ERROR: $script $name.txt: found \"$result\", expecting \"$value\""
+            (( fails++ ))
+        else
+            V "       OK"
+        fi
+    done < <(grep -oP '^[[:space:]]*//[[:space:]]*TEST:[[:space:]]*\K[-_[:alnum:][:space:]]+[[:space:]]+-?[[:alnum:]]+' "$script")
+    return "$fails"
+}        
+
+errors=0
+# if we are in a day dir, only test it
+if [[ $PWD =~ (^|/)d[[:digit:]]+$ ]]; then
+    default="${PWD##*/}"
+    cd .. || exit 1
+else
+    default=ALL
+fi
+
+for arg in "$@"; do [[ $arg =~ ^- ]] || { default=; break;}; done
+for arg in "$@" $default; do
+    if [[ $arg == '-v' ]]; then
+        verbose=true
+    elif [[ $arg == '-t' ]]; then
+        timer=true
+    elif [[ $arg == '-tv' ]] || [[ $arg == '-vt' ]]; then
+        timer=true; verbose=true
+    elif [[ $arg =~ ^- ]]; then   # any option ==> usage
+        echo "USAGE: $USAGE"; exit 1
+    elif [[ $arg == ALL ]]; then # run all tests found GO files
+        while read -r script; do
+            runtest "$script"
+            (( errors += $? ))
+        done < <(find . -name d\*.go |sed -e 's|^[.]/||' |grep -v '_test[.]go' |sort)
+    elif [[ $arg =~ ^d[[:digit:]]+$ ]]; then
+        runtest "$arg/$arg.go"
+        (( errors += $? ))
+    elif [[ $arg =~ ^[[:digit:]]+$ ]]; then # run all the tests of the day
+        [[ $arg =~ ^[[:digit:]]$ ]] && n="0$arg" || n="$arg"
+        runtest "d$n/d$n.go"
+        (( errors += $? ))
+    elif [[ -e $arg ]]; then    # run tests for a single code
+        runtest "$arg"
+        (( errors += $? ))
+    else
+        echo "***ERROR: Script not found: $arg.${nl}${nl}USAGE=$USAGE"
+        exit 1
+    fi
+done
+
+[[ $errors != 0 ]] && echo "$errors Tests failed!"
+exit "$errors"
+        

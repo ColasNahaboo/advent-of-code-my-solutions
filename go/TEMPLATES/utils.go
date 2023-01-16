@@ -116,6 +116,55 @@ func itoa(i int) string {
 	return strconv.Itoa(i)
 }
 
+////// Slice utils
+
+func prependInt(x []int, y int) []int {
+    x = append(x, 0)
+    copy(x[1:], x)
+    x[0] = y
+    return x
+}
+
+func indexOfInt(list []int, number int) (int) {
+   for i, v := range list {
+       if number == v {
+           return i
+       }
+   }
+   return -1    //not found.
+}
+
+// Generic versions
+
+func prepend[T comparable](list []T, elt T) []T {
+    list = append(list, *new(T))
+    copy(list[1:], list)
+    list[0] = elt
+    return list
+}
+
+
+func IndexOf[T comparable](collection []T, el T) int {
+    for i, x := range collection {
+        if x == el {
+            return i
+        }
+    }
+    return -1
+}
+
+func sliceEquals[T comparable](a []T, b []T) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 ////// VP ("Verbose Print") wrappers: print only if verbose var is true
 
 // VP = fmt.Println
@@ -137,4 +186,9 @@ func VPf(f string, v ...interface{}) {
 	if verbose {
 		fmt.Printf(f, v...)
 	}
+}
+
+////// Convenience panic
+func panicf(f string, v ...interface{}) {
+	panic(fmt.Sprintf(f, v...))
 }

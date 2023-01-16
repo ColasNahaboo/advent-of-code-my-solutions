@@ -12,11 +12,11 @@ name="d$n"
 [[ -e "$name/$name.go" ]] && { echo "ABORT: $name already exists"; exit 1;}
 
 mkdir -p "$name"
-# cp ../TEMPLATES/TEST.go  "$name/${name}_test.go"
-cp ../TEMPLATES/utils.go "$name"
+cp ../../TEMPLATES/TEST.go  "$name/${name}_test.go"
+cp ../../TEMPLATES/utils.go "$name"
 sed -r -e "s/YYYY/$YYYY/g" -e "s/dNN/$name/g" \
-    <../TEMPLATES/INIT.go >"$name/$name.go"
+    <../../TEMPLATES/INIT.go >"$name/$name.go"
 touch "$name/input.txt" "$name/example.txt" 
 
-echo "Generated $name/$name.go $name/input.txt $name/example.txt in $name/"
+echo "Generated $name/$name.go $name/${name}_test.go $name/input.txt $name/example.txt in $name/"
 

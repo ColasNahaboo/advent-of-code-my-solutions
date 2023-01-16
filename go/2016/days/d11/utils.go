@@ -125,6 +125,16 @@ func prependInt(x []int, y int) []int {
     return x
 }
 
+func insertInt(list []int, i, v int) []int {
+	l := make([]int, len(list)+1)
+    copy(l[:i], list[:i])
+	l[i] = v
+	if i < len(list) {
+		copy(l[i+1:], list[i:])
+	}
+    return l
+}
+
 func indexOfInt(list []int, number int) (int) {
    for i, v := range list {
        if number == v {
@@ -134,9 +144,54 @@ func indexOfInt(list []int, number int) (int) {
    return -1    //not found.
 }
 
+// safe delete, keeps list order
+func deleteOrderInt(list []int, number int) ([]int, bool) {
+   for i, v := range list {
+       if number == v {
+		   l := make([]int, len(list) - 1)
+		   copy(l, list[:i])
+		   copy(l[i:], list[i+1:])
+		   return l, true   // Truncate slice.
+       }
+   }
+   return list, false    // not found.
+}
+
+// safe delete, does not keep list order (faster)
+func deleteInt(list []int, number int) ([]int, bool) {
+	l := make([]int, len(list))
+	copy(l, list)
+	return deleteFastInt(l, number)
+}
+
+// fastest delete, does not keep list order
+// Should not be used if other slices point to list
+func deleteFastInt(list []int, number int) ([]int, bool) {
+   for i, v := range list {
+       if number == v {
+		   list[i] = list[len(list) - 1] // Copy last elt to index i.
+		   return list[:len(list)-1], true   // Truncate slice.
+       }
+   }
+   return list, false    // not found.
+}
+
+func sliceIntEquals(l1, l2 []int) bool {
+	if len(l1) != len(l2) {
+		return false
+	}
+	for i, v := range l1 {
+       if v != l2[i] {
+           return false
+       }
+   }
+	return true
+}
+
+
 // Generic versions
 
-func prepend[T comparable](list []T, elt T) []T {
+func prependElt[T comparable](list []T, elt T) []T {
     list = append(list, *new(T))
     copy(list[1:], list)
     list[0] = elt
@@ -144,13 +199,55 @@ func prepend[T comparable](list []T, elt T) []T {
 }
 
 
-func IndexOf[T comparable](collection []T, el T) int {
+func insertElt[T comparable](list []T, i int, elt T) []T {
+	l := make([]T, len(list)+1)
+    copy(l[:i], list[:i])
+	l[i] = elt
+	if i < len(list) {
+		copy(l[i+1:], list[i:])
+	}
+    return l
+}
+
+func IndexOf[T comparable](collection []T, elt T) int {
     for i, x := range collection {
-        if x == el {
+        if x == elt {
             return i
         }
     }
     return -1
+}
+
+// safe delete, keeps list order
+func deleteOrderElt[T comparable](list []T, elt T) ([]T, bool) {
+   for i, v := range list {
+       if elt == v {
+		   l := make([]T, len(list) - 1)
+		   copy(l, list[:i])
+		   copy(l[i:], list[i+1:])
+		   return l, true   // Truncate slice.
+       }
+   }
+   return list, false    // not found.
+}
+
+// safe delete, does not keep list order (faster)
+func deleteElt[T comparable](list []T, elt T) ([]T, bool) {
+	l := make([]T, len(list))
+	copy(l, list)
+	return deleteFastElt(l, elt)
+}
+
+// fastest delete, does not keep list order
+// Should not be used if other slices point to list
+func deleteFastElt[T comparable](list []T, elt T) ([]T, bool) {
+   for i, v := range list {
+       if elt == v {
+		   list[i] = list[len(list) - 1] // Copy last elt to index i.
+		   return list[:len(list)-1], true   // Truncate slice.
+       }
+   }
+   return list, false			// could not find it
 }
 
 func sliceEquals[T comparable](a []T, b []T) bool {

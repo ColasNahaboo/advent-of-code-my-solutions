@@ -3,7 +3,7 @@
 // the input file name: default: input.txt
 // TEST: -1 example 18
 // TEST: -1 input 308
-// TEST: example 54
+// TEST: example 
 // TEST: input 908
 
 // This problem is quite interesting, because we can see that the blizzard
@@ -12,13 +12,19 @@
 // means than we can cache all state of all the blizzards in an array "grids"
 // of 2D maps indexed by time only. The state of the system then becomes only
 // two integers: the time and our position! This makes "forking" the state to
-// explore a new branch quite light. Then, we do not need to explore again the
+// explore a new branch quite light.
+
+// Also, the blizzards state loops with a frequency of the Least Common Multiple
+// of the inside dims of the grid, so we can pre-compute this fixed number
+// of states and index via time modulo the LCM
+
+// Then, we do not need to explore again the
 // same pairs (time, pos), so we cache the already explored positions into a 2D
 // map for each time in `dones`. Add the small heuristic of trying the
 // exploration with the most likely directions first (right, then left), and
 // the search ends up being super fast. We do a DFS (Depth First Search) in
 // order to come up with a solution as fast as possible, so we can abort the
-// subsequent searches for better ones as early as possible as soon as they
+// subsequent explorations for better ones as early as possible as soon as they
 // take more time.
 
 package main
@@ -51,18 +57,18 @@ type Dir struct {
 var dirs [5]Dir 				// dirs[4] is special: stay in place, "O"
 // exploration order of dirs U D R L O to DFS-explore
 // we try to go first right, then down, and stay in place last
-var exploredirs = [5]int{3, 1, 0, 2, 4}
-var exploredirs2 = [5]int{2, 0, 1, 3, 4} // for reverse exploring
+var exploredirs = []int{3, 1, 0, 2, 4}
+var exploredirsrev = []int{2, 0, 1, 3, 4} // for reverse exploring
 
 // here are the globals that stay the same for all the exploration branches
 var gw, gh, area int			//  global dims of the grid
+var lcm int						// least common multiple of the inside dims
 var start, end int				// position of entry and exit
 // the blizzard positions are deterministic, so are the same in all branches
 // for a given time! So we can cache them in this array indexed by time
 var grids [][]int				// grid states at time
 // and thus we do not need to re-explore from the same (time,pos) pairs
 var dones [][]bool				// positions already done at time
-var dones2 [][]bool				// same for reverse exploring to start
 const maxint = 8888888888888888888 // easily identifiable in debug
 var mintime = maxint
 
@@ -96,25 +102,31 @@ func main() {
 
 func part1(lines []string) int {
 	parse(lines)
-	explore1(0, start)
+	donesInit()
+	explore(0, start, end, exploredirs)
 	return mintime
 }
 
 //////////// Part 2
 func part2(lines []string) int {
 	parse(lines)
-	time := 0
 	// 1rst trip, start -> end
-	explore1(time, start)
+	time := 0
+	donesInit()
+	explore(time, start, end, exploredirs)
+	fmt.Printf("  run:   %d\n", mintime)
 	// 2nd trip, get back to start
 	time = mintime
-	// optimisation: suppose we do not take more than twice as long
-	mintime = time * 3			
-	explore2(time, end)
+	mintime = maxint
+	donesInit()
+	explore(time, end, start, exploredirsrev)
+	fmt.Printf("  back:  %d\n", mintime)
 	// 3rd trip, start -> end
 	time = mintime
-	mintime = time * 2
-	explore1(time, start)
+	mintime = maxint
+	donesInit()
+	explore(time, start, end, exploredirs)
+	fmt.Printf("  rerun: %d\n", mintime)
 
 	return mintime
 }
@@ -125,6 +137,7 @@ func parse(lines []string) () {
 	gw = len(lines[0])
 	gh = len(lines)
 	area = gw * gh
+	lcm = leastCommonMultiple(gw-2, gh-2)
 	dirs = [5]Dir{
 		Dir{U, -gw, true,  'U'},
 		Dir{D, gw,  true,  'D'},
@@ -161,21 +174,25 @@ func parse(lines []string) () {
 			break
 		}
 	}
-	grids = append(grids, grid)				// cache initial state
-	dones = append(dones, make([]bool, area, area))
-	dones2 = append(dones2, make([]bool, area, area))
-	VPf("Grid %dx%d = %d, start=%d, end=%d\n", gw, gh, area, start, end)
+	gridsCreate(grid)				// generate grids for a loop of size lcm
+	fmt.Printf("Grid %dx%d = %d, start=%d, end=%d, loop=%d\n", gw, gh, area, start, end, lcm)
 }
 
-// returns the grid state cached at t, or auto-create-and-cache it
-func gridAt(time int) []int {
-	if len(grids) > time {		// already cached
-		return grids[time]
+func gridsCreate(grid []int) {
+	grids = make([][]int, lcm, lcm)
+	grids[0] = grid				// initial state
+	for i := 1; i < lcm; i++ {
+		grids[i] = gridNext(grids[i-1])
 	}
-	if len(grids) < time {		// missing a step? should never happen in our exploring
-		panic(fmt.Sprintf("Asking for a grid at time %d, but only the ones up to %d exist\n", time, len(grids)-1))
+	// debug: check that are really looping after lcm time
+	grid2 := gridNext(grids[len(grids)-1])
+	if !sliceEquals(grid, grid2) {
+		panic(fmt.Sprintf("Grids do not loop after %d time!\n", lcm))
 	}
-	prev := grids[time-1]		// we are now with len(grid) == time
+}
+
+// compute state after one tick
+func gridNext(prev []int) []int {
 	grid := make([]int, area, area)
 	for p := 0; p < area; p++ {
 		if prev[p] == WALL {
@@ -204,61 +221,69 @@ func gridAt(time int) []int {
 			}
 		}
 	}
-	grids = append(grids, grid)	// cache it
-	dones = append(dones, make([]bool, area, area))
-	dones2 = append(dones2, make([]bool, area, area))
 	return grid
+}
+
+// (re-)init dones
+func donesInit() {
+	if len(dones) == 0 {		// init
+		dones = make([][]bool, lcm, lcm)
+		for i := 0; i < lcm; i++ {
+			dones[i] = make([]bool, area, area)
+		}
+	} else {					// reset
+		for i := 0; i < lcm; i++ {
+			for j := 0; j < area; j++ {
+				dones[i][j] = false
+			}
+		}
+	}
+}
+
+// greatest common divisor (GCD) via Euclidean algorithm
+func greatestCommonDivisor(a, b int) int {
+	for b != 0 {
+		t := b
+		b = a % b
+		a = t
+	}
+	return a
+}
+
+// find Least Common Multiple (LCM) via GCD
+func leastCommonMultiple(a, b int, integers ...int) int {
+	result := a * b / greatestCommonDivisor(a, b)
+	for i := 0; i < len(integers); i++ {
+		result = leastCommonMultiple(result, integers[i])
+	}
+	return result
 }
 	
 
-//////////// Part1 functions
-
-// explore start -> end
-func explore1(time, pos int) {
-	VPf("explore1(%d, %d) at [%d, %d]\n", time, pos, pos%gw, pos/gw)
-	dones[time][pos] = true			// avoid re-exploring from same state: (time, pos)
+// explore from time & pos, to goal, explore order
+func explore(time, pos, goal int, expldirs []int) {
+	VPf("explore(%d, %d) at [%d, %d] towards %d\n", time, pos, pos%gw, pos/gw, goal)
+	dones[time % lcm][pos] = true			// avoid re-exploring from same state: (time, pos)
 	time++
 	if time >= mintime {		// too long, abort
 		return
 	}
-	grid := gridAt(time)
-	for _, d := range exploredirs {
+	grid := grids[time % lcm]
+	for _, d := range expldirs {
 		p := pos + dirs[d].step
-		if p == end {
+		if p == goal {
 			if time < mintime {
 				mintime = time
 				VPf("explore1: found new best, time = %d / %d\n", mintime, len(grids))
 			}
 			continue			// a solution found, dont explore further
 		}
-		if p > 0 && p < area && !dones[time][p] && grid[p] == FREE {
-			explore1(time, p)
+		if p > 0 && p < area && !dones[time % lcm][p] && grid[p] == FREE {
+			explore(time, p, goal, expldirs)
 		}
 	}
 }
+
+//////////// Part1 functions
 
 //////////// Part2 functions
-
-// explore end -> start
-func explore2(time, pos int) {
-	VPf("explore2(%d, %d) at [%d, %d]\n", time, pos, pos%gw, pos/gw)
-	dones2[time][pos] = true			// avoid re-exploring from same state: (time, pos)
-	time++
-	if time >= mintime {		// too long, abort
-		return
-	}
-	grid := gridAt(time)
-	for _, d := range exploredirs2 {
-		p := pos + dirs[d].step
-		if p == start {
-			if time < mintime {
-				mintime = time
-				VPf("explore2: Found new best, time = %d / %d\n", mintime, len(grids)) // 
-			}
-			continue			// a solution found, dont explore further
-		}
-		if p > 0 && p < area && !dones2[time][p] && grid[p] == FREE {
-			explore2(time, p)
-		}
-	}
-}

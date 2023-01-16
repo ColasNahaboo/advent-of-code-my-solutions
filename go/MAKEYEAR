@@ -1,0 +1,26 @@
+#!/bin/bash
+# Usage: MAKEYEAR YYYY
+# creates the set of dirs+files for year YYYY
+year="$1"
+[[ $year =~ ^[[:digit:]]{4}$ ]] || { echo "Usage: MAKEDAY YYYY"; exit 1;}
+
+# Are e in the proper place?
+[[ -s TEMPLATES/INIT.go ]] || { echo "ABORT: not in proper dir"; exit 1;}
+
+[[ -e "$year/days/MAKEDAY" ]] && { echo "ABORT: $year dir already exists"; exit 1;}
+
+mkdir -p "$year/days"
+version=1.19
+[[ $(go version) =~ 'go version go'([[:digit:]]+[.][[:digit:]]+) ]] && version="${BASH_REMATCH[1]}"
+
+echo "module github.com/ColasNahaboo/advent-of-code-my-solutions/go/$year/src
+
+go $version
+" >"$year/days"/go.mod
+
+cp TEMPLATES/{CLEANALL,MAKEDAY,TESTALL} "$year/days"
+sed -e "s/YYYY/$year/g" <TEMPLATES/README-YYYY.md >$year/README.md
+
+echo "Generated $name/$name.go $name/${name}_test.go $name/input.txt $name/example.txt in $name/"
+echo "          $name/README.md"
+

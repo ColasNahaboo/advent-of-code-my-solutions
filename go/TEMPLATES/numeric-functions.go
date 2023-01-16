@@ -54,3 +54,22 @@ func allDivisors(n int) (divs []int) {
 	}
 	return
 }
+
+// greatest common divisor (GCD) via Euclidean algorithm
+func greatestCommonDivisor(a, b int) int {
+	for b != 0 {
+		t := b
+		b = a % b
+		a = t
+	}
+	return a
+}
+
+// find Least Common Multiple (LCM) via GCD
+func leastCommonMultiple(a, b int, integers ...int) int {
+	result := a * b / greatestCommonDivisor(a, b)
+	for i := 0; i < len(integers); i++ {
+		result = leastCommonMultiple(result, integers[i])
+	}
+	return result
+}

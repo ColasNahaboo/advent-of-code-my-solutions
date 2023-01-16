@@ -1,8 +1,8 @@
 // Adventofcode 2016, d07, in go. Arguments:
 // -1: use solve part 1 of the problem, default is the second one
 // the input file name: default: input.txt
-// TEST: -1 input
-// TEST: input
+// TEST: -1 input 110
+// TEST: input 242
 package main
 
 import (

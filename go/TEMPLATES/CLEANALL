@@ -1,0 +1,38 @@
+#!/bin/bash
+# clean the directories before git-commiting
+
+# first, place ourselves in the dir of the script
+cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null
+
+# remove non-commitable files
+export d
+for d in d??; do
+    ( cd "$d" || exit 1
+      rm -f -- d[0-9][0-9] __debug_bin *~ \#*
+    )
+done
+
+# check some problematic files do not remain
+nfs=$(find -name .nfs\*)
+if [[ -n $nfs ]]; then
+    echo "### Warning: some .nfs files remain!"
+    echo "$nfs"
+fi
+
+# check that all GO source files have their TEST: lines completed
+missing=$(grep '^// TEST: .*[^[:alnum:]]$' d??/*.go)
+if [[ -n $missing ]]; then
+    echo "### Warning: some TEST declarations are missing values!"
+    echo "$missing"
+    echo "=== Please fix them"
+fi
+
+# check that we added the notes for the completed day
+for day in d??; do
+    day="${d#d}"
+    [[ -s $day/input.txt ]] || continue
+    if ! grep -q "^- [*][*]d${d}[*][*][[:space:]]*[^[:space:]]" ../README.md; then
+        echo "### Warning: missing $day note in ../README.md"
+    fi
+done
+

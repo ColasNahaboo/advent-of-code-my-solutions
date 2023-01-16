@@ -1,11 +1,10 @@
 package main
 
 import (
-	"reflect"
 	"testing"
 )
 
-// reflect.DeepEqual(got, expected)
+// set of unit tests
 func Test_1(t *testing.T) {
 	// setup code
 
@@ -19,7 +18,7 @@ func Test_1(t *testing.T) {
 }
 
 // test function
-func t_wc(label string, t *testing.T, args, expected int) {
+func t_1(label string, t *testing.T, args, expected int) {
 	// setup here
 	t.Run(label, func(t *testing.T) {
 		got := theFunctionToTest(args)
