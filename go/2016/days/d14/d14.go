@@ -80,6 +80,7 @@ func idxMD5(idx int) string {
 	var s string
 	if stretching {				// Part2: compute MD5 2017 times
 		// we do the []byte => hex string conversion by hand to try to be the fastest possible
+		// avoid copying the [16]byte array as much as possible, minimize conversions
 		h := make([]byte, 32, 32) 
 		harray := md5.Sum([]byte(salt + itoa(idx)))
 		n := 1
