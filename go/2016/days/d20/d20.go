@@ -66,12 +66,14 @@ func part1(lines []string) int {
 //////////// Part 2
 func part2(lines []string) (allowed int) {
 	blocks, _ := parse(lines)
-	intervals := [][2]int{{0, maxval}}	// todo list: a stack of IP intervals to test
+	// ip intervals: [low, high, starting block to test with]
+	intervals := [][3]int{{0, maxval, 0}}	// todo list: a stack of IP intervals to test
 	for {
 		if len(intervals) == 0 { break;} // no intervals left to test in the todo list
 		ips := intervals[len(intervals)-1] // pop next one
 		intervals = intervals[:len(intervals)-1]
-		for _, block := range blocks {
+		for b := ips[2]; b < len(blocks); b++ {
+			block := blocks[b]
 			if ips[1] < block[0] || ips[0] > block[1] { // disjoints
 				continue
 			}
@@ -87,9 +89,12 @@ func part2(lines []string) (allowed int) {
 					ips[1] = block[0] - 1
 					if isEmpty(ips) { goto BLOCKED;} // ips empty
 				} else {								  // block cuts ips in two intervals
-					ips2 := [2]int{block[1]+1, ips[1]}
+					if b < len(blocks) - 1 {			  // no need, no more blocks to test
+						// push high half onto todo list, to start testing at next block
+						ips2 := [3]int{block[1]+1, ips[1], b+1}
+						intervals = append(intervals, ips2) 
+					}
 					ips[1] = block[0] - 1
-					intervals = append(intervals, ips2) // push high half onto todo list
 					continue							// continue testing the lower half
 				}
 			}
@@ -100,7 +105,8 @@ func part2(lines []string) (allowed int) {
 	return
 }
 
-func isEmpty(ips [2]int) bool {
+func isEmpty(ips [3]int) bool {
+	VPf("EMPTY interval: %v\n", ips)
 	return ips[0] > ips[1]
 }
 
