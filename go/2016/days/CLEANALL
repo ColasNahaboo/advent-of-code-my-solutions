@@ -27,12 +27,16 @@ if [[ -n $missing ]]; then
     echo "=== Please fix them"
 fi
 
-# check that we added the notes for the completed day
 for day in d??; do
     day="${d#d}"
-    [[ -s $day/input.txt ]] || continue
-    if ! grep -q "^- [*][*]d${d}[*][*][[:space:]]*[^[:space:]]" ../README.md; then
-        echo "### Warning: missing $day note in ../README.md"
+    # check that we will not commit the input file
+    [[ -s $day/input.txt ]] && echo "### Warning: $day/input.txt present, rename as $day-input,R1,R2.test"
+    file=$(echo $day-input,[0-9]*,[0-9]*.test)
+    # check that we added the notes for the completed day (when input file exists)
+    if [[ -s "$file" ]] then
+       if ! grep -q "^- [*][*]d${d}[*][*][[:space:]]*[^[:space:]]" ../README.md; then
+           echo "### Warning: missing $day note in ../README.md"
+       fi
     fi
 done
 

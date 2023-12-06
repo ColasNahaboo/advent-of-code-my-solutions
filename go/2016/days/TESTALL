@@ -3,10 +3,16 @@
 USAGE='TESTALL [-v] [-t] [days...]
 Runs the test on a solution (script name or number), or on all tests if no
 argument and run in dir ".../go/days/".
-To define a test, in a script put comments like:
-  // TEST: [-option] input-name expected-value
+
+To define a test for go code dNN.go, either create a file named
+dNN-input-name,expectedresultpart1,expectedrexultpart2.test containing the input
+E,g: d07-long-example,17,567.test, d18-2-minitest-2,18.test d02-onlypart1,45,.test
+This allows excluding all *.test files from git to avoid disclosing the input
+
+Or, in th Go source dNN.go put comments like:
+  // TEST: [-option] input-name expected-result
 This program will then run the program for each #TEST: line, with
-day/input-name.txt as argument, expecting expected-value (a number) as the last
+day/input-name.txt as argument, expecting expected-result (a number) as the last
 line of output (so the program can print extra info before)
 Nothing is printed in case of success, unless -v is used.
 Comments starting with TEST but not in the proper syntax are ignored, e.g. with
@@ -39,7 +45,8 @@ runtest(){
     V "Running tests in $script"
     while read -r line; do
         cd "$OPWD" || exit 1
-        if [[ $line =~ ^((-[-[:alnum:]]+[[:space:]]+)*)([[:alnum:]]+)[[:space:]]+(-?[[:alnum:]]+) ]]; then
+        V "line: \"$line\"" >&2
+        if [[ $line =~ ^((-[-[:alnum:]]+[[:space:]]+)*)([-.,[:alnum:]]+)[[:space:]]+(-?[[:alnum:]]+) ]]; then
             opt="${BASH_REMATCH[1]}"
             name="${BASH_REMATCH[3]}"
             value="${BASH_REMATCH[4]}"
@@ -49,7 +56,8 @@ runtest(){
             cd "$OPWD" || exit 1
             continue
         fi
-        V "  TEST ${radix##*/} $opt $name.txt == $value"
+        [[ $name =~ [.]test$ ]] || name="$name.txt"
+        V "  TEST ${radix##*/} $opt $name == $value"
         cd "${script%%/*}" || exit 1
         # compile if needed
         go build || { cd "$OPWD" || exit 1; continue;}
@@ -64,20 +72,37 @@ runtest(){
         # shellcheck disable=SC2086
         if "$timer"; then
             "$verbose" || export TIMEFORMAT="  Time: %3R s for $radix $opt $name"
-            result=$(time ./"${radix##*/}" $opt "$name.txt" | tail -1)
+            result=$(time ./"${radix##*/}" $opt "$name" | tail -1)
         else
-            result=$(./"${radix##*/}" $opt "$name.txt" | tail -1)
+            result=$(./"${radix##*/}" $opt "$name" | tail -1)
         fi
         cd "$OPWD" || exit 1
         if [[ $result != "$value" ]]; then
-            echo "***TEST ERROR: $script $name.txt: found \"$result\", expecting \"$value\""
+            echo "***TEST ERROR: $script $name: found \"$result\", expecting \"$value\""
             (( fails++ ))
         else
             V "       OK"
         fi
-    done < <(grep -oP '^[[:space:]]*//[[:space:]]*TEST:[[:space:]]*\K[-_[:alnum:][:space:]]+[[:space:]]+-?[[:alnum:]]+' "$script")
+    done < <(grep -oP '^[[:space:]]*//[[:space:]]*TEST:[[:space:]]*\K(-1[[:space:]]+)?[[:alnum:]][-_.[:alnum:]]*[[:space:]]+[[:alnum:]]+' "$script"; runtestfiles "$script")
     return "$fails"
 }        
+
+# outputs as comment lines all the test files named SSS-PART-...-RESULT.test
+# in dir of radix of SSS argument.
+# E.g: input-big-one,56798,78.test, input,,.test
+runtestfiles(){
+    local script="$1"
+    local dir="." path opt
+    [[ $script =~ / ]] && dir="${script%/*}"
+    while read -r path; do
+        if [[ $path =~ ^(.*/)?input.*,([0-9]*),([0-9]*)[.]test$ ]]; then
+            res1="${BASH_REMATCH[2]}"
+            [[ -n "$res1" ]] && echo "-1 ${path##*/} $res1"
+            res2="${BASH_REMATCH[3]}"
+            [[ -n "$res2" ]] && echo "${path##*/} $res2"
+        fi
+    done < <(find "$dir" -regex "\(.*/\)?input.*,[0-9]*,[0-9]*[.]test" -size +0c)
+}
 
 errors=0
 # if we are in a day dir, only test it

@@ -1,7 +1,7 @@
-# Advent of code challenge YYYY, in GO
+# Advent of code challenge 2023, in GO
 
-Here are my solutions to the "Advent of code" challenge of YYYY implemented in GO (aka Golang).
-See https://adventofcode.com/YYYY
+Here are my solutions to the "Advent of code" challenge of 2023 implemented in GO (aka Golang).
+See https://adventofcode.com/2023
 
 I am doing this to keep learning GO, so this must be considered as "student code". I am coding it to try my hand at various GO idioms, not seeking efficiency, scalability nor optimality. But feedback is very welcome.
 
@@ -25,7 +25,7 @@ The code is in standard GO, with some housekeeping scripts in bash.
 
 - Unit tests are performed via the standard GO testing system, in the optional source file `days/dNN/dNN_test.go`
 - Integration tests are done by looking at the comments `// TEST: [option] input-file result` in source files and running the code with the option and input and checking the last printed line is the result. The `days/TESTALL` bash script runs all the unit and integration tests, see it for technical details. I tend to use more these integration test than the GO unit test above, as they are impervious to the major refactoring that can happen as I try many different approaches in this style of experimental programming. I rely rather on many small input samples in files `ex1.tx`, `ex2.txt`...
-- Input files for tests can also be specified in a standalone way, as files containing the problem input but named `input`*-DESCRIPTION,RESULT1,RESULT2*`.test`. (E.g. `input-negative-values,345,.test`). The optional description is freeform, and *result1* and *result2*, if present, are the expected results of the test. This avoids cluttering the Go source code, and if you ignore `*.test` files in your version control system (e.g. `.gitignore`), avoid publishing your personal input, as requested by the author of the adventofcode. 
+- **New for 2023:** input files for tests can also be specified in a standalone way, as files containing the problem input but named `input`*-DESCRIPTION,RESULT1,RESULT2*`.test`. (E.g. `input-negative-values,345,.test`). The optional description is freeform, and *result1* and *result2*, if present, are the expected results of the test. This avoids cluttering the Go source code, and if you ignore `*.test` files in your version control system (e.g. `.gitignore`), avoid publishing your personal input, as requested by the author of the adventofcode. 
 - The examples given in the problem descriptions are used in GO unit tests `dNN_test.go` , whereas the input file is used for the high-level integration tests of `TESTALL`.
 
 **Misc:**
