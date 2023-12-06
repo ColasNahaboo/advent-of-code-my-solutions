@@ -6,12 +6,12 @@
 // And any file named input-DESCRIPTION,RESULT1,RESULT2.test containing an input
 
 // For a race of duration D, keeping the button pressed for time T
-// makes the boat goes to length L:
+// makes the boat goes to length L to get at least record R:
 // speed = T; L = speed * (D - T); L = T * (D - T); L = -1 T2 + D T
 // Wins are T * (D - T) > R, values above solutions of -1 T2 + D T - R = 0
 // Solutions are (-D +/- sqrt(D2 - 4R) ) / -2 = (D +/- sqrt(D2 - 4R)) / 2
-// E.g for example race 1, D=7, R=9: (7 +- sqrt(49 - 36)) / 2
-// sqrt(13) = 3.6... so we retain 3 (rounded low) to remove and 4 (rounded high)
+// E.g for example race 1, D=7, R=9+1: (7 +- sqrt(49 - 40)) / 2
+// sqrt(13) = 3 so we retain 3 (rounded low) to remove and 4 (rounded high)
 // to add to get integer solutions inside the allowed range: 2 to 5.
 
 package main
@@ -26,7 +26,7 @@ import (
 var verbose bool
 
 var	durations []int					// the (fixed) duration of each race
-var	records []int					// its current distance record
+var	records []int					// the record to reach: current one + 1
 
 func main() {
 	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
@@ -72,13 +72,15 @@ func part2(lines []string) int {
 
 //////////// Common Parts code
 
-var margin = 0.00000000001		// a tiny offset to avoid delta being an int
+var margin = 0.0001		// a tiny offset to avoid delta being an int
+
 func winsNum(race int) int {
 	// sqrt(D2 - 4R))
 	delta := math.Sqrt(float64(durations[race] * durations[race] - 4 * records[race]))
 	VPf("    Delta = %f\n", delta)
-	from := int((float64(durations[race]) - delta + margin) / 2) + 1
-	to := int((float64(durations[race]) + delta - margin) / 2)
+	// Use Ceiling & Floor because from must be the integer inside the solution
+	from := int(math.Ceil((float64(durations[race]) - delta) / 2))
+	to := int(math.Floor((float64(durations[race]) + delta) / 2))
 	VPf("  Race[%d](%d, %d): %d = %d..%d\n", race, durations[race], records[race], to - from + 1, from, to)
 	return to - from + 1
 }
@@ -91,7 +93,7 @@ func parse1(lines []string) {
 		durations = append(durations, atoi(n))
 	}
 	for _, n := range renum.FindAllString(lines[1], -1) {
-		records = append(records, atoi(n))
+		records = append(records, atoi(n) + 1)
 	}
 }
 
@@ -108,5 +110,5 @@ func parse2(lines []string) {
 	for _, n := range renum.FindAllString(lines[1], -1) {
 		line = line + n
 	}
-	records = append(records, atoi(line))
+	records = append(records, atoi(line) + 1)
 }
