@@ -10,7 +10,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	// "regexp"
+	"regexp"
 )
 
 var verbose bool

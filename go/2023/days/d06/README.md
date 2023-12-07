@@ -1,6 +1,6 @@
 # Advent of code challenge 2023, in GO, day d06
 
-Insteqd of trying all the values, we just solve the problem mathematically.
+Instead of trying all the values, we just solve the problem mathematically.
 
 For a race of duration $d$, keeping the button pressed for a time $t$ makes the boat goes to length $l$ by the formula:
 
@@ -10,7 +10,7 @@ That is, since $speed$ is given by the time $t$ itself:
 
 $l=t(d-t) \implies -t^2+dt$
 
-So, the winning times $w$ are the ones that can generate a distance $r$, equal to the current record + 1.
+So, the winning times $w$ are the ones that can generate a distance $r$, equal or greater to the current record + 1.
 
 $-t^2+dt=r \implies -t^2+dt-r=0$
 
