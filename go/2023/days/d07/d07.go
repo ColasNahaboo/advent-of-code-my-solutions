@@ -17,7 +17,7 @@ import (
 
 var verbose bool
 
-// This is over-engineered, as I was anticipating part2 that would have scaled
+// This is over-engineered, as I was anticipating part2 would have scaled
 // hugely. In retrospect, just storing cards by their score (field "hand")
 // and computing other fields (e.g cards) on demand would have been fast enough.
 

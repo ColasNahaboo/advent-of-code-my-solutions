@@ -10,26 +10,15 @@ import (
 	"fmt"
 	"regexp"
 	//"time"
-	//"github.com/fzipp/astar"
+	"github.com/fzipp/astar"
 )
 
 type Node struct {				// the initial state
 	x, y, size, used, avail int
+	t int						// taquin type of the node
 }
 var grid []Node					// linear of the 2d grid: pos = x + y*gw
 var gw, gh, garea int			// its dims
-
-// data of nodes for part2 A* graph search of shortest path
-// for each pos in grid, delta of avail to it
-// e.g: avail at p is grid[p].avail + state[p]
-// an extra int is the position of data G, thus at state[garea]
-// BUT we use 2-byte numbers instead of ints, to be able to use strings
-// as indexes in a map of states, using the optimisation in
-// https://pthevenet.com/posts/programming/go/bytesliceindexedmaps/
-// v := m[string(byteSlice)]
-// Thus avail at p is grid[p].avail + state[p*2]*256 + state[p*2+1]
-type State []byte				// of length (garea + 1) * 2
-var states map[string]State
 
 var verbose bool
 
@@ -60,6 +49,7 @@ func main() {
 
 //////////// Part 1
 
+// Part1 is totally simplistic
 func part1() (viable int) {
 	for a := 0; a < garea; a++ {
 		for b := 0; b < garea; b++ {
@@ -73,17 +63,12 @@ func part1() (viable int) {
 	return			
 }
 
-//////////// Part 2
-
-func part2() int {
-	return 0
-}
-
 //////////// Common Parts code
 
 func parse(lines []string) {
 	re := regexp.MustCompile("/dev/grid/node-x([[:digit:]]+)-y([[:digit:]]+)[[:space:]]+([[:digit:]]+)T[[:space:]]+([[:digit:]]+)T[[:space:]]+([[:digit:]]+)T[[:space:]]+")
 	nodes := []Node{}				// list, not ordered in a 2D grid
+	hole_p := -1
 	for lineno := 0; lineno < len(lines); lineno++ {
 		line := lines[lineno]
 		if m := re.FindStringSubmatch(line); m != nil {
@@ -93,6 +78,17 @@ func parse(lines []string) {
 				size: atoi(m[3]),
 				used: atoi(m[4]),
 				avail: atoi(m[5]),
+			}
+			if node.used == 0 {
+				if hole_p != -1 {
+					panic("grid has 2 holes")
+				}
+				hole_p = lineno
+				node.t = HOLE
+			} else if node.used > 100 {
+				node.t = WALL
+			} else {
+				node.t = TILE
 			}
 			if node.x > gw -1 { gw = node.x +1; }
 			if node.y > gh -1 { gh = node.y +1; }
@@ -107,16 +103,44 @@ func parse(lines []string) {
 	for _, node := range nodes {
 		grid[node.x + node.y * gw] = node
 	}
-	// check we do not have holes
+	// our goal is at x=gw-1, y=0
+	grid[gw-1].t = GOAL
+	// checks: missing nodes
 	for i := 0; i < garea; i++ {
 		if grid[i].size == 0 {
 			panic(fmt.Sprintf("grid missing a node at (%d, %d)\n", i%gw, i/gw))
 		}
 	}
+	if hole_p == -1 {
+		panic("grid has no hole!")
+	}
 	VPf("Grid %d x %d\n", gw, gh)
 }
 
+//////////// Part 2
 
-//////////// Part1 functions
+// For part 2, we solve this as a taquin, with A* of github.com/fzipp/astar
+// There is one hole, and movable tiles or immovable ealls
+// We must bring the goal tile to (0, 0) from its (gw-1, 0) position
 
-//////////// Part2 functions
+type State struct {
+	hole int					// position of the hole
+	data int					// position of the data
+	grid []int8					// the grid, of size gw*gh
+}
+var gw, gh int					// grid size with a border of walls added
+
+const (							// taquin types. movable tile: >0
+	HOLE = 0
+	TILE = 1
+	GOAL = 2
+	WALL = -1
+)
+
+
+
+func part2() int {
+	return 0
+}
+
+
