@@ -57,7 +57,3 @@ func part2(lines []string) int {
 }
 
 //////////// Common Parts code
-
-//////////// Part1 functions
-
-//////////// Part2 functions

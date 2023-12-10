@@ -20,7 +20,7 @@ if [[ -n $nfs ]]; then
 fi
 
 # check that all GO source files have their TEST: lines completed
-missing=$(grep '^// TEST: .*[^[:alnum:]]$' d??/*.go)
+missing=$(grep '^// TEST: .*[^[:alnum:]]([[:space:]]*//.*)$' d??/*.go)
 if [[ -n $missing ]]; then
     echo "### Warning: some TEST declarations are missing values!"
     echo "$missing"
