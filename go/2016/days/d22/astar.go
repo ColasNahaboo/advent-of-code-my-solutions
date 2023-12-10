@@ -5,34 +5,86 @@
 // Package astar implements the A* search algorithm for finding least-cost paths.
 
 // Colas: This is a modified version of https://github.com/fzipp/astar
-// with the end condition of FindPath being not that n is equal to dest, but
-// that the distance from n to dest is <= 0
-// This allows to search for multiple possible destinations
+// modified to not requiring playing with types and methods, and working
+// with graphs that are dynamically lazy-created on demand, useful to explore
+// solutions in potentially huge spaces, and the goal to reach can be many states
+// satisfying an end condition.
+// Typically, finding a path in all possible moves of a chess game, with the
+// destination being not one configuration but any one providing a mat
+//
+// For now, this is not a package but a simple file to copy into your sources
 //
 // The recommended use is to have Nodes be an id (int), an index in a dynamic
 // slice (global variable) of more complex structures states that can be
 // created on demand and have way (Map table?) to find the neigbours of a state,
-// auto-creating them on demand.
+// auto-creating them on demand. But Node can be any comparable Go type.
 //
-// User thus just has to define 3 functions to pass to FindPath:
-// - nodesConnected(node Node) []Node, type ConnectedFunc
-// - nodesDistance(node1, node2 Node) float64, type CostFunc
-//   a negative or null result meants the destination is reached
-// - nodesHeuristic(node, destination Node) float64, type CostFunc
-// Then the call to the generic FindPath:
-// FindPath[Node](start, dest, nodesConnected, nodesDistance, nodesHeuristic)
+// User thus just has to define 4 functions to pass to AStarFindPath:
+// - nodesConnected(g any, node Node) []Node, type ConnectedFunc
+//   returns a slice of the neighbour nodes, possibly auto-created
+// - nodesDistance(g any, node1, node2 Node) float64, type CostFunc
+//   returns the length of the path from node1 to neighbour node2
+// - nodesHeuristic(g any, node, destination Node) float64, type CostFunc
+//   returns how far from the destination we estimate node is
+// - nodeEnd(g any, node Node) bool, type EndFunc
+//   tells if we have reached a satisfying destination node
+// Then the call to the generic AStarFindPath:
+// AStarFindPath[Node](nil, start, dest, nodesConnected, nodesDistance, nodesHeuristic, nodeEnd)
 // finds the shortest path (a []Node) via the A* algorithm
 
 package main
 
 import "container/heap"
 
+//////////// Types of the Callbacks implemented and provided to AStarFindPath
 // A ConnectedFunc returns the neighbour nodes of node n in the graph.
-type ConnectedFunc[Node any] func(a Node) []Node
+type ConnectedFunc[Node any] func(g any, a Node) []Node
+// A CostFunc returns a cost for the transition node a -> node b
+type CostFunc[Node any] func(g any, a, b Node) float64
+// A EndFunc returns true if node is a/the destination
+type EndFunc[Node any] func(g any, a Node) bool
 
-// A CostFunc is a function that returns a cost for the transition
-// from node a to node b.
-type CostFunc[Node any] func(a, b Node) float64
+//////////// The path-finding function, AStarFindPath
+
+// AStarFindPath finds the least-cost path between start and dest in graph g
+// using the cost function d and the cost heuristic function h.
+// g can be anything, it is just a context blindly passed to the callback
+// functions in argument. This can be either the full graph structure, or just
+// nil in trivial programs relying on global variables for the graph and context
+// Note that g should be a pointer to an object if the graph is to be
+// dynamically created by the calls to your callbacks
+
+func AStarFindPath[Node comparable](g any, start, dest Node, cf ConnectedFunc[Node], df, hf CostFunc[Node], ne EndFunc[Node]) Path[Node] {
+	closed := make(map[Node]bool)
+
+	pq := &priorityQueue[Path[Node]]{}
+	heap.Init(pq)
+	heap.Push(pq, &item[Path[Node]]{value: newPath(start)})
+
+	for pq.Len() > 0 {
+		p := heap.Pop(pq).(*item[Path[Node]]).value
+		n := p.last()
+		if closed[n] {
+			continue
+		}
+		if ne(g, n) {			// Path found
+			return p
+		}
+		closed[n] = true
+
+		for _, nb := range cf(g, n) {
+			cp := p.cont(nb)
+			heap.Push(pq, &item[Path[Node]]{
+				value:    cp,
+				priority: -(cp.Cost(g, df) + hf(g, nb, dest)),
+			})
+		}
+	}
+
+	// No path found
+	return nil
+}
+
 
 // A Path is a sequence of nodes in a graph.
 type Path[Node any] []Node
@@ -59,45 +111,11 @@ func (p Path[Node]) cont(n Node) Path[Node] {
 
 // Cost calculates the total cost of path p by applying the cost function d
 // to all path segments and returning the sum.
-func (p Path[Node]) Cost(d CostFunc[Node]) (c float64) {
+func (p Path[Node]) Cost(g any, df CostFunc[Node]) (c float64) {
 	for i := 1; i < len(p); i++ {
-		c += d(p[i-1], p[i])
+		c += df(g, p[i-1], p[i])
 	}
 	return c
-}
-
-// FindPath finds the least-cost path between start and dest in graph g
-// using the cost function d and the cost heuristic function h.
-func FindPath[Node comparable](start, dest Node, c ConnectedFunc[Node], d, h CostFunc[Node]) Path[Node] {
-	closed := make(map[Node]bool)
-
-	pq := &priorityQueue[Path[Node]]{}
-	heap.Init(pq)
-	heap.Push(pq, &item[Path[Node]]{value: newPath(start)})
-
-	for pq.Len() > 0 {
-		p := heap.Pop(pq).(*item[Path[Node]]).value
-		n := p.last()
-		if closed[n] {
-			continue
-		}
-		if h(n, dest) <= 0 {
-			// Path found
-			return p
-		}
-		closed[n] = true
-
-		for _, nb := range c(n) {
-			cp := p.cont(nb)
-			heap.Push(pq, &item[Path[Node]]{
-				value:    cp,
-				priority: -(cp.Cost(d) + h(nb, dest)),
-			})
-		}
-	}
-
-	// No path found
-	return nil
 }
 
 //////////////////////// Priority Queues ////////////////////////

@@ -19,6 +19,7 @@ type Node struct {				// the initial state
 var grid []Node					// linear of the 2d grid: pos = x + y*gw
 var gw, gh, garea int			// its dims
 var ghole = -1					// hole position in grid
+var ggoal int					// initial goal position in grid
 
 var verbose bool
 
@@ -34,14 +35,19 @@ func main() {
 		infile = fileMatch("input,[0-9]*,[0-9]*.test")
 	}
 	lines := fileToLines(infile)
-	parse(lines[2:])
 	
 	var result int
 	if *partOne {
 		VP("Running Part1")
+		parse(lines[2:])
 		result = part1()
 	} else {
 		VP("Running Part2")
+		if lines[0] == "#MAP#" {
+			parseMap(lines[1:])
+		} else {
+			parse(lines[2:])
+		}
 		result = part2()
 	}
 	fmt.Println(result)
@@ -80,12 +86,7 @@ func parse(lines []string) {
 				avail: atoi(m[5]),
 			}
 			if node.used == 0 {
-				if ghole != -1 {
-					panic("grid has 2 holes")
-				}
-				ghole = gpos
 				node.t = HOLE
-				
 			} else if node.used > 100 {
 				node.t = WALL
 			} else {
@@ -106,11 +107,14 @@ func parse(lines []string) {
 		grid[node.x + node.y * gw] = node
 	}
 	// our goal is at x=gw-1, y=0
-	grid[gw-1].t = GOAL
+	ggoal = gw - 1
+	grid[ggoal].t = GOAL
 	// checks: missing nodes
 	for i := 0; i < garea; i++ {
 		if grid[i].size == 0 {
 			panic(fmt.Sprintf("grid missing a node at (%d, %d)\n", i%gw, i/gw))
+		} else if grid[i].used == 0 {
+			ghole = i
 		}
 	}
 	if ghole == -1 {
@@ -119,6 +123,44 @@ func parse(lines []string) {
 	VPf("Grid %d x %d\n", gw, gh)
 }
 
+// parseMap is an alternative parser for inputs in the form of ascii maps using
+// rows as strings of WALL, TILE, HOLE, GOAL, describing only the inside of
+// the map, not the border walls nor the EOL
+
+func parseMap(lines []string) {
+	gw = len(lines[0])
+	gh = len(lines)
+	garea = gw * gh
+	var t byte
+	nodes := []Node{}				// list, not ordered in a 2D grid
+	for i := 0; i < garea; i++ {
+		t = TILE
+		used := 60
+		size := 100
+		avail := 40
+		t = lines[i / gw][i % gw]
+		if t == HOLE {
+			ghole = i
+			used, avail = 0, 100
+		} else if t == GOAL || t == ALTGOAL {
+			t = GOAL
+			ggoal = i
+		} else if t == WALL {
+			used, avail = 100, 0
+		}
+		node := Node{x: i%gw, y: i/gw, size: size, used: used, avail: avail, t: int(t)}
+		nodes = append(nodes, node)
+	}
+	grid = make([]Node, garea, garea)
+	for _, node := range nodes {
+		grid[node.x + node.y * gw] = node
+	}
+	if ghole == -1 {
+		panic("grid has no hole!")
+	}
+	VPf("Grid %d x %d\n", gw, gh)
+}
+	
 //////////// Part 2
 
 // For part 2, we solve this as a taquin, with A*
@@ -143,7 +185,8 @@ const (
 	TILE = '.'
 	GOAL = 'X'
 	HOLE = '@'
-	SEP = ' '					// DEBUG: for readability of boards
+	EOL = ' '					// DEBUG: for readability of boards
+	ALTGOAL = 'G'				// alias to X for reading some maps
 )
 
 type States []State
@@ -163,7 +206,6 @@ func part2() int {
 	bgoal = bw + 1				// the final destination of G
 	VPf("Grid %d (%d, %d), board %d (%d, %d)\n", gw*gh, gw, gh, barea, bw, bh)
 	for i, node := range grid {
-		//VPf("  grid pos %d ==> board pos %d\n", i, grid2boardPos(i))
 		bboard[grid2boardPos(i)] = byte(node.t)
 	}
 	// walls
@@ -177,7 +219,7 @@ func part2() int {
 		bboard[j * bw + gw+1] = WALL
 	}
 	for j := 0; j < bh; j++ {	// DEBUG: space between rows
-		bboard[j * bw + bw - 1] = SEP
+		bboard[j * bw + bw - 1] = EOL
 	}
 	// goal pseudo-state, id 0, used only in nodeDist comparison of goal pos
 	goal_s := State{goal: bgoal}
@@ -185,8 +227,6 @@ func part2() int {
 	start_s := State{hole: bhole, goal: bw + gw, board: string(bboard)}
 	// The node object used in astar is the index of a state in the graph array
 	graph = []State{goal_s, start_s}
-	//VPf("Init board: [%3d] %v\n", 1, start_s)
-	//VPnode(1)
 
 	// Reverse map to find state id from its board string representation
 	stateid = make(map[string]int, 0)
@@ -194,7 +234,7 @@ func part2() int {
 	stateid[start_s.board] = 1
 	
 	// Find the shortest path
-	path := FindPath[int](1, 0, nodesConnected, nodesDistance, nodesHeuristic)
+	path := AStarFindPath[int](nil, 1, 0, nodesConnected, nodesDistance, nodesHeuristic, nodeEnd)
 	if verbose {
 		VPf("### Path found with %d steps:\n", len(path) - 1)
 		for i, n :=range path {
@@ -202,12 +242,14 @@ func part2() int {
 			VPnode(n)
 		}
 	}
+	fmt.Printf("Reminder, starting board: %d x %d, hole @%d, goal @%d\n", bw, bh, bhole, bw+gw)
 	printBoard(start_s.board)
 	copy(bboard, []byte(start_s.board))
-	for _, n := range path {
-		bboard[graph[n].hole] = byte('+')
+	for i, n := range path {	// path is string of 01234567890123...
+		bboard[graph[n].hole] = '0' + byte(i%10)
 		bboard[graph[n].goal] = byte('x')
 	}
+	fmt.Println("Path followed:")
 	printBoard(string(bboard))
 	return len(path) - 1
 }
@@ -219,7 +261,7 @@ func stateId(hole, goal int, board string) (id int) {
 		state := State{hole: hole, goal: goal, board: board}
 		id = len(graph)
 		graph = append(graph, state)
-		VPf("  Creating new state of id %d: %v\n", id, state) 
+		//VPf("  Creating new state of id %d: %v\n", id, state) 
 		stateid[board] = id
 	}
 	return
@@ -256,12 +298,13 @@ func printBoard(board string) {
 		fmt.Println(board[i*bw:(i+1)*bw])
 	}
 }
-	
+
+//////////// The 4 callbacks for AStarFindPath
 
 // here we implement all the constraints on tile moves
 // we use the global value graph, as the parameter is a copy
 
-func nodesConnected(n int) (nexts []int) {
+func nodesConnected(g any, n int) (nexts []int) {
 	state := graph[n]
 	h := state.hole
 	// look if we can swap hole with up, down, left, right adjacent tile
@@ -275,22 +318,19 @@ func nodesConnected(n int) (nexts []int) {
 				newgoal = h
 			}
 			newstate := stateId(h+dir, newgoal, string(bboard))
-			//VPf(" |  [%2d] %v\n", n, state.board)
-			//VPf(" L_ [%2d] %v\n", newstate, string(bboard))
 			nexts = append(nexts, newstate)
 		}
 	}
-	VPf("  Neighbours of state %d: %v\n", n, nexts)
 	return
 }
 
 // in a path, all neigbours are at a distance of one move (a tile/hole swap)
-func nodesDistance(i, j int) float64 {
+func nodesDistance(g any, i, j int) float64 {
 	return 1
 }
 
 // heuristics: the "badness" (cost) of a node is its goal manhattan distance
-func nodesHeuristic(n, dest int) float64 {
+func nodesHeuristic(g any, n, dest int) float64 {
 	if graph[n].goal == bgoal {	// Goal reached!
 		return -1
 	}
@@ -299,7 +339,16 @@ func nodesHeuristic(n, dest int) float64 {
 	return float64(dPos(i, bgoal) + dPos(i, graph[n].hole))
 }
 
-// the manhattan distance between 2 positions
+// are we arrived yet?
+func nodeEnd(g any, n int) bool {
+	if graph[n].goal == bgoal {	// Goal reached!
+		return true
+	} else {
+		return false
+	}
+}
+
+// util: the manhattan distance between 2 positions
 func dPos(i, j int) int {
 	return intAbs(j%bw - i%bw) + intAbs(j/bw - i/bw)
 }
