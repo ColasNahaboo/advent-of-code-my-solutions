@@ -1,5 +1,5 @@
-// Adventofcode YYYY, dNN, in go. Arguments:
-// -1: use solve part 1 of the problem, default is the second one
+// Adventofcode YYYY, dNN, in go. https://adventofcode.com/YYYY/day/NN
+// Arguments: -1: use solve part 1 of the problem, default is the second one
 // the input file name: default: input,RESULT1,RESULT2.test
 // TEST: -1 example
 // TEST: example

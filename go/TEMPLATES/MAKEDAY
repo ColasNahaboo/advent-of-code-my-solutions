@@ -25,9 +25,9 @@ fi
 mkdir -p "$name"
 #cp ../../TEMPLATES/TEST.go  "$name/${name}_test.go"
 cp ../../TEMPLATES/utils.go "$name"
-sed -r -e "s/YYYY/$YYYY/g" -e "s/dNN/$name/g" \
+sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" \
     <../../TEMPLATES/INIT.go >"$name/$name.go"
-sed -r -e "s/YYYY/$YYYY/g" -e "s/dNN/$name/g" \
+sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" \
     <../../TEMPLATES/README-DD.md >"$name/README.md"
 touch "$name/input,,.test" "$name/example.txt" 
 
