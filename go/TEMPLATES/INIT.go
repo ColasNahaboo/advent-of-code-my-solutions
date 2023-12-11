@@ -57,3 +57,5 @@ func part2(lines []string) int {
 }
 
 //////////// Common Parts code
+
+//////////// PrettyPrinting & Debugging functions

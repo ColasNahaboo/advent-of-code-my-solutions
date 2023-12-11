@@ -2,7 +2,10 @@
 // -1: use solve part 1 of the problem, default is the second one
 // the input file name: default: input,,.test
 // TEST: -1 example 5
-// TEST: example
+// TEST: example 7
+// TEST: example2 43
+// TEST: example3 53
+// TEST: example4 41
 package main
 
 import (
@@ -241,16 +244,16 @@ func part2() int {
 			VPf("Step %d: state [%d]:\n", i, n)
 			VPnode(n)
 		}
+		fmt.Printf("Reminder, starting board: %d x %d, hole @%d, goal @%d\n", bw, bh, bhole, bw+gw)
+		printBoard(start_s.board)
+		copy(bboard, []byte(start_s.board))
+		for i, n := range path {	// path is string of 01234567890123...
+			bboard[graph[n].hole] = '0' + byte(i%10)
+			bboard[graph[n].goal] = byte('x')
+		}
+		fmt.Println("Path followed:")
+		printBoard(string(bboard))
 	}
-	fmt.Printf("Reminder, starting board: %d x %d, hole @%d, goal @%d\n", bw, bh, bhole, bw+gw)
-	printBoard(start_s.board)
-	copy(bboard, []byte(start_s.board))
-	for i, n := range path {	// path is string of 01234567890123...
-		bboard[graph[n].hole] = '0' + byte(i%10)
-		bboard[graph[n].goal] = byte('x')
-	}
-	fmt.Println("Path followed:")
-	printBoard(string(bboard))
 	return len(path) - 1
 }
 
