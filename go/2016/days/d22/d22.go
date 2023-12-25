@@ -343,7 +343,7 @@ func nodesHeuristic(g any, n, dest int) float64 {
 }
 
 // are we arrived yet?
-func nodeEnd(g any, n int) bool {
+func nodeEnd(g any, n, end int) bool {
 	if graph[n].goal == bgoal {	// Goal reached!
 		return true
 	} else {

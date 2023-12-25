@@ -49,7 +49,7 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 
 ## Day highlights
 
-- **d01** Contained a sublte trick: it needed to find words in the strings that can overlap: E.g. find `eight` and `three` in the string `eighthree`
+- **d01** Contained a subtle trick: it needed to find words in the strings that can overlap: E.g. find `eight` and `three` in the string `eighthree`
 - **d04** Scaling for part2 needed to factorize cards so not to process each one individually
 - **d05** Scaling for part2 needed to regroup number into ranges of numbers being mapped in the same way, and only work on the (few) ranges, and not the (many) numbers. The difficulty is that the ranges are different on each mapping, and you must use the intersections of them.
 - **d06** Modelizing the problem shows that it amounts to finding the integer that are abscisses of the part of a parabola above a threshold. Thus solving a 2nd order polynomial equation.

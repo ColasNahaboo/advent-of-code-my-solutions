@@ -42,7 +42,7 @@ type ConnectedFunc[Node any] func(g any, a Node) []Node
 // A CostFunc returns a cost for the transition node a -> node b
 type CostFunc[Node any] func(g any, a, b Node) float64
 // A EndFunc returns true if node is a/the destination
-type EndFunc[Node any] func(g any, a Node) bool
+type EndFunc[Node any] func(g any, a, end Node) bool
 
 //////////// The path-finding function, AStarFindPath
 
@@ -68,7 +68,7 @@ func AStarFindPath[Node comparable](g any, start, dest Node, cf ConnectedFunc[No
 		if closed[n] {
 			continue
 		}
-		if ne(g, n) {			// Path found
+		if ne(g, n, dest) {			// Path found
 			return p
 		}
 		closed[n] = true

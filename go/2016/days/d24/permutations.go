@@ -30,33 +30,3 @@ func getPerm(orig, p []int) []int {
 //        fmt.Println(getPerm(orig, p))
 //     }
 // }
-
-////////////////////////////////////////////////////////////////// Variant:
-// Enumerate all the subsets of size k from a set of size n
-// Fast algortihm via bitsets, but only for n < 64
-// see http://math0.wvstateu.edu/~baker/cs405/code/Subset.html
-
-func subsetsList(n, k int) []int {
-	x := twoPower(2, k) - 1
-	max := twoPower(2, n) - twoPower(2, n-k)
-	s := make([]int, 1, max-x)
-	s[0] = x
-	for x < max {
-		u := x & (-x)
-		v := x + u
-		x = v + (((v ^ x) / u) >> 2)
-		s = append(s, x)
-	}
-	return s
-}
-
-func twoPower(n int) int {
-	if n <= 0 {
-		return 1
-	}
-	result := 2
-	for i := 2; i <= n; i++ {
-		result *= 2
-	}
-	return result
-}
