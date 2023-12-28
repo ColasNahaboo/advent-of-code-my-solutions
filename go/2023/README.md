@@ -57,3 +57,5 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 - **d08** A problem that can only be solved easily by strong hypotheses on the input. In this case that values loop in a clean way.
 - **d10** A topological problem, where you must find points inside a loop, my solution is tracing a ray and counting the crossings of the loop. Point is inside if this number is odd.
 - **d11** Simple problem, but too huge to be solved by handling space as a grid, we must use the mere list of galaxies coordinates instead.
+- **d12** I had a very hard time to debug this. The algorithm seemed simple enough to me, but I kept having bugs that I could not identify.
+- **d14** A classic: detecting a loop in a series of results to avoid computing all of them. I also made a library `Scalarray.go` to help managing these 2D grids that are so often used in these kind of problems.

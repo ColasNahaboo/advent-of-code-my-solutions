@@ -1,6 +1,6 @@
 # Advent of code challenge 2023, in GO, day d12
 
-Part1 was quite simple. I solved it by just generating all the possible arragements with all the combinations of value s'.' or '#' for the '?', and then checking all of them to see which ones were valid. But this would not scale for part2.
+Part1 was quite simple. I solved it by just generating all the possible arrangments with all the combinations of value s'.' or '#' for the '?', and then checking all of them to see which ones were valid. But this would not scale for part2.
 
 I thus tried an iterative approach: moving up the string of the springs records, each time I encountered a '?', explored on the 2 possible branches. Nice, but not enough. I kept the code (functions named `explore`) for this approach as an alternate to part2, callable with the `-a` command line option
 
