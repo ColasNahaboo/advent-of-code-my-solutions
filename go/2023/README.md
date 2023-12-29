@@ -59,3 +59,4 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 - **d11** Simple problem, but too huge to be solved by handling space as a grid, we must use the mere list of galaxies coordinates instead.
 - **d12** I had a very hard time to debug this. The algorithm seemed simple enough to me, but I kept having bugs that I could not identify.
 - **d14** A classic: detecting a loop in a series of results to avoid computing all of them. I also made a library `Scalarray.go` to help managing these 2D grids that are so often used in these kind of problems.
+- **d16** The trick was to avoid looping when following the path of the light beam.

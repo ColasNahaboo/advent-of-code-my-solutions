@@ -28,6 +28,7 @@
 package main
 
 import "fmt"
+import "strconv"
 
 //////////// Scalarray, 2D with optional borders
 
@@ -53,6 +54,7 @@ func (sa *Scalarray[T]) Get(x, y int) T {
 	return sa.a[x + y * sa.w]
 }
 
+// 2D coordinates / 1D positions conversion
 func (sa *Scalarray[T]) Pos(x, y int) int {
 	return x + y * sa.w
 }
@@ -77,6 +79,7 @@ func (sa *Scalarray[T]) Vector(pos int) (v [2]int) {
 	return
 }
 
+// is inside array
 func  (sa *Scalarray[T]) isValid(pos int) bool {
 	return pos >= 0 && pos < sa.w * sa.h
 }
@@ -84,6 +87,33 @@ func  (sa *Scalarray[T]) isValid(pos int) bool {
 // returns array of position offsets for going Up Right Down Left
 func (sa *Scalarray[T]) Dirs(pos int) [4]int {
 	return [4]int{-sa.w, 1, sa.w, -1}
+}
+
+// move from pos in horizontal dir (multiple of sa.Dirs()), do we stay inside?
+func  (sa *Scalarray[T]) stepInsideRow(pos, dir int) bool {
+	if dir < 0 {
+		return pos % sa.w > 0
+	} else {
+		return pos % sa.w < sa.w - 1
+	}
+}
+// move from pos in vertical dir (multiple of sa.Dirs()), do we stay inside?
+func  (sa *Scalarray[T]) stepInsideCol(pos, dir int) bool {
+	if dir < 0 {
+		return pos >= sa.w
+	} else {
+		return pos < sa.w * (sa.h - 1)
+	}
+}
+// move from pos in dir (of sa.Dirs()) by a single step, do we stay inside?
+func  (sa *Scalarray[T]) stepOnceInside(pos, dir int) bool {
+	switch dir {
+	case -1: return pos % sa.w > 0
+	case 1: return pos % sa.w < sa.w - 1
+	case -sa.w: return pos >= sa.w
+	case sa.w: return pos < sa.w * (sa.h - 1)
+	default: panic("stepOnceInside, bad direction: " + strconv.Itoa(dir))
+	}
 }
 
 // Clone also the underlying array
@@ -106,6 +136,46 @@ func (s1 *Scalarray[T]) Equal(s2 Scalarray[T]) bool {
 		}
 	}
 	return true
+}
+
+// insert n rows before row at r. To extend at end, use r = sa.h
+func (sa *Scalarray[T]) insertRow(r, n int) {
+	oh := sa.h
+	oa := sa.a
+	sa.h = oh + n
+	sa.a = make([]T, sa.w*sa.h, sa.w*sa.h)
+	// before insert point, copy
+	for y := 0; y < r; y++ {
+		for x := 0; x < sa.w; x++ {
+			sa.a[x + y*sa.w] = oa[x + y*sa.w]
+		}
+	}
+	// afterwards, copy but shifted
+	for y := r; y < oh; y++ {
+			for x := 0; x < sa.w; x++ {
+				sa.a[x + (y+n)*sa.w] = oa[x + y*sa.w]
+		}
+	}
+}
+
+// insert n cols before col at c. To extend at end, use c = sa.w
+func (sa *Scalarray[T]) insertCol(c, n int) {
+	ow := sa.w
+	oa := sa.a
+	sa.w = ow + n
+	sa.a = make([]T, sa.w*sa.h, sa.w*sa.h)
+	// before insert point, copy
+	for x := 0; x < c; x++ {
+		for y := 0; y < sa.h; y++ {
+			sa.a[x + y*sa.w] = oa[x + y*ow]
+		}
+	}
+	// afterwards, copy but shifted
+	for x := c; x < ow; x++ {
+		for y := 0; y < sa.h; y++ {
+			sa.a[x+n + y*sa.w] = oa[x + y*ow]
+		}
+	}
 }
 
 //////////// Convenience 2D functions to manage a border, names end in B
@@ -202,8 +272,8 @@ func VPScallaryInt(label string, sa Scalarray[int]) {
 			max = -i
 		}
 	}
-	maxs := itoa(max)
-	cellformat := "%" + itoa(len(maxs) + 1) + "d"
+	maxs := strconv.Itoa(max)
+	cellformat := "%" + strconv.Itoa(len(maxs) + 1) + "d"
 	for p, i := range sa.a {
 		if p % sa.w == 0 {
 			fmt.Println()
