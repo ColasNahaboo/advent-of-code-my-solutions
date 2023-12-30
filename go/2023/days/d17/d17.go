@@ -35,6 +35,7 @@ func main() {
 	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
 	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
 	partThree := flag.Bool("3", false, "run exercise part3, (default: part2)")
+	partFour := flag.Bool("4", false, "run exercise part4, (default: part2)")
 	flag.Parse()
 	verbose = *verboseFlag
 	var infile string
@@ -52,6 +53,9 @@ func main() {
 	} else if *partThree {
 		VP("Running Part3")
 		result = part3(lines)
+	} else if *partFour {
+		VP("Running Part4")
+		result = part4(lines)
 	} else {
 		VP("Running Part2")
 		result = part2(lines)
@@ -258,6 +262,65 @@ func distNodes3(g any, n1, n2 int) float64 {
 func distEnd3(g any, n1, n2 int) float64 {
 	x1, y1 := city.Coords(id3d.X(n1))
 	x2, y2 := city.Coords(id3d.X(n2))
+	return float64(intAbs(x2-x1) + intAbs(y2-y1))
+}
+
+//////////// Part 4
+
+// Part4 is a Part2 implementation variant, also without the indirection of a
+// mapTable stateIDs, by using the states themselves directly as Nodes.
+
+func part4(lines []string) (sum int) {
+	city = parse(lines)
+	dirs = city.Dirs()
+	// dir field is not important for start and end
+	start := State{0, 0, 0}
+	end := State{city.w*city.h - 1, 0, 0}
+	path := AStarFindPath[any, State](nil, start, end, connectedNodes4, distNodes4, distEnd4, samePosNodes4)
+	for i := 1; i < len(path); i++ { //  dont count start heat loss
+		sum += city.a[path[i].pos]
+	}
+	return
+}
+
+// neighbour states. Where can the crucible go?
+func connectedNodes4(g any, s State) (cns []State) {
+	// go straight?
+	if s.steps < 10 && city.stepDirInside(s.pos, s.dir) {
+		cns = append(cns, State{s.pos+dirs[s.dir], s.dir, s.steps+1})
+	}
+	// cannot turn if we do not have performed 4 steps
+	if s.steps >= 1 && s.steps < 4 {
+		return
+	}
+	// turn right?
+	newdir := (s.dir + 1) % 4
+	if city.stepDirInside(s.pos, newdir) {
+		cns = append(cns, State{s.pos+dirs[newdir], newdir, 1})
+	}
+	// turn left?
+	newdir = (s.dir + 3) % 4
+	if city.stepDirInside(s.pos, newdir) {
+		cns = append(cns, State{s.pos+dirs[newdir], newdir, 1})
+	}
+	return
+}
+
+// reached end, any direction is OK, but we must have done at least 4 steps
+func samePosNodes4(g any, s1, s2 State) bool {
+	return s1.pos == s2.pos && s1.steps >= 4
+}
+
+// "cost", between 2 points: Mahattan distance + destination heatloss
+// but here case all neighbours are adjacent so we only count the heatloss
+func distNodes4(g any, s1, s2 State) float64 {
+	return float64(city.a[s2.pos])
+}
+
+// distance to end: Mahattan distance
+func distEnd4(g any, s1, s2 State) float64 {
+	x1, y1 := city.Coords(s1.pos)
+	x2, y2 := city.Coords(s2.pos)
 	return float64(intAbs(x2-x1) + intAbs(y2-y1))
 }
 
