@@ -25,6 +25,8 @@
 
 // Scallaray4D, ScallarayN... may be implemented later for N-dimensional arrays
 
+// For now, this is not a package but a simple file to copy into your sources
+
 package main
 
 import "fmt"
@@ -84,8 +86,8 @@ func  (sa *Scalarray[T]) isValid(pos int) bool {
 	return pos >= 0 && pos < sa.w * sa.h
 }
 
-// returns array of position offsets for going Up Right Down Left
-func (sa *Scalarray[T]) Dirs(pos int) [4]int {
+// returns array of position offsets for going Up Right Down Left (N E S W)
+func (sa *Scalarray[T]) Dirs() [4]int {
 	return [4]int{-sa.w, 1, sa.w, -1}
 }
 
@@ -115,6 +117,16 @@ func  (sa *Scalarray[T]) stepOnceInside(pos, dir int) bool {
 	default: panic("stepOnceInside, bad direction: " + strconv.Itoa(dir))
 	}
 }
+// like stepOnceInside but with a cardinal direction [0:4]: N E S W = 0 1 2 3
+func  (sa *Scalarray[T]) stepDirInside(pos, dir int) bool {
+	switch dir {
+	case 0: return pos >= sa.w
+	case 1: return pos % sa.w < sa.w - 1
+	case 2: return pos < sa.w * (sa.h - 1)
+	case 3: return pos % sa.w > 0
+	default: panic("stepOnceInside, bad direction: " + strconv.Itoa(dir))
+	}
+}
 
 // Clone also the underlying array
 func (sa *Scalarray[T]) Clone() (sc Scalarray[T]) {
@@ -123,6 +135,15 @@ func (sa *Scalarray[T]) Clone() (sc Scalarray[T]) {
 	sc.b = sa.b
 	sc.a = make([]T, len(sa.a), len(sa.a))
 	copy(sc.a, sa.a)
+	return
+}
+
+// Just make one of the same dimensions, but not initialized
+func (sa *Scalarray[T]) New() (sc Scalarray[T]) {
+	sc.w = sa.w
+	sc.h = sa.h
+	sc.b = sa.b
+	sc.a = make([]T, len(sa.a), len(sa.a))
 	return
 }
 
@@ -350,6 +371,15 @@ func (sa *Scalarray3D[T]) Clone() (sc Scalarray3D[T]) {
 	sc.d = sa.d
 	sc.a = make([]T, len(sa.a), len(sa.a))
 	copy(sc.a, sa.a)
+	return
+}
+
+// Just make one of the same dimensions, but not initialized
+func (sa *Scalarray3D[T]) New() (sc Scalarray3D[T]) {
+	sc.w = sa.w
+	sc.h = sa.h
+	sc.d = sa.d
+	sc.a = make([]T, len(sa.a), len(sa.a))
 	return
 }
 

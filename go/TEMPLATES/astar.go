@@ -16,8 +16,10 @@
 //
 // The recommended use is to have Nodes be an id (int), an index in a dynamic
 // slice (global variable) of more complex structures states that can be
-// created on demand and have way (Map table?) to find the neigbours of a state,
+// created on demand and have a way (a Map?) to find the neigbours of a state,
 // auto-creating them on demand. But Node can be any comparable Go type.
+// Graph is your "context" type holding all you global info (such as the dynamic
+// slice above with Nodes as indexes)
 //
 // User thus just has to define 4 functions to pass to AStarFindPath:
 // - nodesConnected(g any, node Node) []Node, type ConnectedFunc
