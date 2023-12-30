@@ -60,4 +60,4 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 - **d12** I had a very hard time to debug this. The algorithm seemed simple enough to me, but I kept having bugs that I could not identify.
 - **d14** A classic: detecting a loop in a series of results to avoid computing all of them. I also made a library `Scalarray.go` to help managing these 2D grids that are so often used in these kind of problems.
 - **d16** The trick was to avoid looping when following the path of the light beam.
-- **d17** A typical problem, where we must find the shortest path in states of "things" on a 2D board. We combine for the solution the use of `scalarray.go` (for the 2D board) and `astar.go` (for the shortest path)
+- **d17** A typical problem, where we must find the shortest path in states of "things" on a 2D board. We combine for the solution the use of `scalarray.go` (for the 2D board) and `astar.go` (for the shortest path). We also provide an alternate implementation of part2, named part3 and callable with the `-3` command line option that use a 3D scalar array instead of a hashtable map to get IDs of states.
