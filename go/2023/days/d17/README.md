@@ -10,7 +10,7 @@ We do not have an actual State type, we map the fields virtually on the 3D coord
 
 Note that we do not need to actually instanciate the scalar array field of id3d, we only use its coordinates/position conversion methods, as we do not have to store additional data to Nodes.
 
-The Part3 implementation is thus 25% faster than part2, and takes less space are the is no actual data structure to do the mapping state -> ID.
+The Part3 implementation is thus 25% faster than part2, and takes less space as there is no actual data structure to do the mapping state -> ID.
 
 ## Part 4
 
