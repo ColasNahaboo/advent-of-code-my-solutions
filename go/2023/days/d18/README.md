@@ -7,19 +7,19 @@ In part 2, the map is too big to use the naive approach of managing the map as c
 If we take a simple exemple:
 
 ```
-     original map 23x8            19 tiles on a map 5x5:
-   xlist=0,7,21   ylist=0,3,7     all 16 '#' 1x1 tiles, 
-                                  plus these 3 "big" tiles:
-   0111111233333333333334         
-   |      |             |         
-   ########              --0      ### 
-   #      #                1      #1#       1 = 6x2 
-   #      #                1      #-### 
-   #      ###############--2      #2|3#     2 = 6x3 
-   #                    #  3      ##### 
-   #                    #  3                3 = 13x3 
-   #                    #  3 
-   ######################--4 
+   Oiginal map 23x8 cells   ----> 25 tiles on a 5x5 map:
+   xlist=0,7,21   ylist=0,3,7     xtiles=0,1,7,8,21
+                                  All 17 "#"  Plus 8 "big"
+   0111111233333333333334         1x1 tiles   tiles:
+   |      |             |
+   ########              --0      ###4#       1 = 6x2 
+   #      #                1      #1#5#       2 = 6x3 
+   #      #                1      #-#6#       3 = 13x3
+   #      ###############--2      #2|3#       - = 6x1 
+   #                    #  3      #####       | = 1x3
+   #                    #  3                  4 = 13x1
+   #                    #  3                  5 = 13x2
+   ######################--4                  6 = 13x1
 ```
 
 We thus apply the same method as in part 1, but for this vitual map, knowing that the capacity of each tile is not always 1.
