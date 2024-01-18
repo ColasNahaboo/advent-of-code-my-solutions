@@ -64,5 +64,6 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 - **d18** asks to count cells on a grid, but its becoms so huge in part2 that we must aggregate the cells in virtual mega tiles and work on them. The fun in the text was that the 1st part mentioned colors but with played no issue at all ultimately, and where a way to "hide" into the common input file what amounted to a different input for part 2.
 - **d20** part2 could be only solved by looking at the possible paths in reverse from the goal and seeing that it needed that 4 nodes be in low state at some point, but these 3 nodes were entering low cyclycally with different period. The solution was thus the Least Common Multiple (LCM) of these cycles.
 - **d21** was very hard, but not in the programming sense. All the difficulty was to understand how the input was a very specific case and designing and ad hoc solution.
-- **d22**, on the opposite, was a very pleasant exercise, a 3D tetris. 
+- **d22** on the opposite, was a very pleasant exercise, a 3D tetris. 
 - **d23** a straightforward path exploration
+- **d24** part2 needed to detect pecularities on the input data to help solve equations.
