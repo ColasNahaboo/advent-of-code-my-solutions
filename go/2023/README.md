@@ -67,3 +67,4 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 - **d22** on the opposite, was a very pleasant exercise, a 3D tetris. 
 - **d23** a straightforward path exploration
 - **d24** part2 needed to detect pecularities on the input data to help solve equations.
+- **d25** is a classic graph problem: find the minimal number off edges to cut to obtainm two inconnect graphs. I discovered - and used - the Karger algorithm.
