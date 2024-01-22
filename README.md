@@ -11,7 +11,7 @@ Available for now:
 - go/2020 (to do)
 - go/2019 (to do)
 - go/2018 (to do)
-- go/2017 (to do)
+- [go/2017](go/2017) (in progress)
 - [go/2016](go/2016) (completed)
 - [go/2015](go/2015) (completed)
 
