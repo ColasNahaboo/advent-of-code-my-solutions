@@ -174,6 +174,7 @@ func KargerMinCut(edges []Edge, vertices int) mapset.Set[Edge] {
 
 //////////// union-find via disjoint sets trees
 // from https://github.com/vipul0092/advent-of-code-2023/blob/main/utils/disjointset.go
+// logic in https://cp-algorithms.com/data_structures/disjoint_set_union.html
 
 type Arr []int
 
