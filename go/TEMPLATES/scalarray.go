@@ -39,6 +39,8 @@
 // 	return sa
 // }
 
+// It is a simplified Morton Z-Order curve. For a general package, see:
+// https://pkg.go.dev/github.com/jsewill/morton
 
 package main
 
