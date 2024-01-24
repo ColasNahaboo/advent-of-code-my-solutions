@@ -17,8 +17,8 @@
 // in this case (x,y) is at position x+b + (y+b) * (width+2*b)
 // It is often easier to add "walls" around a 2D board rather to always check
 // if the coordinates stay in the board space
-// No work with the original coordinates before theborder was added use the
-// methods ending in B such as GetB instead of Get
+// Do not work with the original (before the border was added) coordinates,
+// instead use the methods ending in B such as GetB instead of Get
 
 // Scalarray is the default type: 2D array with an optional border
 // Scalarray3D is the same concept, but for fixed size 3 dimensions arrays
