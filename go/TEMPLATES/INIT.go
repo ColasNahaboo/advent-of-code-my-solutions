@@ -24,7 +24,7 @@ func main() {
 	if flag.NArg() > 0 {
 		infile = flag.Arg(0)
 	} else {
-		infile = fileMatch("input,[0-9]*,[0-9]*.test")
+		infile = fileMatch("input,[[:alnum:]]*,[[:alnum:]]*.test")
 	}
 	lines := fileToLines(infile)
 
