@@ -27,16 +27,13 @@ func main() {
 		infile = fileMatch("input,[[:alnum:]]*,[[:alnum:]]*.test")
 	}
 	lines := fileToLines(infile)
-
-	var result int
 	if *partOne {
 		VP("Running Part1")
-		result = part1(lines)
+		fmt.Println(part1(lines))
 	} else {
 		VP("Running Part2")
-		result = part2(lines)
+		fmt.Println(part2(lines))
 	}
-	fmt.Println(result)
 }
 
 //////////// Part 1
