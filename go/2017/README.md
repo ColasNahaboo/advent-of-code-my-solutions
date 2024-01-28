@@ -46,4 +46,5 @@ Author: (c)2024 Colas Nahaboo, https://colas.nahaboo.net
 License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_License).
 
 ## Day highlights
-- **d01** 
+- **d01** to **d10** are very simple
+- **d11** is interesting as it made me discover ways to work with hexagonal grids, see <https://www.redblobgames.com/grids/hexagons/>
