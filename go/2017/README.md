@@ -48,3 +48,4 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 ## Day highlights
 - **d01** to **d10** are very simple
 - **d11** is interesting as it made me discover ways to work with hexagonal grids, see <https://www.redblobgames.com/grids/hexagons/>
+- **d14** reuses the code of the solution in d10 to define a hash function
