@@ -5,7 +5,8 @@
 // TEST: example
 // And any file named input-DESCRIPTION,RESULT1,RESULT2.test containing an input
 
-// part2 is slow. Takes 90s
+// part3 is a brute force implementation of part2, but too slow. Takes 90s
+// I kept it as reference
 
 package main
 
@@ -18,6 +19,7 @@ var verbose bool
 
 func main() {
 	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
+	partThree := flag.Bool("3", false, "run exercise part3, (default: part2)")
 	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
 	flag.Parse()
 	verbose = *verboseFlag
@@ -28,7 +30,10 @@ func main() {
 		infile = fileMatch("input,[[:alnum:]]*,[[:alnum:]]*.test")
 	}
 	lines := fileToLines(infile)
-	if *partOne {
+	if *partThree {
+		VP("Running Part3")
+		fmt.Println(part3(lines))
+	} else if *partOne {
 		VP("Running Part1")
 		fmt.Println(part1(lines))
 	} else {
@@ -75,6 +80,29 @@ func insert(step, val int, pos *LinkedCell[int], buf *LinkedList[int]) *LinkedCe
 //////////// Part 2
 
 func part2(lines []string) int {
+	step := parse(lines)
+	pos := 0
+	for i := 1; i <= 50000000; i++ {
+		pos = insert2(step, i, pos)
+	}
+	return v1
+}
+
+var v1 int						// value at pos 1, v0 is always 0
+
+func insert2(step, val, pos int) int {
+	np := (pos + step) % val
+	if np == 0 {
+		v1 = val
+	}
+	return np+1
+}
+
+//////////// Part 3
+
+// for reference, this is the brute force approach for part2 similar to part1
+
+func part3(lines []string) int {
 	step := parse(lines)
 	buf := LinkedList[int]{}
 	buf.Push(0)
