@@ -55,4 +55,9 @@ func part2(lines []string) int {
 
 //////////// Common Parts code
 
+func parse(lines []string) {
+	renum := regexp.MustCompile("[[:digit:]]+")
+
+}
+
 //////////// PrettyPrinting & Debugging functions
