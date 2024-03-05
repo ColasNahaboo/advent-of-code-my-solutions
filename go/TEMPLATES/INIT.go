@@ -14,13 +14,15 @@ import (
 	// "golang.org/x/exp/slices"
 )
 
-var verbose bool
+var verbose, debug bool
 
 func main() {
 	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
 	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
+	debugFlag := flag.Bool("V", false, "debug: even more verbose")
 	flag.Parse()
 	verbose = *verboseFlag
+	debug = *debugFlag
 	var infile string
 	if flag.NArg() > 0 {
 		infile = flag.Arg(0)
@@ -62,3 +64,8 @@ func parse(lines []string) {
 }
 
 //////////// PrettyPrinting & Debugging functions
+
+func DEBUG() {
+	if ! debug { return }
+	// ad hoc debug code here
+}

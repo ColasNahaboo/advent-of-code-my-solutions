@@ -50,4 +50,4 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 - **d11** is interesting as it made me discover ways to work with hexagonal grids, see <https://www.redblobgames.com/grids/hexagons/>
 - **d14** reuses the code of the solution in d10 to define a hash function
 - **d18** uses Go goroutines and channels to run two proram instances in parallel
-- **d19** For this I tried to shed my habit of using slow shell scripts, and avoid using too smart data structures, instead relying on lots of small methods trying to explain the logic of the solution.
+- **d19** From now on I tried to shed my habits gained by using slow shell scripts, and avoid using too smart data structures, instead relying on lots of small methods trying to explain the logic of the solution.
