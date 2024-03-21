@@ -11,9 +11,9 @@ Available for now:
 - go/2020 (to do)
 - go/2019 (to do)
 - go/2018 (to do)
-- [go/2017](go/2017) (in progress)
+- [go/2017](go/2017) (completed)
 - [go/2016](go/2016) (completed)
 - [go/2015](go/2015) (completed)
 
-Author: (c)2021-2023 Colas Nahaboo, https://colas.nahaboo.net
+Author: (c)2021-2024 Colas Nahaboo, https://colas.nahaboo.net
 License: free of use via the MIT License
