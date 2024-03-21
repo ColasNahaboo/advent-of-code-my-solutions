@@ -51,3 +51,4 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 - **d14** reuses the code of the solution in d10 to define a hash function
 - **d18** uses Go goroutines and channels to run two proram instances in parallel
 - **d19** From now on I tried to shed my habits gained by using slow shell scripts, and avoid using too smart data structures, instead relying on lots of small methods trying to explain the logic of the solution.
+- **d23** was tricky, as it required to reverse-engineer the code of a toy assembly language, to see it was computing prime numbers, and thus guessing the expected results in a faster way. I could not see it, but ChatGPT did!

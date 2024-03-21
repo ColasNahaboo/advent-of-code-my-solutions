@@ -1,8 +1,8 @@
 # Advent of code challenge 2017, in GO, day d23
 
-Part 1 is a straughtforward subset of the day 19 problem, a virtual computer program running on a "tablet".
+Part 1 is a straightforward subset of the day 19 problem, a virtual computer program running on a "tablet".
 
-The Part 2 howver requires to examine the result and try to detect cycles as to predict a very distant end of the program.
+The Part 2 however requires to examine the result and try to detect cycles as to predict a very distant end of the program.
 
 The program in my input ends with the following intructions:
 Note: I prefix with the line number, starting at zero.
