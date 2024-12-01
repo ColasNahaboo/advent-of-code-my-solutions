@@ -46,4 +46,3 @@ Author: (c)2024 Colas Nahaboo, https://colas.nahaboo.net
 License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_License).
 
 ## Day highlights
-- **d01** 
