@@ -21,6 +21,5 @@ go $version
 cp TEMPLATES/{CLEANALL,MAKEDAY,TESTALL} "$year/days"
 sed -e "s/YYYY/$year/g" <TEMPLATES/README-YYYY.md >$year/README.md
 
-echo "Generated $name/$name.go $name/${name}_test.go $name/input.txt $name/example.txt in $name/"
-echo "          $name/README.md"
+echo "Generated $year/"
 
