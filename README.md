@@ -5,6 +5,7 @@ The code is reasonably commented, and the top README in each directory details t
 
 Available for now:
 
+- [go/2024](go/2024) (in progress)
 - [go/2023](go/2023) (completed)
 - [go/2022](go/2022) (completed)
 - [bash/2021](bash/2021) (completed)
