@@ -85,7 +85,7 @@ NEXT_REPORT:
 	return
 }
 
-// ReportLess1 is a report with one element removed at index x
+// ReportLess1 is a report with one element removed (skipped) at index x
 // no element is removed for x == -1
 
 type ReportLess1 struct {
