@@ -6,8 +6,10 @@
 // And any file named input-DESCRIPTION,RESULT1,RESULT2.test containing an input
 
 // for testing the record with one less level, instead of creating a new record
-// we use a template ReportLess1 on the record masking one level
-// and provide an iterator on it
+// we use a template ReportLess1 on the record masking one level at position x
+// Thus by going through all x between -1 (no element masked) and the last one
+// we scan the full record, then all the sub-records with one level missing.
+
 
 package main
 
