@@ -1,3 +1,4 @@
+# OBSOLETE since Go 1.21, do not use anymore!
 
 func min(is ...int) int {
 	min := is[0]
