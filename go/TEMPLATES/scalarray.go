@@ -46,12 +46,14 @@ package main
 
 import "fmt"
 import "strconv"
+import "slices"
 
 //////////// Scalarray, 2D with optional borders
 
 type Scalarray[T comparable] struct {
 	w, h, b int					// width, height and borderwidth of the array
 	a []T						// the array elements in a slice
+	dirs []int					// the 8 directions offsets: N NE E SE S SW W NW
 }
 
 // by default, stay simple, do not add a border
@@ -59,6 +61,8 @@ func makeScalarray[T comparable](w, h int) (sa Scalarray[T]) {
 	sa.w = w
 	sa.h = h
 	sa.a = make([]T, w*h, w*h)
+	dirs := sa.Dirs()
+	sa.dirs = dirs[:]			// make a slice pointing to array
 	return
 }
 
@@ -102,44 +106,73 @@ func  (sa *Scalarray[T]) isValid(pos int) bool {
 }
 
 // returns array of position offsets for going Up Right Down Left (N E S W)
-func (sa *Scalarray[T]) Dirs() [4]int {
+func (sa *Scalarray[T]) DirsOrtho() [4]int {
 	return [4]int{-sa.w, 1, sa.w, -1}
 }
 
-// move from pos in horizontal dir (multiple of sa.Dirs()), do we stay inside?
-func  (sa *Scalarray[T]) stepInsideRow(pos, dir int) bool {
-	if dir < 0 {
-		return pos % sa.w > 0
-	} else {
-		return pos % sa.w < sa.w - 1
-	}
+// returns array of position offsets for going (NE SE SW NW)
+func (sa *Scalarray[T]) DirsDiags() [4]int {
+	return [4]int{-sa.w + 1, sa.w + 1, sa.w - 1, -sa.w - 1}
 }
-// move from pos in vertical dir (multiple of sa.Dirs()), do we stay inside?
-func  (sa *Scalarray[T]) stepInsideCol(pos, dir int) bool {
-	if dir < 0 {
-		return pos >= sa.w
-	} else {
-		return pos < sa.w * (sa.h - 1)
-	}
+
+// returns array of position offsets for the 8 dirs (N NE E SE S SW W NW)
+func (sa *Scalarray[T]) Dirs() [8]int {
+	return [8]int{-sa.w, -sa.w + 1, 1, sa.w + 1, sa.w, sa.w - 1, -1, -sa.w - 1}
 }
-// move from pos in dir (of sa.Dirs()) by a single step, do we stay inside?
-func  (sa *Scalarray[T]) stepOnceInside(pos, dir int) bool {
+
+// rotate dir by N degrees (multiple of 45: 0, 45, 90, ... ,270, 315)
+func (sa *Scalarray[T]) RotateDir (dir, rd int) int {
+	r := rd / 45				// rotation in 45 degrees increments
+	i := slices.Index(sa.dirs, dir)
+	if i == -1 {
+		panic(fmt.Sprintf("Not a direction: %d", dir))
+	}
+	i = (i + r) % 8
+	return sa.dirs[i]
+}
+
+// from a direction as an offset to an angle, 0 for N, 45 for NE, ...
+func (sa *Scalarray[T]) DirToDegrees(dir int) int {
+	di := slices.Index(sa.dirs, dir)
+	if di == -1 {
+		panic("DirToDegrees bad direction: " + strconv.Itoa(dir))
+	}
+	return di * 45
+}
+
+// from an offset to an angle, 0 for N, 45 for NE, ... to a direction offset
+func (sa *Scalarray[T]) DegreesToDir(deg int) int {
+	di := (deg / 45) % 8
+	return sa.dirs[di]
+}
+
+// move from pos in dir offset (of sa.dirs) by a single step, do we stay inside?
+func  (sa *Scalarray[T]) StepDirInside(pos, dir int) bool {
 	switch dir {
-	case -1: return pos % sa.w > 0
-	case 1: return pos % sa.w < sa.w - 1
 	case -sa.w: return pos >= sa.w
+	case -sa.w + 1: return pos >= sa.w && pos % sa.w < sa.w - 1
+	case 1: return pos % sa.w < sa.w - 1
+	case sa.w + 1: return pos < sa.w * (sa.h - 1) && pos < sa.w * (sa.h - 1)
 	case sa.w: return pos < sa.w * (sa.h - 1)
-	default: panic("stepOnceInside, bad direction: " + strconv.Itoa(dir))
+	case sa.w - 1: return pos < sa.w * (sa.h - 1) && pos % sa.w > 0
+	case -1: return pos % sa.w > 0
+	case -sa.w - 1: return pos >= sa.w && pos % sa.w > 0
+	default: panic("StepDirInside, bad direction: " + strconv.Itoa(dir))
 	}
 }
-// like stepOnceInside but with a cardinal direction [0:4]: N E S W = 0 1 2 3
-func  (sa *Scalarray[T]) stepDirInside(pos, dir int) bool {
+
+// move from pos in dir offset (of sa.dirs) by n steps, do we stay inside?
+func  (sa *Scalarray[T]) MoveDirInside(pos, dir, n int) bool {
 	switch dir {
-	case 0: return pos >= sa.w
-	case 1: return pos % sa.w < sa.w - 1
-	case 2: return pos < sa.w * (sa.h - 1)
-	case 3: return pos % sa.w > 0
-	default: panic("stepOnceInside, bad direction: " + strconv.Itoa(dir))
+	case -sa.w: return pos >= sa.w*n
+	case -sa.w + 1: return pos >= sa.w*n && pos % sa.w < sa.w - n
+	case 1: return pos % sa.w < sa.w - n
+	case sa.w + 1: return pos < sa.w * (sa.h - 1)*n && pos < sa.w * (sa.h - n)
+	case sa.w: return pos < sa.w * (sa.h - n)
+	case sa.w - 1: return pos < sa.w * (sa.h - 1)*n && pos % sa.w > n
+	case -1: return pos % sa.w > n
+	case -sa.w - 1: return pos >= sa.w*n && pos % sa.w > n
+	default: panic("MoveDirInside, bad direction: " + strconv.Itoa(dir))
 	}
 }
 
@@ -249,6 +282,8 @@ func makeScalarrayB[T comparable](w, h, b int) (sa Scalarray[T]) {
 	sa.w = w + 2*b
 	sa.h = h + 2*b
 	sa.b = b
+	dirs := sa.Dirs()
+	sa.dirs = dirs[:]
 	sa.a = make([]T, sa.w*sa.h, sa.w*sa.h)
 	return
 }
@@ -287,6 +322,14 @@ func (sa *Scalarray[T]) XB(pos int) int {
 
 func (sa *Scalarray[T]) YB(pos int) int {
 	return pos / sa.w - sa.b
+}
+
+func (sa *Scalarray[T]) WB() int { // inner width
+	return sa.w - 2 * sa.b
+}
+
+func (sa *Scalarray[T]) HB() int { // inner height
+	return sa.h - 2 * sa.b
 }
 
 func (sa *Scalarray[T]) CoordsB(pos int) (x, y int) {
