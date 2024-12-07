@@ -17,7 +17,14 @@ import (
 //   grid.dirs[index-of(gd)].a[gd] = true
 //   where index-of returns 0,1,2,3 from a pos offset dir
 // this one-bool-array-per-dir is an alternative to a single array with
-// bitfields for storing dir tracks
+// bitfields for storing dir tracks. called with -2
+
+// Part3 (-3) is an alternative with a simpler implementation of path as ints,
+// bitwise-OR of dirs, which consumes a bit more memory... but is twice faster!
+
+// Part4 (-4) is an alternative with a simpler implementation of path as bytes,
+// bitwise-OR of dirs, which is both smaller and faster.
+// So we make it the default
 
 type Grid struct {				// the problem data world
 	labo, path Scalarray[bool]	// lab obstruction map and positions visited
@@ -29,6 +36,9 @@ var verbose, debug bool
 
 func main() {
 	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
+	partTwo := flag.Bool("2", false, "run exercise part2, alternate part2")
+	partThree := flag.Bool("3", false, "run exercise part3, alternate part2")
+	partFour := flag.Bool("4", false, "run exercise part4, default for part2")
 	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
 	debugFlag := flag.Bool("V", false, "debug: even more verbose")
 	flag.Parse()
@@ -44,9 +54,18 @@ func main() {
 	if *partOne {
 		VP("Running Part1")
 		fmt.Println(part1(lines))
-	} else {
+	} else if *partTwo {
 		VP("Running Part2")
 		fmt.Println(part2(lines))
+	} else if *partThree {
+		VP("Running Part3")
+		fmt.Println(part3(lines))
+	} else if *partFour {
+		VP("Running Part4")
+		fmt.Println(part4(lines))
+	} else {
+		VP("Running Part4")
+		fmt.Println(part4(lines))
 	}
 }
 
@@ -130,10 +149,10 @@ func  (grid *Grid) StepCheckLoop() (bool, bool) {
 	if ! grid.labo.StepDirInside(grid.gp, grid.gd) {	// left the lab
 		return false, false
 	}
-	if grid.labo.a[gnp] {		// bumps into an obstacle, turn right
+	if grid.labo.a[gnp] {		// bumps into an obstacle, turn right in place
 		gnd := grid.labo.RotateDir(grid.gd, 90)
 		grid.gd = gnd
-		gnp = grid.gp			//  but stays in place
+		grid.dirs[DirIndex(grid, gnd)].a[gnp] = true // marks new dir taken
 		return true, false
 	} else {
 		if grid.path.a[gnp] && grid.dirs[DirIndex(grid, grid.gd)].a[gnp] {
@@ -145,7 +164,6 @@ func  (grid *Grid) StepCheckLoop() (bool, bool) {
 		return true, false
 	}
 }
-
 
 func GridPathInit(grid *Grid) {
 	grid.path = grid.labo.New()
@@ -175,6 +193,175 @@ func parse(lines []string) (*Grid) {
 	}
 	grid := Grid{labo, path, gp, gd, []Scalarray[bool]{}}
 	return &grid
+}
+
+//////////// Part3
+// with a simpler implementation of path as ints, bitwise-OR of dirs
+
+type Grid3 struct {				// the problem data world
+	labo Scalarray[bool]	    // lab obstruction map
+	path Scalarray[int]         // positions and dirs visited, OR of DN DE DS DW
+	gp, gd int					// guard position and direction
+}
+
+const (
+	DN = 1
+	DE = 2
+	DS = 4
+	DW = 8
+)
+
+func part3(lines []string) (loops int) {
+	grid2 := parse(lines)
+	gp := grid2.gp				// remember start position for reset
+	gd := grid2.gd
+	grid := &Grid3{grid2.labo, makeScalarray[int](grid2.labo.w, grid2.labo.h), gp, gd}
+	for p := range grid.labo.a {
+		grid.gp, grid.gd = gp, gd // reset grid guard pos & path
+		Grid3PathInit(grid)
+		if Grid3ObstacleCreatesLoop(grid, p) {
+			loops++
+		}
+	}
+	return
+}
+
+func Grid3DirToDX(grid *Grid3, d int) int {
+	switch d {
+	case - grid.labo.w: return DN
+	case 1: return DE
+	case grid.labo.w: return DS
+	case -1: return DW
+	}
+	return 0
+}
+
+func Grid3PathInit(grid *Grid3) {
+	grid.path = grid.path.New()
+	grid.path.a[grid.gp] = Grid3DirToDX(grid, grid.gd)
+}
+
+// does adding an obstacle at pos p creates a loop?
+func Grid3ObstacleCreatesLoop(grid *Grid3, p int) (loop bool) {
+	if grid.gp == p || grid.labo.a[p] {
+		return					// if p is occupied by guard or obstacle, skip
+	}
+	grid.labo.a[p] = true		// place obstacle and test a run
+	var ok bool
+	for {
+		ok, loop = grid.StepCheckLoop()
+		if ! ok {		// guard lefts the lab
+			break
+		}
+		if loop {
+			break
+		}
+	}
+	grid.labo.a[p] = false		// resets lab obstacles map
+	return
+}
+
+// returns: ok-to-continue?, loop-detected?
+func  (grid *Grid3) StepCheckLoop() (bool, bool) {
+	gnp := grid.gp + grid.gd	// next position for the guard
+	if ! grid.labo.StepDirInside(grid.gp, grid.gd) {	// left the lab
+		return false, false
+	}
+	if grid.labo.a[gnp] {		// bumps into an obstacle, turn right in place
+		gnd := grid.labo.RotateDir(grid.gd, 90)
+		grid.gd = gnd
+		grid.path.a[grid.gp] |= Grid3DirToDX(grid, gnd)
+		return true, false
+	} else {
+		dx := Grid3DirToDX(grid, grid.gd)
+		if grid.path.a[gnp] & dx != 0 {
+			return false, true	// guard already went through in same dir
+		}
+		grid.gp = gnp			// moves ahead
+		grid.path.a[gnp] = dx // marks new pos into path
+		return true, false
+	}
+}
+
+//////////// Part4
+// with a simpler implementation of path as bytes, bitwise-OR of dirs
+
+type Grid4 struct {				// the problem data world
+	labo Scalarray[bool]	    // lab obstruction map
+	path Scalarray[byte]         // positions and dirs visited, OR of DN DE DS DW
+	gp, gd int					// guard position and direction
+}
+
+func part4(lines []string) (loops int) {
+	grid2 := parse(lines)
+	gp := grid2.gp				// remember start position for reset
+	gd := grid2.gd
+	grid := &Grid4{grid2.labo, makeScalarray[byte](grid2.labo.w, grid2.labo.h), gp, gd}
+	for p := range grid.labo.a {
+		grid.gp, grid.gd = gp, gd // reset grid guard pos & path
+		Grid4PathInit(grid)
+		if Grid4ObstacleCreatesLoop(grid, p) {
+			loops++
+		}
+	}
+	return
+}
+
+func Grid4DirToDX(grid *Grid4, d int) byte {
+	switch d {
+	case - grid.labo.w: return DN
+	case 1: return DE
+	case grid.labo.w: return DS
+	case -1: return DW
+	}
+	return 0
+}
+
+func Grid4PathInit(grid *Grid4) {
+	grid.path = grid.path.New()
+	grid.path.a[grid.gp] = Grid4DirToDX(grid, grid.gd)
+}
+
+// does adding an obstacle at pos p creates a loop?
+func Grid4ObstacleCreatesLoop(grid *Grid4, p int) (loop bool) {
+	if grid.gp == p || grid.labo.a[p] {
+		return					// if p is occupied by guard or obstacle, skip
+	}
+	grid.labo.a[p] = true		// place obstacle and test a run
+	var ok bool
+	for {
+		ok, loop = grid.StepCheckLoop()
+		if ! ok {		// guard lefts the lab
+			break
+		}
+		if loop {
+			break
+		}
+	}
+	grid.labo.a[p] = false		// resets lab obstacles map
+	return
+}
+
+// returns: ok-to-continue?, loop-detected?
+func  (grid *Grid4) StepCheckLoop() (bool, bool) {
+	gnp := grid.gp + grid.gd	// next position for the guard
+	if ! grid.labo.StepDirInside(grid.gp, grid.gd) {	// left the lab
+		return false, false
+	}
+	if grid.labo.a[gnp] {		// bumps into an obstacle, turn right in place
+		gnd := grid.labo.RotateDir(grid.gd, 90)
+		grid.gd = gnd
+		grid.path.a[grid.gp] |= Grid4DirToDX(grid, gnd)
+		return true, false
+	} else {
+		dx := Grid4DirToDX(grid, grid.gd)
+		if grid.path.a[gnp] & dx != 0 {
+			return false, true	// guard already went through in same dir
+		}
+		grid.gp = gnp			// moves ahead
+		grid.path.a[gnp] = dx // marks new pos into path
+		return true, false
+	}
 }
 
 //////////// PrettyPrinting & Debugging functions
