@@ -10,7 +10,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"slices"
 )
 
 // if guard lands at pos gp and at direction gd (pos offset), then:
@@ -379,18 +378,19 @@ type Grid5 struct {			   // the problem data world
 	labo Board[bool]		   // lab obstruction map
 	path Board[byte]		   // positions and dirs visited, OR of DN DE DS DW
 	gp Point				   // guard position and direction
-	gd Point
+	gx int					   // guard dir as index in DirMask & DirsOrtho
 }
+
+var Grid5Mask = [4]byte{DN, DE, DS, DW}
 
 func part5(lines []string) (loops int) {
 	g := Grid5{}
-	var gp, gd Point
+	var gp Point
 	g.labo = *parseBoard[bool](lines, func(x, y int, r rune) bool {
 		if r == '#' {
 			return true
 		} else if r == '^' {
 			gp = Point{x, y}
-			gd = DirsOrtho[DirsOrthoN]
 		}
 		return false
 	})
@@ -399,7 +399,7 @@ func part5(lines []string) (loops int) {
 	
 	for x := range g.labo.w {
 		for y := range g.labo.h {
-			g.gp, g.gd = gp, gd // reset grid guard pos & path
+			g.gp, g.gx = gp, 0 // reset grid guard pos, dir & path
 			g.path.Clear(clearcol) // fast fill of path[][] with zeros
 			g.path.a[gp.x][gp.y] = DN
 			if Grid5ObstacleCreatesLoop(&g, Point{x, y}) {
@@ -419,10 +419,7 @@ func Grid5ObstacleCreatesLoop(grid *Grid5, p Point) (loop bool) {
 	var ok bool
 	for {
 		ok, loop = grid.StepCheckLoop()
-		if ! ok {		// guard lefts the lab
-			break
-		}
-		if loop {
+		if ! ok || loop {		// end condition: guard lefts the lab or loops
 			break
 		}
 	}
@@ -432,32 +429,23 @@ func Grid5ObstacleCreatesLoop(grid *Grid5, p Point) (loop bool) {
 
 // returns: ok-to-continue?, loop-detected?
 func  (grid *Grid5) StepCheckLoop() (bool, bool) {
-	gnp := grid.gp.Add(grid.gd)	// next position for the guard
+	gnp := grid.gp.Add(DirsOrtho[int(grid.gx)])	// next position for the guard
 	if ! grid.labo.Inside(gnp) {	// left the lab
 		return false, false
 	}
 	if grid.labo.a[gnp.x][gnp.y] { // bumps into an obstacle, turn right in place
-		gnd := grid.gd.RotateDirOrtho(1)
-		grid.gd = gnd
-		grid.path.a[grid.gp.x][grid.gp.y] |= Grid5DirToDX(gnd)
+		gnx := (grid.gx +1 ) % 4   // turn right
+		grid.gx = gnx
+		grid.path.a[grid.gp.x][grid.gp.y] |= Grid5Mask[gnx]
 		return true, false
 	} else {
-		dx := Grid5DirToDX(grid.gd)
-		if grid.path.a[gnp.x][gnp.y] & dx != 0 {
+		if grid.path.a[gnp.x][gnp.y] & Grid5Mask[grid.gx] != 0 {
 			return false, true	// guard already went through in same dir
 		}
 		grid.gp = gnp			// moves ahead
-		grid.path.a[gnp.x][gnp.y] |= dx // marks new pos into path
+		grid.path.a[gnp.x][gnp.y] |= Grid5Mask[grid.gx] // marks new pos into path
 		return true, false
 	}
-}
-
-func Grid5DirToDX(d Point) byte {
-	i := slices.Index(DirsOrtho, d)
-	if i == -1 {
-		panic(fmt.Sprintf("Not a DirsOrtho: %v", d))
-	}
-	return [4]byte{DN, DE, DS, DW}[i]
 }
 
 //////////// PrettyPrinting & Debugging functions
