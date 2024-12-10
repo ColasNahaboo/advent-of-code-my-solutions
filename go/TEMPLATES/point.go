@@ -141,6 +141,29 @@ func (b *Board[T]) Inside(p Point) bool {
 	return p.x >= 0 && p.x < b.w && p.y >= 0 && p.y < b.h
 }
 
+// apply f to all cells, and returns ("maps") a new Board of the results
+func (b *Board[T])Map (f func (b *Board[T], x, y int) T) (bp *Board[T]) {
+	bb := makeBoard[T](b.w, b.h)
+	for x, col := range b.a {
+		for y := range col {
+			bb.a[x][y] = f(b, x, y)
+		}
+	}
+	return &bb
+}
+
+// apply f to all cells, that can modify them in place if needed
+func (b *Board[T])Apply (f func (b *Board[T], x, y int)) {
+	for x, col := range b.a {
+		for y := range col {
+			f(b, x, y)
+		}
+	}
+}
+
+	
+/////////// Clears
+
 // Clear the board to default values for T.
 // Needs a clearcol seed previously created by ClearInit or ClearInitValue
 func (b *Board[T]) Clear(clearcol *[]T) {
