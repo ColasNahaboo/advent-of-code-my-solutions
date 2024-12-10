@@ -2,6 +2,8 @@
 
 package main
 
+import "fmt"
+
 type Point struct {
 	x, y int
 }
@@ -61,3 +63,72 @@ func (p Point) Index(list []Point) int {
 	return -1
 }
 
+////////////////////// Directions
+
+var DirsOrtho = []Point{Point{0,-1},Point{1,0},Point{0,1},Point{-1,0}}
+var DirsDiag = []Point{Point{1,-1},Point{1,1},Point{-1,1},Point{-1,-1}}
+var DirsAll = []Point{Point{0,-1},Point{1,-1},Point{1,0},Point{1,1},
+	Point{0,1},Point{-1,1},Point{-1,0},Point{-1,-1}}
+
+func RotateDirOrtho(stepright int) Point {
+	return DirsOrtho[(stepright + 1) % 4]
+}
+
+func RotateDirDiag(stepright int) Point {
+	return DirsDiag[(stepright + 1) % 4]
+}
+
+func RotateDirAll(stepright int) Point {
+	return DirsAll[(stepright + 1) % 8]
+}
+
+////////////////////// The board, grid of cells at points
+
+type Board[T comparable] struct {
+	w, h int					// width, height
+	a [][]T						// the board cells as slices of slices [X][Y]
+}
+
+func makeBoard[T comparable](w, h int) (b Board[T]) {
+	b.w = w
+	b.h = h
+	b.a = make([][]T, h)
+	for y := range h {
+		b.a[y] = make([]T, w)
+	}
+	return
+}
+
+// Point is inside Board
+func (b *Board[T]) Inside(p Point) bool {
+	return p.x >= 0 && p.x < b.w && p.y >= 0 && p.y < b.h
+}
+
+// Creates a board from an ASCII map with func f to create board cells values
+func parseBoard[T comparable](lines []string, f func (x, y int, r rune) T) (bp *Board[T]) {
+	b := makeBoard[T](len(lines[0]), len(lines))
+	for y, line := range lines {
+		for x, r := range line {
+			b.a[x][y] = f(x, y, r)
+		}
+	}
+	return &b
+}
+
+////////////////////// DEBUG
+func (b *Board[T]) VPBoard(titles ...string) {
+	if !verbose {
+		return
+	}
+	title := ""
+	if len(titles) > 0 {
+		title = titles[0]
+	}
+	fmt.Printf("Board %dx%d %s\n", b.w, b.h, title)
+	for y := range b.h {
+		for x  := range b.w {
+			fmt.Print(b.a[x][y])
+		}
+		fmt.Print("\n")
+	}
+}

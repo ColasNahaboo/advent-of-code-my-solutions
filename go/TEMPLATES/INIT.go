@@ -41,26 +41,26 @@ func main() {
 
 //////////// Part 1
 
-func part1(lines []string) int {
-	for _, line := range lines {
-		fmt.Println(line)
-	}
-	return 0
+func part1(lines []string) (res int) {
+	parse(lines)
+	return 
 }
 
 //////////// Part 2
 
-func part2(lines []string) int {
-	for _, line := range lines {
-		fmt.Println(line)
-	}
-	return 0
+func part2(lines []string) (res int) {
+	parse(lines)
+	return 
 }
 
 //////////// Common Parts code
 
 func parse(lines []string) {
 	renum := regexp.MustCompile("[[:digit:]]+")
+	for _, line := range lines {
+		m := renum.FindAllString(line, -1)
+	}
+	return 0
 
 }
 
