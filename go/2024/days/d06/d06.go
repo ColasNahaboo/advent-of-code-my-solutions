@@ -25,10 +25,11 @@ import (
 
 // Part4 (-4) is an alternative with a simpler implementation of path as bytes,
 // bitwise-OR of dirs, which is both smaller and faster.
-// So we make it the default
 
 // Part5 (-5) is an alternative implementation with point instead of scalarray
-// Simpler, but 30% slower
+// Simpler, ans as fast as -4
+// So we make it the default
+
 
 type Grid struct {				// the problem data world
 	labo, path Scalarray[bool]	// lab obstruction map and positions visited
@@ -40,10 +41,10 @@ var verbose, debug bool
 
 func main() {
 	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
-	partTwo := flag.Bool("2", false, "run exercise part2, alternate part2")
-	partThree := flag.Bool("3", false, "run exercise part3, alternate part2")
-	partFour := flag.Bool("4", false, "run exercise part4, default for part2")
-	partFive := flag.Bool("5", false, "run exercise part5")
+	partTwo := flag.Bool("2", false, "run exercise part2, alt. part2")
+	partThree := flag.Bool("3", false, "run exercise part3, alt. part2")
+	partFour := flag.Bool("4", false, "run exercise part4, alt. for part2")
+	partFive := flag.Bool("5", false, "run exercise part5, default for part2")
 	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
 	debugFlag := flag.Bool("V", false, "debug: even more verbose")
 	flag.Parse()
@@ -72,8 +73,8 @@ func main() {
 		VP("Running Part5")
 		fmt.Println(part5(lines))
 	} else {
-		VP("Running Part4")
-		fmt.Println(part4(lines))
+		VP("Running Part5")
+		fmt.Println(part5(lines))
 	}
 }
 
@@ -393,22 +394,20 @@ func part5(lines []string) (loops int) {
 		}
 		return false
 	})
-
+	g.path = makeBoard[byte](g.labo.w, g.labo.h)
+	clearcol := g.path.ClearInit() // used as seed for later Clear()
+	
 	for x := range g.labo.w {
 		for y := range g.labo.h {
 			g.gp, g.gd = gp, gd // reset grid guard pos & path
-			Grid5PathInit(&g)
+			g.path.Clear(clearcol) // fast fill of path[][] with zeros
+			g.path.a[gp.x][gp.y] = DN
 			if Grid5ObstacleCreatesLoop(&g, Point{x, y}) {
 				loops++
 			}
 		}
 	}
 	return
-}
-
-func Grid5PathInit(g *Grid5) {
-	g.path = makeBoard[byte](g.labo.w, g.labo.h)
-	g.path.a[g.gp.x][g.gp.y] = DN
 }
 
 // does adding an obstacle at pos p creates a loop?

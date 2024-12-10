@@ -141,6 +141,27 @@ func (b *Board[T]) Inside(p Point) bool {
 	return p.x >= 0 && p.x < b.w && p.y >= 0 && p.y < b.h
 }
 
+// Clear the board to default values for T.
+// Needs a clearcol seed previously created by ClearInit or ClearInitValue
+func (b *Board[T]) Clear(clearcol *[]T) {
+	for x := range b.w {
+		copy(b.a[x], *clearcol)
+	}
+}
+
+func (b *Board[T]) ClearInit() *[]T {
+	cc := make([]T, b.h)
+	return &cc
+}
+
+func (b *Board[T]) ClearInitValue(v T) *[]T {
+	cc := make([]T, b.h)
+	for i := range cc {
+		cc[i] = v
+	}
+	return &cc
+}
+
 // Creates a board from an ASCII map with func f to create board cells values
 // Example of a function returning an int from a digit map
 // func(x, y int, r rune) int {
