@@ -10,6 +10,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"slices"
 )
 
 // if guard lands at pos gp and at direction gd (pos offset), then:
@@ -26,6 +27,9 @@ import (
 // bitwise-OR of dirs, which is both smaller and faster.
 // So we make it the default
 
+// Part5 (-5) is an alternative implementation with point instead of scalarray
+// Simpler, but 30% slower
+
 type Grid struct {				// the problem data world
 	labo, path Scalarray[bool]	// lab obstruction map and positions visited
 	gp, gd int					// guard position and direction
@@ -39,6 +43,7 @@ func main() {
 	partTwo := flag.Bool("2", false, "run exercise part2, alternate part2")
 	partThree := flag.Bool("3", false, "run exercise part3, alternate part2")
 	partFour := flag.Bool("4", false, "run exercise part4, default for part2")
+	partFive := flag.Bool("5", false, "run exercise part5")
 	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
 	debugFlag := flag.Bool("V", false, "debug: even more verbose")
 	flag.Parse()
@@ -63,6 +68,9 @@ func main() {
 	} else if *partFour {
 		VP("Running Part4")
 		fmt.Println(part4(lines))
+	} else if *partFive {
+		VP("Running Part5")
+		fmt.Println(part5(lines))
 	} else {
 		VP("Running Part4")
 		fmt.Println(part4(lines))
@@ -288,7 +296,7 @@ func  (grid *Grid3) StepCheckLoop() (bool, bool) {
 
 type Grid4 struct {				// the problem data world
 	labo Scalarray[bool]	    // lab obstruction map
-	path Scalarray[byte]         // positions and dirs visited, OR of DN DE DS DW
+	path Scalarray[byte]        // positions and dirs visited, OR of DN DE DS DW
 	gp, gd int					// guard position and direction
 }
 
@@ -362,6 +370,95 @@ func  (grid *Grid4) StepCheckLoop() (bool, bool) {
 		grid.path.a[gnp] = dx // marks new pos into path
 		return true, false
 	}
+}
+
+//////////// Part5  with point.go Point and Board
+
+type Grid5 struct {			   // the problem data world
+	labo Board[bool]		   // lab obstruction map
+	path Board[byte]		   // positions and dirs visited, OR of DN DE DS DW
+	gp Point				   // guard position and direction
+	gd Point
+}
+
+func part5(lines []string) (loops int) {
+	g := Grid5{}
+	var gp, gd Point
+	g.labo = *parseBoard[bool](lines, func(x, y int, r rune) bool {
+		if r == '#' {
+			return true
+		} else if r == '^' {
+			gp = Point{x, y}
+			gd = DirsOrtho[DirsOrthoN]
+		}
+		return false
+	})
+
+	for x := range g.labo.w {
+		for y := range g.labo.h {
+			g.gp, g.gd = gp, gd // reset grid guard pos & path
+			Grid5PathInit(&g)
+			if Grid5ObstacleCreatesLoop(&g, Point{x, y}) {
+				loops++
+			}
+		}
+	}
+	return
+}
+
+func Grid5PathInit(g *Grid5) {
+	g.path = makeBoard[byte](g.labo.w, g.labo.h)
+	g.path.a[g.gp.x][g.gp.y] = DN
+}
+
+// does adding an obstacle at pos p creates a loop?
+func Grid5ObstacleCreatesLoop(grid *Grid5, p Point) (loop bool) {
+	if grid.gp == p || grid.labo.a[p.x][p.y] {
+		return					// if p is occupied by guard or obstacle, skip
+	}
+	grid.labo.a[p.x][p.y] = true		// place obstacle and test a run
+	var ok bool
+	for {
+		ok, loop = grid.StepCheckLoop()
+		if ! ok {		// guard lefts the lab
+			break
+		}
+		if loop {
+			break
+		}
+	}
+	grid.labo.a[p.x][p.y] = false		// resets lab obstacles map
+	return
+}
+
+// returns: ok-to-continue?, loop-detected?
+func  (grid *Grid5) StepCheckLoop() (bool, bool) {
+	gnp := grid.gp.Add(grid.gd)	// next position for the guard
+	if ! grid.labo.Inside(gnp) {	// left the lab
+		return false, false
+	}
+	if grid.labo.a[gnp.x][gnp.y] { // bumps into an obstacle, turn right in place
+		gnd := grid.gd.RotateDirOrtho(1)
+		grid.gd = gnd
+		grid.path.a[grid.gp.x][grid.gp.y] |= Grid5DirToDX(gnd)
+		return true, false
+	} else {
+		dx := Grid5DirToDX(grid.gd)
+		if grid.path.a[gnp.x][gnp.y] & dx != 0 {
+			return false, true	// guard already went through in same dir
+		}
+		grid.gp = gnp			// moves ahead
+		grid.path.a[gnp.x][gnp.y] |= dx // marks new pos into path
+		return true, false
+	}
+}
+
+func Grid5DirToDX(d Point) byte {
+	i := slices.Index(DirsOrtho, d)
+	if i == -1 {
+		panic(fmt.Sprintf("Not a DirsOrtho: %v", d))
+	}
+	return [4]byte{DN, DE, DS, DW}[i]
 }
 
 //////////// PrettyPrinting & Debugging functions
