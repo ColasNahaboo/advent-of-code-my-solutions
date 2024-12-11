@@ -1,4 +1,6 @@
 // Some simple operations on 2D integer coords for board games & puzzles
+// I use it for solving the AdventOfCode
+// Cells can be of any type T, unlike common Go matrix packages using floats
 
 package main
 
@@ -71,7 +73,7 @@ var DirsDiag = []Point{Point{1,-1},Point{1,1},Point{-1,1},Point{-1,-1}}
 var DirsAll = []Point{Point{0,-1},Point{1,-1},Point{1,0},Point{1,1},
 	Point{0,1},Point{-1,1},Point{-1,0},Point{-1,-1}}
 
-const (
+const (							// directions as indexes in the above slices
 	DirsOrthoN = 0
 	DirsOrthoE = 1
 	DirsOrthoS = 2
@@ -164,7 +166,7 @@ func (b *Board[T])Apply (f func (b *Board[T], x, y int)) {
 	
 /////////// Clears
 
-// Clear the board to default values for T.
+// Fast clearing of boards to default values for T.
 // Needs a clearcol seed previously created by ClearInit or ClearInitValue
 func (b *Board[T]) Clear(clearcol *[]T) {
 	for x := range b.w {
