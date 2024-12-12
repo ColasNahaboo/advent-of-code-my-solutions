@@ -5,6 +5,6 @@ I discovered "advent of code" in 2021, and did it in [bash](../) for the challen
 
 The code is in GO, with some housekeeping scripts in bash.
 
-I tried to keep each day directory as standalone as possible. For instance, instead of factorizing code that is often used acrosss days, I store them in the `TEMPLATES/` directory, and I copy them in the day dir if needed, instead of making separate packages. This is because I keep tweaing them to experiment and do not want to manage backwards compatibility, and ensure you can re-compile my exemple by downloading only the directory of single day without strings attached. Of course, I may publish as proper separate packages on GitHub these libraries once I am confident enough their API is stabilized.
+I tried to keep each day directory as standalone as possible. For instance, instead of factorizing code that is often used acrosss days, I store them in the `TEMPLATES/` directory, and I copy them in the day dir if needed, instead of making separate packages. Thus two days can have different versions of `utils.go` for instance. This is because I keep tweaking them to experiment and do not want to manage backwards compatibility, and ensure you can re-compile my exemple by downloading only the directory of single day without strings attached. Of course, I may publish as proper separate packages on GitHub these libraries once I am confident enough their API is stabilized, and they provide something more than what is already alvailable elsewhere.
 
 More details in each of the per-year subdirectories.
