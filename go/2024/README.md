@@ -48,3 +48,4 @@ License: free of use via the [MIT License](https://en.wikipedia.org/wiki/MIT_Lic
 ## Day highlights
 - **d04** Tried to use methods on generics, and immediately closed the Pandora can of worms I opened!
 - **d06** Different implementation to test speeds for part2: 4 arrays bools or array of ints or bytes used as 4-bit bitfields. The latter is faster.
+- **d14** How to recognize an xmas tree in the output? I suppose it is inside a box, and I look for horizontal lines
