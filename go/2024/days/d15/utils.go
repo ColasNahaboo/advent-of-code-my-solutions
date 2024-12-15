@@ -170,7 +170,7 @@ func LineBlocks(lines []string) (blocks [][]string) {
 		if len(line) == 0 {
 			if len(b) != 0 {
 				blocks = append(blocks, b)
-				b = b[:0]
+				b = []string{}
 			}
 		} else {
 			b = append(b, line)
