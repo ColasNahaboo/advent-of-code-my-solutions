@@ -1,13 +1,5 @@
 package main
 
-const MaxUint = ^uint(0)
-const MinUint = 0
-const MaxInt = int(MaxUint >> 1)
-const MinInt = -MaxInt - 1
-
-// an easier to spot maxint in debug than 9223372036854775807 (^uint(0) >> 1)
-const maxint = 8888888888888888888
-
 // Get all prime factors of a given number n
 // from: https://siongui.github.io/2017/05/09/go-find-all-prime-factors-of-integer-number/
 
