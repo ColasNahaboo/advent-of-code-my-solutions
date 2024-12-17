@@ -18,6 +18,7 @@ var verbose, debug bool
 
 func main() {
 	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
+	//partTwo := flag.Bool("2", false, "run exercise part2, (default)")
 	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
 	debugFlag := flag.Bool("V", false, "debug: even more verbose")
 	flag.Parse()
@@ -33,6 +34,9 @@ func main() {
 	if *partOne {
 		VP("Running Part1")
 		fmt.Println(part1(lines))
+		//	} else if *partTwo {
+		// VP("Running Part2")
+		// fmt.Println(part2(lines))
 	} else {
 		VP("Running Part2")
 		fmt.Println(part2(lines))
