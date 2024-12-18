@@ -3,7 +3,7 @@
 Here are my solutions to the "Advent of code" challenge of 2024 implemented in GO (aka Golang).
 See https://adventofcode.com/2024
 
-I am doing this to keep learning GO, so this must be considered as "student code". I am coding it to try my hand at various GO idioms, not seeking efficiency, scalability nor optimality. But feedback is very welcome.
+I am doing this to keep learning GO, so this must be considered as "amateur code". I am coding it to try my hand at various GO idioms, not seeking efficiency, scalability nor optimality. But feedback is very welcome.
 
 The code is in standard GO, with some housekeeping scripts in bash.
 
