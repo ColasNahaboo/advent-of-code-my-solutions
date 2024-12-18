@@ -22,13 +22,6 @@ type Maze struct {
 	start, end Point			// start and end points in the maze
 }
 
-type Step struct {
-	p Point						// position and direction index
-	d int
-}
-
-type Path []Step
-
 func main() {
 	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
 	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
@@ -55,7 +48,6 @@ func main() {
 //////////// Part 1
 
 var turns = [3]int{0, -1, 1}	// we try straight, then left, then right
-var minpaths []Path				// the list of all best paths
 var minscore = maxint			// and their best score
 var dirglyphs = [4]string{"^", ">", "v", "<"}
 // the done map is a way for explorations to mark each dir at each p:
@@ -71,20 +63,99 @@ func part1(lines []string) int {
 	// keep track of the current path so we do not loop
 	tracks := MakeBoard[bool](maze.b.w, maze.b.h)
 	tracks.Set(rp, true)
-	path := Path{}
 	done = MakeBoard[[4]int](maze.b.w, maze.b.h)
 	done.Fill([4]int{maxint, maxint, maxint, maxint})
 	// Now, forward-explore
-	Explore(maze, &tracks, path, rp, rd, 0)
-	VPpath(maze, minpaths)
+	Explore(maze, &tracks, rp, rd, 0)
 	return minscore
 }
 
-// path is actually only used for debug in part1
+// Explore but only to find the best score
 
-func Explore(m *Maze, tracks *Board[bool], path Path, p Point, d, score int) {
+func Explore(m *Maze, tracks *Board[bool], p Point, d, score int) {
 	if p == m.end {				// ok, path found
-		VPf("== Path found: %d %d\n", len(path), score)
+		VPf("== Path found: %d\n", score)
+		if score < minscore {
+			minscore = score
+		}
+		return
+	}
+	for _, turn := range turns {	// straight, then turn left and right
+		nd := RotateDirOrtho(d, turn)
+		var nscore int
+		if q := p.StepOrtho(nd); ! (tracks.Get(q) || m.b.Get(q)) { // free?
+			if turn == 0 {
+				nscore = score + 1
+			} else {
+				nscore = score + 1001
+			}
+			if nscore >= minscore { // too big already, abort
+				return
+			}
+			if nscore >= done.a[q.x][q.y][nd] { // another exploration is better
+				return
+			}
+			done.a[q.x][q.y][nd] = nscore
+				
+			tracks.Set(q, true)
+			Explore(m, tracks, q, nd, nscore)
+			tracks.Set(q, false)
+		}
+	}
+}
+
+//////////// Part 2
+
+// a path is a reverse linked list of steps
+type Path *Step
+
+type Step struct {
+	p Point						// position and direction index
+	d int
+	prev *Step					// reverse chain
+}
+
+var minpaths []Path				// the list of all best paths
+var nilpath Path
+
+func part2(lines []string) (res int) {
+	// similar to part1, but we keep all the best paths
+	maze, rp, rd := parse(lines)
+	startStep := Step{p: maze.start, d: DirsOrthoE}
+	nilpath = &startStep
+	VPmaze(maze)
+	// keep track of the current path so we do not loop
+	tracks := MakeBoard[bool](maze.b.w, maze.b.h)
+	tracks.Set(rp, true)
+	path := nilpath
+	done = MakeBoard[[4]int](maze.b.w, maze.b.h)
+	done.Fill([4]int{maxint, maxint, maxint, maxint})
+	// Now, forward-explore
+	ExploreAll(maze, &tracks, path, rp, rd, 0)
+
+	b := MakeBoard[bool](done.w, done.h)
+	for _, path := range minpaths {
+		for p := path; p != nilpath; p = p.prev {
+			b.a[p.p.x][p.p.y] = true
+		}
+	}
+	b.Set(maze.start, true)
+	for _, col := range b.a {
+		for _, bestplace := range col {
+			if bestplace {
+				res++
+			}
+		}
+	}
+	return
+}
+
+
+// Explore to record ALL the paths with the best score
+
+func ExploreAll(m *Maze, tracks *Board[bool], path Path, p Point, d, score int) {
+	if p == m.end {				// ok, path found
+		VPf("== Path found: %d\n", score)
 		if score < minscore {
 			minscore = score
 			minpaths = []Path{path}
@@ -111,38 +182,14 @@ func Explore(m *Maze, tracks *Board[bool], path Path, p Point, d, score int) {
 			done.a[q.x][q.y][nd] = nscore
 				
 			tracks.Set(q, true)
-			npath := make(Path, len(path)+1, len(path)+1)
-			copy(npath, path)
-			npath[len(path)] = Step{q, nd}
-			VPf("== Exploring %v->%v %s->%s\n", p, q, PathGlyphs(path), DirsOrthoGlyph[nd])
-			Explore(m, tracks, npath, q, nd, nscore)
+			npath := &Step{q, nd, path}
+			VPf("== Exploring %v->%v ->%s\n", p, q, DirsOrthoGlyph[nd])
+			ExploreAll(m, tracks, npath, q, nd, nscore)
 			tracks.Set(q, false)
 		}
 	}
 }
 
-//////////// Part 2
-
-func part2(lines []string) (res int) {
-	maze, _, _ := parse(lines)
-	part1(lines)
-	b := MakeBoard[bool](done.w, done.h)
-	for _, path := range minpaths {
-		for _, p := range path {
-			b.a[p.p.x][p.p.y] = true
-		}
-	}
-	b.Set(maze.start, true)
-	for _, col := range b.a {
-		for _, bestplace := range col {
-			if bestplace {
-				res++
-			}
-		}
-	}
-	VPbestpaths(maze, b)
-	return
-}
 
 //////////// Common Parts code
 
@@ -178,61 +225,4 @@ func VPmaze(maze *Maze) {
 			return "."
 		}
 	})
-}
-
-func VPpath(m *Maze, paths []Path) {
-	b := MakeBoard[string](m.b.w, m.b.h)
-	for x := range b.w {
-		for y := range b.h {
-			if m.b.a[x][y] {
-				b.a[x][y] = "#"
-			} else {
-				b.a[x][y] = "."
-			}
-		}
-	}
-	path := paths[0]
-	for _, s := range path {
-		b.Set(s.p, dirglyphs[s.d])
-	}
-	b.Set(m.start, "S")
-	b.Set(m.end, "E")
-	title := fmt.Sprintf("%d min paths %d steps %d turns", len(paths), len(path), Turns(path))
-	b.VPBoard(title, func (c string) string { return c })
-}
-
-func VPbestpaths(m *Maze, bp Board[bool]) {
-	b := MakeBoard[string](m.b.w, m.b.h)
-	for x := range b.w {
-		for y := range b.h {
-			if bp.a[x][y] {
-				b.a[x][y] = "O"
-			} else if m.b.a[x][y] {
-				b.a[x][y] = "#"
-			} else {
-				b.a[x][y] = "."
-			}
-		}
-	}
-	title := "Best places"
-	b.VPBoard(title, func (c string) string { return c })
-}
-
-func Turns(p Path) (turns int) {
-	od := 1
-	for _, s := range p {
-		if s.d != od {
-			turns++
-		}
-		od = s.d
-	}
-	return
-}
-
-func PathGlyphs(p Path) string {
-	b := []byte{}
-	for _, s := range p {
-		b = append(b, byte(DirsOrthoGlyph[s.d][0]))
-	}
-	return string(b)
 }
