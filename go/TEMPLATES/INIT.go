@@ -19,9 +19,7 @@ import (
 func main() {
 	ParseOptions(2, part1, part2)
 }
-
-func ProcessXtraOptions() { //  extra options, see ParseOptions in utils.go
-}
+func ProcessXtraOptions() {} //  extra options, see ParseOptions in utils.go
 
 //////////// Part 1
 
@@ -48,7 +46,7 @@ func parse(lines []string) []string {
 	return []string{}
 }
 
-//////////// PrettyPrinting & Debugging functions
+//////////// PrettyPrinting & Debugging functions. See also the VPx functions.
 
 func DEBUG() {
 	if ! debug { return }

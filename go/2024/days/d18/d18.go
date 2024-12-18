@@ -76,6 +76,9 @@ func SamePoint(b *Board[bool], p, q Point) bool {
 
 //////////// Part 2
 
+// dichotomy: we know there is a path for fok falls
+// but we know paths are bloqued for fko ==> dichotomy on [fok, fko]
+
 func part2(lines []string) string {
 	b, fok, falls := parse2(lines)
 	start, end := Point{0, 0}, Point{b.w - 1, b.h - 1}
