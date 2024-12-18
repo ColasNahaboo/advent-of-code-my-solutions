@@ -8,40 +8,18 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"regexp"
 	// "slices"
 )
 
-var verbose, debug bool
+//////////// Options
 
 func main() {
-	partOne := flag.Bool("1", false, "run exercise part1, (default: part2)")
-	//partTwo := flag.Bool("2", false, "run exercise part2, (default)")
-	verboseFlag := flag.Bool("v", false, "verbose: print extra info")
-	debugFlag := flag.Bool("V", false, "debug: even more verbose")
-	flag.Parse()
-	verbose = *verboseFlag
-	debug = *debugFlag
-	var infile string
-	if flag.NArg() > 0 {
-		infile = flag.Arg(0)
-	} else {
-		infile = fileMatch("input,[[:alnum:]]*,[[:alnum:]]*.test")
-	}
-	lines := fileToLines(infile)
-	if *partOne {
-		VP("Running Part1")
-		fmt.Println(part1(lines))
-		//	} else if *partTwo {
-		// VP("Running Part2")
-		// fmt.Println(part2(lines))
-	} else {
-		VP("Running Part2")
-		fmt.Println(part2(lines))
-	}
+	ParseOptions(2, part1, part2)
 }
+
+func ProcessXtraOptions() {} // optional extra options, see ParseOptions in utils.go
 
 //////////// Part 1
 
@@ -59,18 +37,19 @@ func part2(lines []string) (res int) {
 
 //////////// Common Parts code
 
-func parse(lines []string) {
-	renum := regexp.MustCompile("[[:digit:]]+")
+func parse(lines []string) []string {
+	renum := regexp.MustCompile("[[:digit:]]+") // example code body, replace.
 	for _, line := range lines {
 		m := renum.FindAllString(line, -1)
+		return m
 	}
-	return 0
-
+	return []string{}
 }
 
 //////////// PrettyPrinting & Debugging functions
 
 func DEBUG() {
 	if ! debug { return }
+	fmt.Println("DEBUG!")
 	// ad hoc debug code here
 }

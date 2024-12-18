@@ -3,7 +3,8 @@
 // the input file name: default: input,RESULT1,RESULT2.test
 // TEST: -1 example 7036
 // TEST: -1 example2 11048
-// TEST: example
+// TEST: example 45
+// TEST: example2 64
 // And any file named input-DESCRIPTION,RESULT1,RESULT2.test containing an input
 
 package main
