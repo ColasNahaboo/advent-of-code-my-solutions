@@ -14,12 +14,11 @@ import (
 	// "slices"
 )
 
-//////////// Options
+//////////// Options parsing & exec parts
 
 func main() {
-	ParseOptions(2, part1, part2)
+	ParseOptions(2, NoXtraOpts, part1, part2)
 }
-func ProcessXtraOptions() {} //  extra options, see ParseOptions in utils.go
 
 //////////// Part 1
 

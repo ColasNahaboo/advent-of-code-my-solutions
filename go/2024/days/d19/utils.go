@@ -24,19 +24,19 @@ const MinInt = -MaxInt - 1
 // an easier to spot maxint in debug than 9223372036854775807 (^uint(0) >> 1)
 const maxint = 8888888888888888888
 
-/////////// Parse options for AdventOfCode
-// ParseOptions(default-part-number, part1func, part2func, part3func, ...)
+/////////// Parse and exec options for AdventOfCode
+// ExecOptions(default-part-number, part1func, part2func, part3func, ...)
 
-// to define extra options create flags as global vars, and process them
-// inside your ProcessXtraOptions(). E.g:
+// to define extra options create flags as global vars, and post-process them
+// inside your xoptsPost() function argument to ExecOptions. E.g:
 //
 // var outputsep = "_"
 // var commaFlag *bool
 // ...
 //     commaFlag = flag.Bool("c", false, "outputs numbers separated by comma")
-//     ParseOptionsString(2, part1, part2)
+//     ExecOptionsString(2, XOptsPost, part1, part2)
 // ...
-// func ProcessXtraOptions() {
+// func XOptsPost() {
 //	if *commaFlag {
 //		outputsep = ","
 //	}
@@ -45,16 +45,16 @@ const maxint = 8888888888888888888
 var verbose, debug bool			// globals set by options
 
 // for partNfunc returning ints
-func ParseOptions(def int, parts ...func ([]string) int) {
-	ParseOptionsT[int](def, parts...)
+func ExecOptions(def int, xoptsPost func (), parts ...func ([]string) int) {
+	ExecOptionsT[int](def, xoptsPost, parts...)
 }
 
 // for partNfunc returning strings
-func ParseOptionsString(def int, parts ...func ([]string) string) {
-	ParseOptionsT[string](def, parts...)
+func ExecOptionsString(def int, xoptsPost func (), parts ...func ([]string) string) {
+	ExecOptionsT[string](def, xoptsPost, parts...)
 }
 
-func ParseOptionsT[T any](def int, parts ...func ([]string) T) {
+func ExecOptionsT[T any](def int, xoptsPost func (), parts ...func ([]string) T) {
 	flags := make([]*bool, len(parts)+1)
 	falsevar := false
 	flags[0] = &falsevar
@@ -75,7 +75,7 @@ func ParseOptionsT[T any](def int, parts ...func ([]string) T) {
 		infile = fileMatch("input,[-_.[:alnum:]]*,[-_.[:alnum:]]*.test")
 	}
 	lines := fileToLines(infile)
-	ProcessXtraOptions()
+	xoptsPost()
 	for i, opt := range flags {
 		if *opt {
 			fmt.Println(parts[i-1](lines))
@@ -84,6 +84,8 @@ func ParseOptionsT[T any](def int, parts ...func ([]string) T) {
 	}
 	fmt.Println(parts[def-1](lines)) // default part
 }
+
+func NoXtraOpts() {}
 
 //////////// Reading a file in memory
 

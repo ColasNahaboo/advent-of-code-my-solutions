@@ -12,22 +12,18 @@
 package main
 
 import (
-	"fmt"
 	"regexp"
 	"strings"
-	// "flag"
-	// "slices"
 )
 
 // Towels, designs, patterns are simply strings of Colors
 var Colors = []string{"w", "u", "b", "r", "g"}
 
-//////////// Options
+//////////// Options parsing & exec parts
 
 func main() {
-	ParseOptions(2, part1, part2)
+	ExecOptions(2, NoXtraOpts, part1, part2)
 }
-func ProcessXtraOptions() {} //  extra options, see ParseOptions in utils.go
 
 //////////// Part 1
 
@@ -93,12 +89,4 @@ func parse(lines []string) (patterns, designs []string)  {
 		designs = append(designs, reword.FindString(line))
 	}
 	return
-}
-
-//////////// PrettyPrinting & Debugging functions. See also the VPx functions.
-
-func DEBUG() {
-	if ! debug { return }
-	fmt.Println("DEBUG!")
-	// ad hoc debug code here
 }
