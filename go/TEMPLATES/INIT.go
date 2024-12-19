@@ -17,7 +17,7 @@ import (
 //////////// Options parsing & exec parts
 
 func main() {
-	ParseOptions(2, NoXtraOpts, part1, part2)
+	ExecOptions(2, NoXtraOpts, part1, part2)
 }
 
 //////////// Part 1
