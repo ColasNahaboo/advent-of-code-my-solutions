@@ -88,6 +88,74 @@ func AStarFindPath[Graph any, Node comparable](g Graph, start, dest Node, cf Con
 	return nil
 }
 
+// same, but only consider paths less than maxcost
+func AStarFindPathLess[Graph any, Node comparable](g Graph, start, dest Node, cf ConnectedFunc[Graph, Node], df, hf CostFunc[Graph, Node], ne EndFunc[Graph, Node], maxcost float64) Path[Node] {
+	closed := make(map[Node]bool)
+
+	pq := &priorityQueue[Path[Node]]{}
+	heap.Init(pq)
+	heap.Push(pq, &item[Path[Node]]{value: newPath(start)})
+
+	for pq.Len() > 0 {
+		p := heap.Pop(pq).(*item[Path[Node]]).value
+		n := p.last()
+		if closed[n] {
+			continue
+		}
+		if ne(g, n, dest) {			// Path found
+			return p
+		}
+		closed[n] = true
+
+		for _, nb := range cf(g, n) {
+			cp := p.cont(nb)
+			if ccost := pathCost[Graph, Node](g, cp, df); ccost <= maxcost {
+				heap.Push(pq, &item[Path[Node]]{
+					value:    cp,
+					priority: -(pathCost[Graph, Node](g, cp, df) + hf(g, nb, dest)),
+				})}
+		}
+	}
+
+	// No path found
+	return nil
+}
+
+// same, but only consider paths with less than maxlen steps (start & end included)
+func AStarFindPathSteps[Graph any, Node comparable](g Graph, start, dest Node, cf ConnectedFunc[Graph, Node], df, hf CostFunc[Graph, Node], ne EndFunc[Graph, Node], maxlen int) Path[Node] {
+	closed := make(map[Node]bool)
+
+	pq := &priorityQueue[Path[Node]]{}
+	heap.Init(pq)
+	heap.Push(pq, &item[Path[Node]]{value: newPath(start)})
+
+	for pq.Len() > 0 {
+		p := heap.Pop(pq).(*item[Path[Node]]).value
+		n := p.last()
+		if closed[n] {
+			continue
+		}
+		if ne(g, n, dest) {			// Path found
+			return p
+		}
+		closed[n] = true
+		if len(p) >= maxlen {	// reached the max allowed steps, do not explore further
+			continue
+		}
+
+		for _, nb := range cf(g, n) {
+			cp := p.cont(nb)
+			heap.Push(pq, &item[Path[Node]]{
+				value:    cp,
+				priority: -(pathCost[Graph, Node](g, cp, df) + hf(g, nb, dest)),
+			})
+		}
+	}
+
+	// No path found
+	return nil
+}
+
 
 // A Path is a sequence of nodes in a graph.
 type Path[Node any] []Node
