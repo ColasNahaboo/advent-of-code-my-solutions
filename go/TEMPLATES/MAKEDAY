@@ -32,3 +32,4 @@ sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" \
 touch "$name/input,,.test" "$name/example.txt" 
 
 echo "Generated $name/$name.go $name/input,,.txt $name/example.txt $name/README.md in $name/"
+echo "To enable tests, do: cp ../../TEMPLATES/TEST.go  $name/${name}_test.go"
