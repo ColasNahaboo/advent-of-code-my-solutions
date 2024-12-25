@@ -9,6 +9,10 @@
 // WARNING: Part2 is not done yet!
 // I solved it by hand for now by printing the graph
 // I plan to design a proper solution later, after the holidays with the family
+// The wires+gates implement a full adder
+// see https://www.geeksforgeeks.org/full-adder-in-digital-logic/
+// The solution is to recognise this pattern for each Z digit, and spot
+// the misplaced wires.
 
 package main
 	
