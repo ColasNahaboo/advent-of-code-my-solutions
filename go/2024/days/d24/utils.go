@@ -43,16 +43,6 @@ const maxint = 8888888888888888888
 //	}
 // }
 
-// for setting vars directly: https://pkg.go.dev/flag#BoolVar
-// for declaring a help text:
-// var usage = `multi-=line text...`
-// + in main:
-//   flag.Usage = func() {
-//    fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:%s", os.Args[0], usage)
-//    flag.PrintDefaults()
-//	 }
-
-
 var verbose, debug bool			// globals set by options
 var showtime func(s ...string)
 
@@ -419,14 +409,10 @@ func sliceEquals[T comparable](a []T, b []T) bool {
 // showtime() resets the timer, but does not print anything
 // showtime(label) prints the label and the number of ms since last call to showtime()
 // showtime(label, "us") prints label, and the number in microseconds
-// only works in verbose mode
 // This function MakeShowtime is automatically called by ExecOptions to create showtime()
 // we use a closure to simulate a static variable to keep track of previous time
 
 func MakeShowtime() (f func(labels ...string)) {
-	if ! verbose {
-		return func (label ...string) {}
-	}
 	var old = time.Now()
 	f = func(labels ...string) {
 		now := time.Now()

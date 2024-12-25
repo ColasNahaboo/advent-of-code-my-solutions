@@ -43,16 +43,6 @@ const maxint = 8888888888888888888
 //	}
 // }
 
-// for setting vars directly: https://pkg.go.dev/flag#BoolVar
-// for declaring a help text:
-// var usage = `multi-=line text...`
-// + in main:
-//   flag.Usage = func() {
-//    fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:%s", os.Args[0], usage)
-//    flag.PrintDefaults()
-//	 }
-
-
 var verbose, debug bool			// globals set by options
 var showtime func(s ...string)
 

@@ -1,0 +1,153 @@
+#!/bin/bash
+Rules='
+[1] If a gate output is z, but not last bit, the operation has to be XOR
+[2] If a gate output is not z and inputs are not x, y then it must not be XOR
+
+Or:
+
+[3] All XOR gates must include x##, y##, or z##
+[4] Except for z45, no OR gates can have z## as an output
+[5] No AND gates can have z## as an output
+[6] Except for z00, the output of x## XOR y## must be input to another XOR gate
+[7] Except for x00 AND y00, the output of an AND gate must be input to an OR gate
+'
+USAGE="rulestest inputfile
+Tests which gate definitions in inputfile fails the following rules:
+
+$Rules"
+
+[[ $# != 1 ]] && { echo "$USAGE"; exit 1; }
+file="$1"
+lastz=$(grep -oP 'z[0-9]{2}' "$file" | sort | tail -1)
+pgate(){ g=($1); in1="${g[0]}"; in2="${g[2]}"; op="${g[1]}"; out="${g[4]}"; }
+unset bad; declare -A bad       # bad gates with the first rule num they fail
+badgate(){
+    local ruleno="$1" gate="${2//[ >]/_}" # quote rules to be used as key
+    if [[ -z ${bad["$gate"]} ]]; then
+        bad["$gate"]=$ruleno
+    fi
+}
+printgate(){ local g="${1//-_/->}"; echo "${g//_/ }"; } # unquote rules
+isinofop(){
+    local in=$1 sop=$2
+    for gate in "${gates[@]}"; do
+        if [[ $gate =~ ($in $op .*| $op $in)' - > ' ]]; then return 0; fi
+    done
+    return 1
+}
+
+# g=($gates[n]), then ${g[0]} = in1, ${g[2]} = in2 ${g[1]} = op, ${g[4]} = out
+mapfile -t gates < <(grep ' -> ' "$file") # -t to avoid storing newlines in gates
+# order in1 < in2
+i=0
+for gate in "${gates[@]}"; do
+    pgate "$gate"
+    if [[ $in1 > $in2 ]]; then
+        gates[i]="$in2 $op $in1 -> $out"
+    fi
+    ((i++))
+done                             
+
+# Rule [1]
+rule=1
+for gate in "${gates[@]}"; do
+    pgate "$gate"
+    if [[ $out =~ ^z ]] && [[ $out != $lastz ]] && [[ $op != XOR ]]; then
+        badgate $rule "$gate"
+    fi
+done
+
+# Rule [2]
+rule=2
+for gate in "${gates[@]}"; do
+    pgate "$gate"
+    if ! [[ $out =~ ^z ]] && ! [[ ,$in1,$in2 =~ ,x.*,y ]]&&[[ $op == XOR ]]; then
+        badgate $rule "$gate"
+    fi
+done
+
+# Rule [3]
+rule=3
+for gate in "${gates[@]}"; do
+    pgate "$gate"
+    if [[ $op == XOR ]] && ! [[ ,$in1,$in2,$out =~ (,x.*,y|,z) ]]; then
+        badgate $rule "$gate"
+    fi
+done
+
+# Rule [4]
+rule=4
+for gate in "${gates[@]}"; do
+    pgate "$gate"
+    if [[ $out =~ ^z ]] && [[ $out != $lastz ]] && [[ $op == OR ]]; then
+        badgate $rule "$gate"
+    fi
+done
+
+
+# Rule [5]
+rule=5
+for gate in "${gates[@]}"; do
+    pgate "$gate"
+    if [[ $out =~ ^z ]] && [[ $op == AND ]]; then
+        badgate $rule "$gate"
+    fi
+done
+
+# Rule [6]
+rule=6
+for gate in "${gates[@]}"; do
+    pgate "$gate"
+    [[ $out =~ z00 ]] && continue
+    if [[ ,$in1,$in2 =~ ,x.*,y ]] && [[ $op == XOR ]]; then
+        isinofop $out XOR || badgate $rule "$gate"
+    fi
+done
+
+# Rule [7]
+rule=7
+for gate in "${gates[@]}"; do
+    pgate "$gate"
+    [[ $in,$in2 == x00,y00 ]] && continue
+    if [[ ,$in1,$in2 =~ ,x.*,y ]] && [[ $op == AND ]]; then
+        isinofop $out OR || badgate $rule "$gate"
+    fi
+done
+
+
+###
+declare -a badz
+declare -a pairs
+declare -a swaps
+i=0
+for gate in "${!bad[@]}"; do
+    badz[i]=${gate##*_}
+    ((i++))
+    echo [${bad["$gate"]}] "$(printgate $gate)"
+done
+
+p=0; n="${#badz[@]}"
+for ((i = 0; i < n; i++)); do
+    for ((j = i+1; j < n; j++)); do
+        pairs[p]="${badz[i]}-${badz[j]}"
+        ((p++))
+    done
+done
+
+go build || exit 1
+
+n=${#pairs[@]}
+echo "Testing all combinations of quadruplets out of the $n pairs"
+for ((i = 0; i < n - 3; i++)); do
+    for ((j = i + 1; j < n - 2; j++)); do
+        for ((k = j + 1; k < n - 1; k++)); do
+            for ((l = k + 1; l < n; l++)); do
+                swap="${pairs[i]},${pairs[j]},${pairs[k]},${pairs[l]}"
+                #echo "[$i $j $k $l] $swap"
+                ./d24 -q -3 -s "$swap" "$file" && good="$good${good:+ }$swap"
+            done
+        done
+    done
+done
+
+echo "GOOD: $good"
