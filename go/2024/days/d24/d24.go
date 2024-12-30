@@ -277,6 +277,9 @@ func NSPf(f string, v ...interface{}) {
 //////////// Part4
 // Part4 is for debugging: prints the graph of the gates and wires
 
+type TWCell struct {
+	x, y, h int
+}
 func part4(lines []string) (res int) {
 	parse(lines)
 	table := tablewriter.NewWriter(os.Stdout)

@@ -6,6 +6,10 @@
 // TEST: example "co_de_ka_ta"
 // And any file named input-DESCRIPTION,RESULT1,RESULT2.test containing an input
 
+// part2 is coded with my own set simple routines
+// part3 is part2 coded with the bits-and-bloom bitset package
+//       ... which is much faster!
+
 package main
 
 import (
@@ -13,6 +17,7 @@ import (
 	"regexp"
 	"flag"
 	"sort"
+	"github.com/bits-and-blooms/bitset"
 )
 
 //////////// Options parsing & exec parts
@@ -21,7 +26,7 @@ var commaSep = "_"
 
 func main() {
 	commaFlag = flag.Bool("c", false, "outputs numbers separated by comma instead of underscores")
-	ExecOptionsString(2, NoXtraOpts, part1, part2)
+	ExecOptionsString(2, NoXtraOpts, part1, part2, part3)
 }
 
 func XtraOpts() { // extra options, see ParseOptions in utils.go
@@ -96,7 +101,7 @@ func part2(lines []string) string {
 	return NodesPrint(BronKerboschEdges(edges))
 }
 
-//////////// Bron–Kerbosch algorithm
+//////////// Bron–Kerbosch algorithm using my sets
 // With pivot version, from:
 // https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm#With_pivoting
 
@@ -294,7 +299,99 @@ func NodesPrint(ns []int) (p string) {
 	}
 	return
 }
+
+
+//////////// Part 3
+
+func part3(lines []string) string {
+	conns := parse(lines)
+	edges := make([][]int, 26*26, 26*26) // [comp]-> list of neigbours
+	for _, c := range conns {
+		edges[c[0]] = append(edges[c[0]], c[1])
+		edges[c[1]] = append(edges[c[1]], c[0])
+	}
+	return BSNodesPrint(BSBronKerboschEdges(edges))
+}
 	
+func BSNodesPrint(ns []uint) (p string) {
+	for i, n := range ns {
+		if i > 0 {
+			p += commaSep
+		}				
+		p += i2n(int(n))
+	}
+	return
+}
+
+//////////// Bron–Kerbosch algorithm using the bitset package
+// With pivot version, from:
+// https://en.wikipedia.org/wiki/Bron%E2%80%93Kerbosch_algorithm#With_pivoting
+
+func BSBronKerboschEdges(edges [][]int) []uint {
+	bkedges = edges
+	var r, p, x bitset.BitSet
+	for i, e := range edges {
+		if len(e) > 0 {
+			p.Set(uint(i))
+		}
+	}
+	cliques := BSBronKerbosch(&r, &p, &x)
+	maxlen := 0
+	var maxclique []uint
+	for _, s := range cliques {
+		nodes := BSNodes(&s)
+		if len(nodes) > maxlen {
+			maxlen = len(nodes)
+			maxclique = nodes
+		}
+	}
+	return maxclique
+}
+
+func BSBronKerbosch(r, p, x *bitset.BitSet) (cliques []bitset.BitSet) {
+	// if P and X are both empty then report R as a maximal clique
+	if p.Count() == 0 && x.Count() == 0 {
+		return []bitset.BitSet{*r}
+	}
+	// else choose pivot vertex (with lots of edges) q from P ⋃ X:
+	u := BSPivot(p.Union(x))
+	// for each vertex v in P \ N(u) do
+	for _, v := range BSNodes(p.SymmetricDifference(BSNeighbors(u))) {
+		if p.Test(v) {
+			nbs := BSNeighbors(v)
+			p = p.Clear(v)
+			cliques = append(cliques,
+				BSBronKerbosch(r.Clone().Set(v), p.Intersection(nbs), x.Intersection(nbs))...)
+			x = x.Set(v)
+		}
+	}
+	return
+}
+
+func BSNodes(s *bitset.BitSet) (nodes []uint) { // list of nodes in set
+	nodes = make([]uint, s.Count(), s.Count())
+	return s.AsSlice(nodes)
+}
+
+func BSPivot(s *bitset.BitSet) (pnode uint) { // node with most edges
+	plen := 0
+	for _, node := range BSNodes(s) {
+		if len(bkedges[node]) > plen {
+			plen = len(bkedges[node])
+			pnode = node
+		}
+	}
+	return
+}
+
+func BSNeighbors(n uint) *bitset.BitSet {
+	var s bitset.BitSet
+	for _, i := range bkedges[n] {
+		s.Set(uint(i))
+	}
+	return &s
+}
+
 //////////// Common Parts code
 
 func n2i(s string) int {
