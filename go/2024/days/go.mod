@@ -6,4 +6,5 @@ require (
 	github.com/bits-and-blooms/bitset v1.20.0 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
+	gonum.org/v1/gonum v0.15.1 // indirect
 )

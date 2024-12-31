@@ -42,6 +42,9 @@ const maxint = 8888888888888888888
 //		outputsep = ","
 //	}
 // }
+// Setting the usage string for partN (default: "run exercise partN") is done
+// by XOptsUsage(N, "usage string...") before the call to ExecOptionsT
+// E.g: XOptsUsage(3, "part2, but coded with the bits-and-bloom bitset package")
 
 var verbose, debug bool			// globals set by options
 var showtime func(s ...string)
@@ -64,8 +67,7 @@ func ExecOptionsT[T any](def int, xoptsPost func (), parts ...func ([]string) T)
 	debugFlag := flag.Bool("V", false, "debug: even more verbose")
 	for n :=  range parts {
 		i := n+1
-		flags[i] = flag.Bool(itoa(i), false,
-			fmt.Sprintf("run exercise part%d, (default: part%d)", i, def))
+		flags[i] = flag.Bool(itoa(i), false, XOptsOf(i, def))
 	}
 	flag.Parse()
 	verbose = *verboseFlag
@@ -87,6 +89,29 @@ func ExecOptionsT[T any](def int, xoptsPost func (), parts ...func ([]string) T)
 	}
 	fmt.Println(parts[def-1](lines)) // default part
 }
+
+var XOptsUsages = []string{}
+
+func XOptsUsage(i int, s string) {
+	for i >= len(XOptsUsages) {
+		XOptsUsages = append(XOptsUsages, "")
+	}
+	XOptsUsages[i] = s
+}
+
+func XOptsOf(i, def int) (s string) {
+	if i < len(XOptsUsages) {
+		s = XOptsUsages[i]
+	}
+	if len(s) == 0 {
+		s = fmt.Sprintf("run exercise part%d", i)
+	}
+	if i == def {
+		s += " (default)"
+	}
+	return
+}
+	
 
 func NoXtraOpts() {}
 

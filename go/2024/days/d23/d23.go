@@ -9,6 +9,7 @@
 // part2 is coded with my own set simple routines
 // part3 is part2 coded with the bits-and-bloom bitset package
 //       ... which is much faster!
+// part4 coded also with graph/topo. Speed is between the 2 above.
 
 package main
 
@@ -18,6 +19,10 @@ import (
 	"flag"
 	"sort"
 	"github.com/bits-and-blooms/bitset"
+	"gonum.org/v1/gonum/graph"
+	"gonum.org/v1/gonum/graph/simple"
+	"gonum.org/v1/gonum/graph/topo"
+	//"slices"
 )
 
 //////////// Options parsing & exec parts
@@ -26,7 +31,10 @@ var commaSep = "_"
 
 func main() {
 	commaFlag = flag.Bool("c", false, "outputs numbers separated by comma instead of underscores")
-	ExecOptionsString(2, NoXtraOpts, part1, part2, part3)
+	XOptsUsage(2, "part2, coded with my own Set routines")
+	XOptsUsage(3, "part2, but coded with the bits-and-bloom bitset package")
+	XOptsUsage(4, "part2, but coded with the graph/topo graph package and its Bron-Kerbosch implementation, and with the bits-and-bloom bitset package")
+	ExecOptionsString(2, NoXtraOpts, part1, part2, part3, part4)
 }
 
 func XtraOpts() { // extra options, see ParseOptions in utils.go
@@ -301,7 +309,7 @@ func NodesPrint(ns []int) (p string) {
 }
 
 
-//////////// Part 3
+//////////// Part 3. BS prefix for BitSet
 
 func part3(lines []string) string {
 	conns := parse(lines)
@@ -391,6 +399,47 @@ func BSNeighbors(n uint) *bitset.BitSet {
 	}
 	return &s
 }
+
+
+//////////// Part 4. GT prefix for Graph/Topo
+// we use the gonum.org/v1/gonum/graph/simple implementations
+
+func part4(lines []string) string {
+	conns := parse(lines)
+	g := simple.NewUndirectedGraph()
+	for _, c := range conns {
+		g.SetEdge(simple.Edge{simple.Node(int64(c[0])), simple.Node(int64(c[1]))})
+	}
+	var maxclique []graph.Node
+	var maxlen int
+	for _, clique := range topo.BronKerbosch(g) {
+		if len(clique) > maxlen {
+			maxclique = clique
+			maxlen = len(clique)
+		}
+	}
+	return CliquePrint(maxclique)
+}
+
+func CliquePrint(c []graph.Node) (p string) {
+	ids := []int64{}
+	for _, n := range c {
+		ids = append(ids, n.ID())
+	}
+	sort.Slice(ids, func(i, j int) bool { return ids[i] < ids[j] })
+	for i, id := range ids {
+		if i > 0 {
+			p += commaSep
+		}				
+		p += i642n(id)
+	}
+	return
+}
+
+func i642n(i int64) string {
+	return string([]byte{byte(i/26)+'a', byte(i%26)+'a'})
+}
+
 
 //////////// Common Parts code
 
