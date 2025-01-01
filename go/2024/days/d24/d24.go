@@ -14,6 +14,8 @@
 // The solution is to recognise this pattern for each Z digit, and spot
 // the misplaced wires.
 
+// Note: We print "OOR" instead of "OR" so that all symbols are 3 letters long
+
 package main
 	
 import (
@@ -48,11 +50,11 @@ var	xnums = []Wid{}				// for part2
 var	ynums = []Wid{}				// for part2
 var	znums = []Wid{}
 var wiresID = make(map[string]Wid) // wire name ==> index in wires
-var opsID = []string{"AND", "OR", "XOR"}
+var opsID = []string{"AND", "OOR", "XOR"}
 var opsFunc = []func(i, j bool)bool{opAND, opOR, opXOR}
 const (
 	AND = 0
-	OR = 1
+	OOR = 1
 	XOR = 2
 )
 
@@ -67,6 +69,7 @@ func main() {
 	commaFlag = flag.Bool("c", false, "outputs numbers separated by comma instead of underscores")
 	flag.StringVar(&swapsFlag, "s", "", "swaps the pairs of wires, comma-separated, e.g: -s z00-z05,z02-z01")
 	flag.BoolVar(&NSPsilent, "q", false, "quiet operation for part3 (testing adder)")
+	flag.IntVar(&tabledepth, "d", 10, "max depth of the table in part4")
 	ExecOptions(2, XtraOpts, part1, part2, part3, part4)
 }
 
@@ -168,6 +171,9 @@ func DeclareGate(outname, opname, inname1, inname2 string) (gid Gid) {
 	in2 := DeclareWire(inname2)
 	if inname1 > inname2 {		// keep args in alphabetical order
 		in1, in2 = in2, in1
+	}
+	if opname == "OR" {
+		opname = "OOR"
 	}
 	out := DeclareWire(outname)
 	op := OPid(slices.Index(opsID, opname))
@@ -274,13 +280,15 @@ func NSPf(f string, v ...interface{}) {
 type TWCell struct {
 	x, y, h int
 }
+var tabledepth int
+
 func part4(lines []string) (res int) {
 	parse(lines)
 	grid := MakeBoard[string](0, 0)
 	y := 0
 	for _, zid := range znums {
 		grid.Append(Point{0, y}, wires[int(zid)].name)
-		y += DrawWire(&grid, zid, 0, y) + 1
+		y += DrawWire(&grid, zid, 0, y, tabledepth) + 1
 	}
 	DrawGrid(&grid)
 	os.Exit(0)					// avoid printing the res
@@ -299,16 +307,16 @@ func DrawGrid(grid *Board[string], legend ...string) {
 	table.Render() 
 }
 
-func DrawWire(grid *Board[string], wid Wid, x, y int) (height int) {
-	if gid := int(wires[int(wid)].ingate); gid >= 0 {
+func DrawWire(grid *Board[string], wid Wid, x, y, d int) (height int) {
+	if gid := int(wires[int(wid)].ingate); gid >= 0 && d > 0 {
 		height = 1
 		gate := gates[gid]
 		VPf("Drawing %s[%s,%s] at %d. Inserting row before %d\n", gate.opname, wires[int(gate.in1)].name, wires[int(gate.in2)].name, y, y+1)
 		grid.Append(Point{x+1, y}, gate.opname)
 		grid.Append(Point{x+2, y}, wires[int(gate.in1)].name)
-		height += DrawWire(grid, gate.in1, x+2, y)
+		height += DrawWire(grid, gate.in1, x+2, y, d-1)
 		grid.Append(Point{x+2, y+height}, wires[int(gate.in2)].name)
-		height += DrawWire(grid, gate.in2, x+2, y+height)
+		height += DrawWire(grid, gate.in2, x+2, y+height, d-1)
 	}
 	return
 }
