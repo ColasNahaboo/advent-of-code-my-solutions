@@ -28,6 +28,9 @@ const maxint = 8888888888888888888
 /////////// Parse and exec options for AdventOfCode
 // ExecOptions(default-part-number, part1func, part2func, part3func, ...)
 
+// To set a usage string, pass it to ExecUsage(string) before ExecOptions
+// reminder: `...` allow to define multi-line texts
+
 // to define extra options create flags as global vars, and post-process them
 // inside your xoptsPost() function argument to ExecOptions. E.g:
 //
@@ -40,14 +43,15 @@ const maxint = 8888888888888888888
 // func XtraOpts() {
 //	if *commaFlag {
 //		outputsep = ","
-//	}
-// }
+// }}
+//
 // Setting the usage string for partN (default: "run exercise partN") is done
 // by XOptsUsage(N, "usage string...") before the call to ExecOptionsT
 // E.g: XOptsUsage(3, "part2, but coded with the bits-and-bloom bitset package")
 
 var verbose, debug bool			// globals set by options
 var showtime func(s ...string)
+var execusage string			// set by ExecUsage
 
 // for partNfunc returning ints
 func ExecOptions(def int, xoptsPost func (), parts ...func ([]string) int) {
@@ -68,6 +72,10 @@ func ExecOptionsT[T any](def int, xoptsPost func (), parts ...func ([]string) T)
 	for n :=  range parts {
 		i := n+1
 		flags[i] = flag.Bool(itoa(i), false, XOptsOf(i, def))
+	}
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:%s", os.Args[0], execusage)
+		flag.PrintDefaults()
 	}
 	flag.Parse()
 	verbose = *verboseFlag
@@ -111,9 +119,12 @@ func XOptsOf(i, def int) (s string) {
 	}
 	return
 }
-	
 
 func NoXtraOpts() {}
+
+func ExecUsage(text string) {
+	execusage = text
+}
 
 //////////// Reading a file in memory
 

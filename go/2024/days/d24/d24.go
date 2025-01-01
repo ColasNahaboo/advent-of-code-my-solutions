@@ -58,18 +58,12 @@ const (
 
 //////////// Options parsing & exec parts
 
-var usage = `
-part3 prints in binary format x, y, x+y, and z, to the errors manually
-part4 prints a graphical representation of the wires and gates
-`
 var commaFlag *bool
 var commaSep = "_"
 var swapsFlag string
 func main() {
-	flag.Usage = func() {
-		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:%s", os.Args[0], usage)
-		flag.PrintDefaults()
-	}
+	XOptsUsage(3, "part3 prints in binary format x, y, x+y, and z, to the errors manually")
+	XOptsUsage(4, "part4 prints a graphical representation of the wires and gates")
 	commaFlag = flag.Bool("c", false, "outputs numbers separated by comma instead of underscores")
 	flag.StringVar(&swapsFlag, "s", "", "swaps the pairs of wires, comma-separated, e.g: -s z00-z05,z02-z01")
 	flag.BoolVar(&NSPsilent, "q", false, "quiet operation for part3 (testing adder)")
@@ -282,13 +276,40 @@ type TWCell struct {
 }
 func part4(lines []string) (res int) {
 	parse(lines)
-	table := tablewriter.NewWriter(os.Stdout)
+	grid := MakeBoard[string](0, 0)
+	y := 0
 	for _, zid := range znums {
-		v := []string{wires[zid].name}
+		grid.Append(Point{0, y}, wires[int(zid)].name)
+		y += DrawWire(&grid, zid, 0, y) + 1
+	}
+	DrawGrid(&grid)
+	os.Exit(0)					// avoid printing the res
+	return
+}
+
+func DrawGrid(grid *Board[string], legend ...string) {
+	if len(legend) > 0 {
+		fmt.Println(legend[0])
+	}
+	table := tablewriter.NewWriter(os.Stdout)
+	for y := range grid.h {
+		v := grid.GetRow(y)
 		table.Append(v)
 	}
 	table.Render() 
-	os.Exit(0)					// avoid printing the res
+}
+
+func DrawWire(grid *Board[string], wid Wid, x, y int) (height int) {
+	if gid := int(wires[int(wid)].ingate); gid >= 0 {
+		height = 1
+		gate := gates[gid]
+		VPf("Drawing %s[%s,%s] at %d. Inserting row before %d\n", gate.opname, wires[int(gate.in1)].name, wires[int(gate.in2)].name, y, y+1)
+		grid.Append(Point{x+1, y}, gate.opname)
+		grid.Append(Point{x+2, y}, wires[int(gate.in1)].name)
+		height += DrawWire(grid, gate.in1, x+2, y)
+		grid.Append(Point{x+2, y+height}, wires[int(gate.in2)].name)
+		height += DrawWire(grid, gate.in2, x+2, y+height)
+	}
 	return
 }
 

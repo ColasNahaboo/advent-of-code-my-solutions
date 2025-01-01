@@ -28,6 +28,9 @@ const maxint = 8888888888888888888
 /////////// Parse and exec options for AdventOfCode
 // ExecOptions(default-part-number, part1func, part2func, part3func, ...)
 
+// To set a usage string, pass it to ExecUsage(string) before ExecOptions
+// reminder: `...` allow to define multi-line texts
+
 // to define extra options create flags as global vars, and post-process them
 // inside your xoptsPost() function argument to ExecOptions. E.g:
 //
@@ -40,11 +43,15 @@ const maxint = 8888888888888888888
 // func XtraOpts() {
 //	if *commaFlag {
 //		outputsep = ","
-//	}
-// }
+// }}
+//
+// Setting the usage string for partN (default: "run exercise partN") is done
+// by XOptsUsage(N, "usage string...") before the call to ExecOptionsT
+// E.g: XOptsUsage(3, "part2, but coded with the bits-and-bloom bitset package")
 
 var verbose, debug bool			// globals set by options
 var showtime func(s ...string)
+var execusage string			// set by ExecUsage
 
 // for partNfunc returning ints
 func ExecOptions(def int, xoptsPost func (), parts ...func ([]string) int) {
@@ -64,8 +71,11 @@ func ExecOptionsT[T any](def int, xoptsPost func (), parts ...func ([]string) T)
 	debugFlag := flag.Bool("V", false, "debug: even more verbose")
 	for n :=  range parts {
 		i := n+1
-		flags[i] = flag.Bool(itoa(i), false,
-			fmt.Sprintf("run exercise part%d, (default: part%d)", i, def))
+		flags[i] = flag.Bool(itoa(i), false, XOptsOf(i, def))
+	}
+	flag.Usage = func() {
+		fmt.Fprintf(flag.CommandLine.Output(), "Usage of %s:%s", os.Args[0], execusage)
+		flag.PrintDefaults()
 	}
 	flag.Parse()
 	verbose = *verboseFlag
@@ -88,7 +98,33 @@ func ExecOptionsT[T any](def int, xoptsPost func (), parts ...func ([]string) T)
 	fmt.Println(parts[def-1](lines)) // default part
 }
 
+var XOptsUsages = []string{}
+
+func XOptsUsage(i int, s string) {
+	for i >= len(XOptsUsages) {
+		XOptsUsages = append(XOptsUsages, "")
+	}
+	XOptsUsages[i] = s
+}
+
+func XOptsOf(i, def int) (s string) {
+	if i < len(XOptsUsages) {
+		s = XOptsUsages[i]
+	}
+	if len(s) == 0 {
+		s = fmt.Sprintf("run exercise part%d", i)
+	}
+	if i == def {
+		s += " (default)"
+	}
+	return
+}
+
 func NoXtraOpts() {}
+
+func ExecUsage(text string) {
+	execusage = text
+}
 
 //////////// Reading a file in memory
 
@@ -409,10 +445,14 @@ func sliceEquals[T comparable](a []T, b []T) bool {
 // showtime() resets the timer, but does not print anything
 // showtime(label) prints the label and the number of ms since last call to showtime()
 // showtime(label, "us") prints label, and the number in microseconds
+// only works in verbose mode
 // This function MakeShowtime is automatically called by ExecOptions to create showtime()
 // we use a closure to simulate a static variable to keep track of previous time
 
 func MakeShowtime() (f func(labels ...string)) {
+	if ! verbose {
+		return func (label ...string) {}
+	}
 	var old = time.Now()
 	f = func(labels ...string) {
 		now := time.Now()
