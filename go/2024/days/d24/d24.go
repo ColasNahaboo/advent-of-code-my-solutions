@@ -302,6 +302,7 @@ func DrawGrid(grid *Board[string], legend ...string) {
 	table := tablewriter.NewWriter(os.Stdout)
 	for y := range grid.h {
 		v := grid.GetRow(y)
+		slices.Reverse(v)
 		table.Append(v)
 	}
 	table.Render() 
