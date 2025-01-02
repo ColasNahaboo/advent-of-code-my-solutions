@@ -11,7 +11,7 @@ Available for now:
 - [bash/2021](bash/2021) (completed)
 - go/2020 (to do)
 - go/2019 (to do)
-- [go/2018] (in progress)
+- [go/2018](go/2018) (in progress)
 - [go/2017](go/2017) (completed)
 - [go/2016](go/2016) (completed)
 - [go/2015](go/2015) (completed)
