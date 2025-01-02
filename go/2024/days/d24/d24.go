@@ -280,11 +280,13 @@ func NSPf(f string, v ...interface{}) {
 type TWCell struct {
 	x, y, h int
 }
-var tabledepth int
+var tabledepth int				// option to limit printing depth
+var drawnwire map[Wid]bool		// do not repeat how wires are fed
 
 func part4(lines []string) (res int) {
 	parse(lines)
 	grid := MakeBoard[string](0, 0)
+	drawnwire = make(map[Wid]bool)
 	y := 0
 	for _, zid := range znums {
 		grid.Append(Point{0, y}, wires[int(zid)].name)
@@ -321,9 +323,17 @@ func DrawWire(grid *Board[string], wid Wid, x, y, d int) (height int) {
 			in1, in2 = gate.in2, gate.in1
 		}
 		grid.Append(Point{x+2, y}, wires[int(in1)].name)
-		height += DrawWire(grid, in1, x+2, y, d-1)
-		grid.Append(Point{x+2, y+height}, wires[int(in2)].name)
-		height += DrawWire(grid, in2, x+2, y+height, d-1)
+		if ! drawnwire[in1] {
+			height += DrawWire(grid, in1, x+2, y, d-1)
+			drawnwire[in1] = true
+		}
+		y += height
+		grid.Append(Point{x+2, y}, wires[int(in2)].name)
+		if ! drawnwire[in2] {
+			height += DrawWire(grid, in2, x+2, y, d-1)
+			drawnwire[in2] = true
+		}
+		y += height
 	}
 	return
 }
