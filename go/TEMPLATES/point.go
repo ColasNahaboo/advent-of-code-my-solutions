@@ -79,6 +79,19 @@ func (p Point) Index(list []Point) int {
 	return -1
 }
 
+// given a list of points, returns the smallest rectangle enclosing them all
+func BoundingBox(ps []Point) (x, y, w, h int) {
+	x, y = MaxInt, MaxInt
+	var xw, yh int
+	for _, p := range ps {
+		x = min(x, p.x)
+		y = min(x, p.y)
+		xw = max(xw, p.x)
+		yh = max(yh, p.y)
+	}
+	return x, y, xw - x, yh - y
+}
+	
 ////////////////////// Directions
 
 var DirsOrtho = []Point{Point{0,-1},Point{1,0},Point{0,1},Point{-1,0}}
