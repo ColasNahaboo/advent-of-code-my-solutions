@@ -1,0 +1,35 @@
+#!/bin/bash
+# Usage: MAKEDAY N
+# creates the set of files for day N
+
+err() { echo "***ERROR: $*"; exit 1;}
+
+n="$1"
+[[ $n =~ ^[[:digit:]]+$ ]] || err "Usage: MAKEDAY N"
+[[ ${#n} == 1 ]] && n="0$n"
+
+name="d$n"
+if [[ $PWD =~ go/([[:digit:]]{4})/ ]]; then
+    YYYY=${BASH_REMATCH[1]}
+else
+    err "The current path must contain the year: $PWD"
+fi
+if [[ $PWD =~ ^(.*/days)/d ]]; then
+    cd "${BASH_REMATCH[1]}" || exit
+elif ! [[ $PWD =~ /days ]]; then
+    err "MAKEDAY must be run from dir days/"   
+fi
+
+[[ -e "$name/$name.go" ]] && err "$name already exists"
+
+mkdir -p "$name"
+#cp ../../TEMPLATES/TEST.go  "$name/${name}_test.go"
+cp ../../TEMPLATES/utils.go "$name"
+sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" \
+    <../../TEMPLATES/INIT.go >"$name/$name.go"
+sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" \
+    <../../TEMPLATES/README-DD.md >"$name/README.md"
+touch "$name/input,,.test" "$name/example.txt" 
+
+echo "Generated $name/$name.go $name/input,,.txt $name/example.txt $name/README.md in $name/"
+echo "To enable tests, do: cp ../../TEMPLATES/TEST.go  $name/${name}_test.go"
