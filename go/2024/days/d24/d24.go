@@ -31,15 +31,15 @@ type Gate struct {
 	id Gid
 	op OPid
 	opname string
-	in1, in2 Wid
-	out Wid
+	in1, in2 Wid				// input wires
+	out Wid						// output wire
 }
 type Wire struct {
 	id Wid
 	name string
 	ready bool
-	value bool
-	ingate Gid
+	value bool					// power is on/off
+	ingate Gid					// -1 if none
 }
 type Gid int
 type Wid int
@@ -313,13 +313,37 @@ func DrawWire(grid *Board[string], wid Wid, x, y, d int) (height int) {
 		gate := gates[gid]
 		VPf("Drawing %s[%s,%s] at %d. Inserting row before %d\n", gate.opname, wires[int(gate.in1)].name, wires[int(gate.in2)].name, y, y+1)
 		grid.Append(Point{x+1, y}, gate.opname)
-		grid.Append(Point{x+2, y}, wires[int(gate.in1)].name)
-		height += DrawWire(grid, gate.in1, x+2, y, d-1)
-		grid.Append(Point{x+2, y+height}, wires[int(gate.in2)].name)
-		height += DrawWire(grid, gate.in2, x+2, y+height, d-1)
+		var in1, in2 Wid
+		if WireBefore(gate.in1, gate.in2) {
+			in1, in2 = gate.in1, gate.in2
+		} else {
+			in1, in2 = gate.in2, gate.in1
+		}
+		grid.Append(Point{x+2, y}, wires[int(in1)].name)
+		height += DrawWire(grid, in1, x+2, y, d-1)
+		grid.Append(Point{x+2, y+height}, wires[int(in2)].name)
+		height += DrawWire(grid, in2, x+2, y+height, d-1)
 	}
 	return
 }
+
+// sort the 2 in-wires by their in-gate types
+func WireBefore(i1, i2 Wid) bool {
+	w1 := wires[int(i1)]
+	w2 := wires[int(i2)]
+	if w1.ingate < 0 {
+		if w2.ingate < 0 {
+			return w1.name <= w2.name // sort by names of the wires
+		} else {
+			return true			// first the wires with no ingate
+		}
+	} else if w2.ingate < 0 {
+		return false
+	}
+	// both have ingates: sort by their OP: XOR, OOR, AND (decreasing lex. order)
+	return gates[int(w1.ingate)].opname > gates[int(w2.ingate)].opname
+}
+			
 
 //////////// PrettyPrinting & Debugging functions. See also the VPx functions.
 
