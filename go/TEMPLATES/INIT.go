@@ -38,8 +38,10 @@ func part2(lines []string) (res int) {
 
 func parse(lines []string) []string {
 	renum := regexp.MustCompile("[[:digit:]]+") // example code body, replace.
+	reline := regexp.MustCompile("^.*$")
 	for _, line := range lines {
 		m := renum.FindAllString(line, -1)
+		m = reline.FindStringSubmatch(line)
 		return m
 	}
 	return []string{}
