@@ -36,15 +36,14 @@ func part2(lines []string) (res int) {
 
 //////////// Common Parts code
 
-func parse(lines []string) []string {
+func parse(lines []string) (res []string) {
 	renum := regexp.MustCompile("[[:digit:]]+") // example code body, replace.
 	reline := regexp.MustCompile("^.*$")
 	for _, line := range lines {
-		m := renum.FindAllString(line, -1)
+		ns := atoil(renum.FindAllString(line, -1))
 		m = reline.FindStringSubmatch(line)
-		return m
 	}
-	return []string{}
+	return
 }
 
 //////////// PrettyPrinting & Debugging functions. See also the VPx functions.
