@@ -37,7 +37,7 @@ func part2(lines []string) (res int) {
 //////////// Common Parts code
 
 func parse(lines []string) (res []string) {
-	renum := regexp.MustCompile("[[:digit:]]+") // example code body, replace.
+	renum := regexp.MustCompile("-?[[:digit:]]+") // example code body, replace.
 	reline := regexp.MustCompile("^.*$")
 	for _, line := range lines {
 		ns := atoil(renum.FindAllString(line, -1))
