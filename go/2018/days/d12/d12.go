@@ -91,6 +91,7 @@ func part2(lines []string) (res int) {
 	s := make([]bool, slen, slen)
 	ns := slices.Clone(s)
 	n0 := slices.Clone(s)
+	runner := []bool{}
 	copy(s[off:], init)			// initial state starts at off
 	VPgen(0, s)
 	for i := 0; i < gens; i++ {
@@ -98,6 +99,13 @@ func part2(lines []string) (res int) {
 		Generate(&ns, s, off, gens-i, rules) // create next s generation into ns
 		copy(s, ns)
 		VPgen(i, s)
+		r1, r2 := FindRunner(s)
+		if slices.Equal(s[r1:r2], runner) {
+			VPf("## runner found at gen %d\n", i)
+			gens = i+1
+			break
+		}
+		runner = slices.Clone(s[r1:r2])
 	}
 	x, y := FindRunner(s)
 	return ScoreRunner(s[x:y], x + 50000000000 - gens, off)
