@@ -5,6 +5,7 @@ The code is reasonably commented, and the top README in each directory details t
 
 Available for now:
 
+- [go/2025](go/2025) (in progress)
 - [go/2024](go/2024) (completed)
 - [go/2023](go/2023) (completed)
 - [go/2022](go/2022) (completed)
@@ -16,5 +17,5 @@ Available for now:
 - [go/2016](go/2016) (completed)
 - [go/2015](go/2015) (completed)
 
-Author: (c)2021-2024 Colas Nahaboo, https://colas.nahaboo.net
+Author: (c)2021-2025 Colas Nahaboo, https://colas.nahaboo.net
 License: free of use via the MIT License
