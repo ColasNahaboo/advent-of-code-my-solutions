@@ -9,6 +9,7 @@ n="$1"
 [[ ${#n} == 1 ]] && n="0$n"
 
 name="d$n"
+nminized="${n#0}"
 if [[ $PWD =~ go/([[:digit:]]{4})/ ]]; then
     YYYY=${BASH_REMATCH[1]}
 else
@@ -23,11 +24,11 @@ fi
 [[ -e "$name/$name.go" ]] && err "$name already exists"
 
 mkdir -p "$name"
-#cp ../../TEMPLATES/TEST.go  "$name/${name}_test.go"
+cp ../../TEMPLATES/TEST.go  "$name/${name}_test.go"
 cp ../../TEMPLATES/utils.go "$name"
-sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" \
+sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" -e "s/NM/${nminized}/g" \
     <../../TEMPLATES/INIT.go >"$name/$name.go"
-sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" \
+sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" -e "s/NM/${nminized}/g" \
     <../../TEMPLATES/README-DD.md >"$name/README.md"
 touch "$name/input,,.test" "$name/example.txt" 
 

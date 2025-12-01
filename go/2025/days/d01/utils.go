@@ -238,12 +238,18 @@ func intPower64(n int, m int) uint64 {
 	return result
 }
 
+// simple absolute value
 func intAbs(i int) int {
 	if i >= 0 {
 		return i
 	} else {
 		return -i
 	}
+}
+
+// Positive modulo
+func pmod(a, n int) int {
+    return ((a % n) + n) % n
 }
 
 //////////// Convenience functions

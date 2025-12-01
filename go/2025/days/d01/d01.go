@@ -26,7 +26,7 @@ func part1(lines []string) (res int) {
 	rots := parse(lines)
 	n := 50
 	for _, rot := range rots {
-		n = turn(n, rot)
+		n = pmod(n + rot, 100)
 		VPf("%d ==> %d\n", rot, n)
 		if n == 0 {
 			res++
@@ -40,29 +40,23 @@ func part1(lines []string) (res int) {
 func part2(lines []string) (zeros int) {
 	rots := parse(lines)
 	n := 50
+	var n2 int					// the virtual raw value of n after the move
 	for _, rot := range rots {
 		if rot > 0 {
-			zeros += (n + rot) / 100
+			n2 = n + rot
 		} else {
-			next := ((100 - n) % 100) - rot // this flips the dial horizontally
-			zeros += next / 100
+			// We flip the dial horizontally to get back to the previous case
+			// Flipping n is pmod(100 - n), flipped rot is -rot
+			n2 = pmod(100 - n, 100) - rot
 		}
-		n = turn(n, rot)
+		zeros += n2 / 100
+		n = pmod(n + rot, 100)
 		VPf("Rot = %d, dial at n = %d, zeros = %d\n", rot, n, zeros)
 	}
 	return 
 }
 
 //////////// Common Parts code
-
-// turn the dial
-func turn(n, rot int) (n2 int) {
-	n2 = (n + rot) % 100
-	if n2 < 0 {
-		n2 += 100
-	}
-	return
-}
 
 func parse(lines []string) (rots []int) {
 	reline := regexp.MustCompile("([LR])([[:digit:]]+)")
