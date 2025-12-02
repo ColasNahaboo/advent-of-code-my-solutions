@@ -1,6 +1,7 @@
 #!/bin/bash
 # Usage: MAKEDAY N
 # creates the set of files for day N
+maketests=true
 
 err() { echo "***ERROR: $*"; exit 1;}
 
@@ -24,13 +25,18 @@ fi
 [[ -e "$name/$name.go" ]] && err "$name already exists"
 
 mkdir -p "$name"
-cp ../../TEMPLATES/TEST.go  "$name/${name}_test.go"
 cp ../../TEMPLATES/utils.go "$name"
 sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" -e "s/NM/${nminized}/g" \
     <../../TEMPLATES/INIT.go >"$name/$name.go"
 sed -r -e "s/YYYY/$YYYY/g" -e "s/NN/${name#d}/g" -e "s/NM/${nminized}/g" \
     <../../TEMPLATES/README-DD.md >"$name/README.md"
 touch "$name/input,,.test" "$name/example.txt" 
+echo "$name" >>"$name/.gitignore"
 
 echo "Generated $name/$name.go $name/input,,.txt $name/example.txt $name/README.md in $name/"
-echo "To enable tests, do: cp ../../TEMPLATES/TEST.go  $name/${name}_test.go"
+
+if "$maketests"; then
+    cp ../../TEMPLATES/TEST.go  "$name/${name}_test.go"
+else
+    echo "To enable tests, do: cp ../../TEMPLATES/TEST.go  $name/${name}_test.go"
+fi

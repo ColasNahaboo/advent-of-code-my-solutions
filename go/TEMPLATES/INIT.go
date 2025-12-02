@@ -41,7 +41,7 @@ func parse(lines []string) (res []string) {
 	reline := regexp.MustCompile("^.*$")
 	for _, line := range lines {
 		ns := atoil(renum.FindAllString(line, -1))
-		m = reline.FindStringSubmatch(line)
+		m := reline.FindStringSubmatch(line)
 	}
 	return
 }

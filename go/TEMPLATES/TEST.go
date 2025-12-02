@@ -18,7 +18,8 @@ func Test(t *testing.T) {
 
 /////////// Functions to test
 
-func t_1(label string, t *testing.T, args, expected int) {
+// adapt to your case the types of args and expected
+func t_1(label string, t *testing.T, args string, expected int) {
 	// setup here
 	t.Run(label, func(t *testing.T) {
 		got := theFunctionToTest(args)
