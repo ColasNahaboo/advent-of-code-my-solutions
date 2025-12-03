@@ -2,7 +2,7 @@ package main
 
 import (
 	"testing"
-	"reflect"
+	// "reflect"
 )
 
 /////////// Setups
@@ -10,19 +10,34 @@ import (
 /////////// Tests to pass
 
 func Test(t *testing.T) {
+	TEST("My Test")
 	//  calls to test function(s) args (adapt "args" and "expected")
-	t_1("1.1", t, args, expected)
-	t_1("1.2", t, args, expected)
-	t_1("1.3", t, args, expected)
+	T(t, args, expected)
+	T(t, args, expected)
+	// ...
 }
 
 /////////// Functions to test
 
-// adapt to your case the types of args and expected
-func t_1(label string, t *testing.T, args string, expected int) {
-	// setup here
-	t.Run(label, func(t *testing.T) {
+// adapt to your case the number and types of args and expected
+func T(t *testing.T, args string, expected int) {
+	TNUM++
+	// your optional setup here
+	t.Run(TNAME + "#" + itoa(TNUM), func(t *testing.T) {
 		got := theFunctionToTest(args)
-		if !reflect.DeepEqual(got, expected) {
-			t.Errorf("exp '%v'\ngot '%v'", expected, got)
-		}})}
+		// or: if !reflect.DeepEqual(got, expected) {
+		if got != expect {
+			t.Errorf("\nexp= '%v'\ngot= '%v'", expected, got)
+		}}
+	)
+}
+
+//////////// Automatic Labels: string-argument-to-TEST + # + test-number
+
+var TNAME = "T"
+var TNUM = 0
+
+func TEST(s string) {
+	TNAME = s
+	TNUM = 0
+}
