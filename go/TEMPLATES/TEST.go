@@ -19,17 +19,17 @@ func Test(t *testing.T) {
 
 /////////// Functions to test
 
-// adapt to your case the number and types of args and expected
+// Wapper test functions calling the existing functions to test
 func T(t *testing.T, args string, expected int) {
 	TNUM++
-	// your optional setup here
+	// optional setup
 	t.Run(TNAME + "#" + itoa(TNUM), func(t *testing.T) {
+		// run the test function
 		got := theFunctionToTest(args)
-		// or: if !reflect.DeepEqual(got, expected) {
-		if got != expect {
+		// compare result with expected
+		if got != expect {	  // or use: if !reflect.DeepEqual(got, expected) {
 			t.Errorf("\nexp= '%v'\ngot= '%v'", expected, got)
-		}}
-	)
+		}})
 }
 
 //////////// Automatic Labels: string-argument-to-TEST + # + test-number
