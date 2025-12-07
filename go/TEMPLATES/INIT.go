@@ -5,6 +5,8 @@
 // TEST: example
 // And any file named input-DESCRIPTION,RESULT1,RESULT2.test containing an input
 
+// Input properties:
+
 package main
 
 import (
@@ -13,6 +15,8 @@ import (
 	// "flag"
 	// "slices"
 )
+
+// Implementation:
 
 //////////// Options parsing & exec parts
 
