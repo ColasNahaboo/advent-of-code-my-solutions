@@ -1,4 +1,5 @@
 package main
+###*** THIS IS A NON-INSTANCIED TEMPLATE, IT DOES NOT COMPILE ***###
 
 import (
 	"testing"
