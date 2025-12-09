@@ -63,8 +63,8 @@ func parseNormed(lines []string) (normx, normy Norm, reds []Point, inside *Board
 		normx = AppendUniqNorm(normx, p.x)
 		normy = AppendUniqNorm(normy, p.y)
 	}
-	slices.Sort(normx)
-	slices.Sort(normy)
+	normx = NormalizeCoords(normx)
+	normy = NormalizeCoords(normy)
 	inside = MakeBoard[bool](len(normx), len(normy))
 	// since we wrap, make the previous point start with the end point
 	p0 := Point{slices.Index(normx, redsin[len(redsin)-1].x),
@@ -77,6 +77,7 @@ func parseNormed(lines []string) (normx, normy Norm, reds []Point, inside *Board
 		inside.DrawLine(p0, p, true)
 		p0 = p
 	}
+	inside.VPcells("Perimeter:", func(c bool) string { if c { return "#"} else { return "."}})
 	// fill the inside, from one point we find inside
 	pi := inside.Seed(true)
 	VPf("Inside Seed: %v\n", pi)
@@ -84,6 +85,18 @@ func parseNormed(lines []string) (normx, normy Norm, reds []Point, inside *Board
 	// setup done. Now find the biggest rectangle
 	return
 }
+
+// Keep the empty spaces between two consecutive coordinates if not adjacent
+func NormalizeCoords(norm Norm) (norm2 Norm) {
+	slices.Sort(norm)
+	for i, n := range norm {
+		norm2 = append(norm2, n)
+		if i < len(norm) - 1 && norm[i+1] > n+1 {
+			norm2 = append(norm2, n+1)
+		}
+	}
+	return
+}			
 
 func AppendUniqNorm(norm Norm, n int) Norm {
 	if slices.Contains(norm, n) {
