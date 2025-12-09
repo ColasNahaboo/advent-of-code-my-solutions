@@ -38,12 +38,32 @@ The example map:
 ```
 thus normalizes to:
 ```
+..#...#
+.......
+#.#....
+.......
+#...#..
+.......
+....#.#
+```
+And, with the edges traced:
+```
 ..#####
 ..#...#
 ###...#
 #.....#
 #####.#
 ....#.#
+....###
+```
+And, filled:
+```
+..#####
+..#ooo#
+###ooo#
+#ooooo#
+#####o#
+....#o#
 ....###
 ```
 reducing it to a size managed simply
