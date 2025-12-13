@@ -5,7 +5,7 @@ The code is reasonably commented, and the top README in each directory details t
 
 Available for now:
 
-- [go/2025](go/2025) (in progress)
+- [go/2025](go/2025) (completed)
 - [go/2024](go/2024) (completed)
 - [go/2023](go/2023) (completed)
 - [go/2022](go/2022) (completed)

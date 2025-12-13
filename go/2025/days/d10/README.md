@@ -23,7 +23,7 @@ Written in matricial form:
 0     0     1     1     1     0     4 
 1     1     0     1     0     0     7 
 ```
-This give the equations to solve:
+This gives the equations to solve:
 ```
 e + f = 3
 b + f = 5
@@ -32,4 +32,10 @@ a + b + d = 7
 ```
 
 We then use the Z3 solver with its [Go-Z3](https://pkg.go.dev/github.com/aclements/go-z3) bindings. Alas, the distribution does not include a [Go wrapper for the Optimizer](https://github.com/aclements/go-z3/pull/2/commits/fc200cae08e68459443ef54e6cf93f2914c2fe24), (and has really minimal docs with no examples) so we optimize by hand by adding iteratively a constraint, an inequality to assert that the sum should be smaller than the one we just found.
+
+The iteration is thus:
+- First find a solution, get the sum `s` of all variables (here `s = a+b+c+d+e+f`)
+- then add the constraint `a+b+c+d+e < s`
+- re-try as long as we find solutions
+- Our result is the las valid `s found`
 
