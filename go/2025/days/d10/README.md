@@ -37,5 +37,5 @@ The iteration is thus:
 - First find a solution, get the sum `s` of all variables (here `s = a+b+c+d+e+f`)
 - then add the constraint `a+b+c+d+e < s`
 - re-try as long as we find solutions
-- Our result is the las valid `s found`
+- Our result is the last valid `s found`
 
