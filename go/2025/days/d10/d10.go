@@ -19,6 +19,7 @@ import (
 	"math"
 	// "flag"
 	"slices"
+	// for part2withZ3Solver
 	"github.com/aclements/go-z3/z3"
 )
 
@@ -41,7 +42,7 @@ const MAXLEDS = 12				// to use fixed size arrays to represent states
 //////////// Options parsing & exec parts
 
 func main() {
-	ExecOptions(3, NoXtraOpts, part1, part2, part2withZ3Solver)
+	ExecOptions(3, NoXtraOpts, part1, part2, part2withZ3Solver, stats)
 }
 
 //////////// Part 1
@@ -68,6 +69,8 @@ type Todo struct {
 func FewestPressesStart(m Machine) (minpresses int) {
 	// the FIFO queue of actions to do. En-queue the first possble presses
 	todo := []Todo{}
+	seen := make(map[int]bool)	// already seen?
+	seen[0] = true
 	for _, nextb := range m.buttons {
 		todo = append(todo, Todo{0, nextb, 0})
 	}
@@ -77,6 +80,7 @@ func FewestPressesStart(m Machine) (minpresses int) {
 		todo = todo[1:]
 		// we push the button
 		pushed := leds ^ b
+		seen[pushed] = true
 		if debug {VPf("  [%s] level %d, [%s] after pushing %s\n", leds2string(m.nleds, leds), presses, leds2string(m.nleds, pushed), button2string(m.nleds, b))}
 		if pushed == m.leds {	// found!
 			return presses + 1	// This is the minimum number, as we BFS
@@ -86,7 +90,9 @@ func FewestPressesStart(m Machine) (minpresses int) {
 		}
 		// else en-queue the exploration of next pushes for the next depth level
 		for _, nextb := range m.buttons {
-			todo = append(todo, Todo{pushed, nextb, presses+1})
+			if ! seen[pushed ^ nextb] {
+				todo = append(todo, Todo{pushed, nextb, presses+1})
+			}
 		}
 	}
 }
@@ -181,20 +187,24 @@ func SumSliceInt(s []int) (sum int) {
 	return
 }
 
+//////////// Optimization Research approaches
+
+// a + b + d = 43  <=>  SPEquation{{0,1,3},43}
+type SPEquation struct {			// Set Partitiong Equations, for Integer Prog
+	vars []int						// List of indexes of var with 1 coeffs
+	rhs  int						// integer non-variable
+}
+
 //////////// Part 3
 // We use the Z3 theorem solver
 
-type Equation struct {			// 
-	vars []int
-	rhs  int
-}
 func part2withZ3Solver(lines []string) (res int) {
 	machines := parse(lines)
 	for i, m := range machines {
 		VPf("Testing #%d: ", i)
 		VPmachine(m)
-		equations := LinearEquations(m)
-		VPLinearEquations(equations)
+		equations := SetPartitioningEquations(m)
+		VPSetPartitioningEquations(equations)
 
 		// Z3
 		config := z3.NewContextConfig()
@@ -251,7 +261,7 @@ func part2withZ3Solver(lines []string) (res int) {
 	return 
 }
 
-func VPLinearEquations(eqs []Equation) {
+func VPSetPartitioningEquations(eqs []SPEquation) {
 	if ! verbose {return}
 	for _, eq := range eqs {
 		for i, varx := range eq.vars {
@@ -264,11 +274,11 @@ func VPLinearEquations(eqs []Equation) {
 	}
 }
 
-// solver of Simple Linear Equations
+// create the Partitioning Equations to solve a machine
+// They are Systems of Linear Equations with coeffs only 0 or 1
+// bounds is the range of values that each non-negative var can take, inclusives
 
-// create the linear equations to solve a machine
-
-func LinearEquations(m Machine) (equations []Equation) {
+func SetPartitioningEquations(m Machine) (equations []SPEquation) {
 	for led, jolt := range m.jolts {
 		coeffs := make([]int, len(m.buttonsInt))
 		for bi, b := range m.buttonsInt {
@@ -276,7 +286,7 @@ func LinearEquations(m Machine) (equations []Equation) {
 				coeffs[bi]++
 			}
 		}
-		eq := Equation{rhs: jolt}
+		eq := SPEquation{rhs: jolt}
 		for varx, coeff := range coeffs {
 			if coeff > 0 {
 				eq.vars = append(eq.vars, varx)
@@ -285,6 +295,41 @@ func LinearEquations(m Machine) (equations []Equation) {
 		equations = append(equations, eq)
 	}
 	return
+}
+
+// return the possible values for each variables: inside the inclusive bounds
+func VarBounds(m Machine) (bounds [][]int) {
+	for vx, jolt := range m.jolts {
+		for _ = range m.leds {
+			// 8...8 is nearly "MaxInt" but human-friendly for debugging
+			bounds = append(bounds, []int{0, 8888888888888888888})
+		}
+		for _, b := range m.buttonsInt {
+			if slices.Contains(b, vx) {
+				if jolt < bounds[vx][1] {
+					bounds[vx][1] = jolt
+				}
+			}
+		}
+	}
+	return
+}
+
+//////////// Part 4: just perform some stats on the input
+
+func stats(lines []string) (res int) {
+	machines := parse(lines)
+	var maxFreeVars, maxfvm int
+	for i, m := range machines {
+		equations := SetPartitioningEquations(m)
+		freevars := len(m.buttonsInt) - m.nleds
+		VPSetPartitioningEquations(equations)
+		if freevars > maxFreeVars {
+			maxFreeVars, maxfvm = freevars, i
+		}
+	}
+	fmt.Printf("max free variables: %d, for machine #%d\n", maxFreeVars, maxfvm)
+	return maxFreeVars
 }
 
 //////////// Common Parts code
